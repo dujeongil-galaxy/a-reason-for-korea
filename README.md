@@ -15,7 +15,7 @@
 | 日本語 | https://dujeongil-galaxy.github.io/a-reason-for-korea/ja/ |
 | 한국어 | https://dujeongil-galaxy.github.io/a-reason-for-korea/ko/ |
 
-每页右上角可切换语言，当前语言高亮；窄屏自动改为短标签（中 / EN / JP / KR）——日语、韩语用拉丁地区缩写，不用「日」「韓」这类单字汉字。短标签带 `aria-hidden`，语言全名以视觉隐藏方式保留给读屏软件。四个页面各有自己的 `hreflang`、`canonical` 与 `og:url`，都是**完整翻译后的静态 HTML**——关掉 JavaScript 也能正常阅读，方便单独分享与收录。
+每页右上角可切换语言，当前语言高亮；窄屏自动改为短标签（`CN / EN / JP / KR`）——四个一律是两字母大写拉丁地区缩写，不用「中」「日」「韓」这类单字汉字，也不混简繁。短标签带 `aria-hidden`，语言全名以视觉隐藏方式保留给读屏软件。四个页面各有自己的 `hreflang`、`canonical` 与 `og:url`，都是**完整翻译后的静态 HTML**——关掉 JavaScript 也能正常阅读，方便单独分享与收录。
 
 **中文原文没有删除、也没有复制成第二份**：`index.html` 是唯一的中文源文案，中文页仍是默认首页。
 
@@ -57,7 +57,7 @@ assets/app.js                 滚动淡入 / 点灯计数 / 理由卡片 / 复�
 assets/clipping-hkcd.jpg      附页剪报（站长本人提供，原样未修改）
 favicon.svg                   猫爪图标
 scripts/build-i18n.mjs        由 index.html + 字典生成三张语言页
-scripts/verify-i18n.mjs       四语一致性 + 附页 + 切换器 + 链接状态校验 + 29 项故障注入自检
+scripts/verify-i18n.mjs       四语一致性 + 附页 + 切换器 + 链接状态校验 + 31 项故障注入自检
 .nojekyll                     让 GitHub Pages 跳过 Jekyll
 CHANGELOG.md / PITFALLS.md    改动记账与踩坑记录
 ```
@@ -68,7 +68,7 @@ CHANGELOG.md / PITFALLS.md    改动记账与踩坑记录
 
 ```bash
 node scripts/build-i18n.mjs     # 重新生成三张语言页
-node scripts/verify-i18n.mjs    # 校验；内含故意造错的自检，必须 29/29 判红
+node scripts/verify-i18n.mjs    # 校验；内含故意造错的自检，必须 31/31 判红
 ```
 
 校验会检查四语 key 是否齐全（84 个节点 / 11 个属性）、中文是否被删、生成页是否与字典逐字一致、资源路径 / 语言切换链接 / canonical 是否正确，以及附页章节、边界声明、剪报图片归属措辞、三条存档链接及其状态标记在四语里是否都在。

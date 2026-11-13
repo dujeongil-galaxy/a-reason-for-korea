@@ -35,8 +35,10 @@ const ARCHIVE_LINKS = [
   'https://news.sxrb.com/sxxww/xwpd/gjxw/3941327.shtml',
   'https://news.ifeng.com/c/7fk6pvzKGtR'
 ];
-/* Mobile switcher labels: Latin/region codes, never CJK glyphs for ja/ko. */
-const SHORT_LABELS = { zh: '中', en: 'EN', ja: 'JP', ko: 'KR' };
+/* Mobile switcher labels: every one is a two-letter uppercase Latin code.
+   No CJK glyph anywhere, including Chinese — the whole set must be one system. */
+const SHORT_LABELS = { zh: 'CN', en: 'EN', ja: 'JP', ko: 'KR' };
+const SHORT_LABEL_PATTERN = /^[A-Z]{2}$/;
 /* Two archives are dead, one is alive; the check date must stay visible. */
 const STATUS_COUNTS = { dead: 2, live: 1 };
 const OWNER_MARKERS = {
@@ -130,6 +132,9 @@ function verify(state) {
     const got = sourceShorts[code];
     if (!got) { errors.push('zh: missing short label -> ' + code); continue; }
     if (got.label !== expected) errors.push('zh: wrong short label ' + code + ' -> ' + got.label);
+    if (!SHORT_LABEL_PATTERN.test(got.label)) {
+      errors.push('zh: short label must be 2 uppercase Latin letters -> ' + code + ' = ' + got.label);
+    }
     if (!got.attrs.includes('aria-hidden="true"')) {
       errors.push('zh: short label needs aria-hidden -> ' + code);
     }
@@ -220,6 +225,8 @@ function verify(state) {
       const got = shorts[code];
       if (!got || got.label !== expected) {
         errors.push(lang + ': wrong or missing short label -> ' + code);
+      } else if (!SHORT_LABEL_PATTERN.test(got.label)) {
+        errors.push(lang + ': short label must be 2 uppercase Latin letters -> ' + code + ' = ' + got.label);
       } else if (!got.attrs.includes('aria-hidden="true"')) {
         errors.push(lang + ': short label needs aria-hidden -> ' + code);
       }
@@ -344,6 +351,12 @@ const faults = [
   { name: 'short label falls back to CJK glyph', mutate: s => {
     s.source = s.source.replace('aria-hidden="true">KR<', 'aria-hidden="true">韓<');
   } },
+  { name: 'Chinese short label falls back to CJK glyph', mutate: s => {
+    s.source = s.source.replace('aria-hidden="true">CN<', 'aria-hidden="true">中<');
+  } },
+  { name: 'Chinese short label is not uppercase Latin', mutate: s => {
+    s.pages.en = s.pages.en.replace('aria-hidden="true">CN<', 'aria-hidden="true">cn<');
+  } },
   { name: 'Japanese short label is not JP', mutate: s => {
     s.pages.ja = s.pages.ja.replace('aria-hidden="true">JP<', 'aria-hidden="true">日<');
   } },
@@ -351,8 +364,8 @@ const faults = [
     s.pages.ko = s.pages.ko.replace(/<span class="lang-short"[^>]*>EN<\/span>/, '');
   } },
   { name: 'short label not hidden from screen readers', mutate: s => {
-    s.pages.en = s.pages.en.replace('<span class="lang-short" aria-hidden="true">中</span>',
-      '<span class="lang-short">中</span>');
+    s.pages.en = s.pages.en.replace('<span class="lang-short" aria-hidden="true">CN</span>',
+      '<span class="lang-short">CN</span>');
   } },
   { name: 'full language name back to display:none', mutate: s => {
     s.css = s.css.replace('.lang-short { display: inline; }',
