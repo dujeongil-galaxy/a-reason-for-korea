@@ -118,7 +118,7 @@ window.SITE_I18N = {
       'archive.link3': 'Ifeng News · same story',
       'archive.statusDead': 'Dead link',
       'archive.statusLive': 'Still online',
-      'archive.linksNote': 'Checked 2026-11-13: the People\'s Daily link no longer connects, Shanxi News returns an error (504 / 404), and only Ifeng still opens normally. Link status changes over time; this note records one check only. Dead links stay here as traces.'
+      'archive.linksNote': 'Checked 2026-11-13: the People\'s Daily link no longer connects, Shanxi News returns an error (504 / 404), and only Ifeng still opens normally. Link status changes over time; this note records one check only. The two dead links above now point back to this page (a-reason-for-korea) as kept traces.'
     },
     attr: {
       'meta.description': 'One Douyin share about cats, kindness and Korea, and the four reasons behind it. Liking a place can have a real reason — and still keep its judgment.',
@@ -227,7 +227,7 @@ window.SITE_I18N = {
       'archive.link3': '鳳凰網 · 同題記事',
       'archive.statusDead': 'リンク切れ',
       'archive.statusLive': '閲覧可',
-      'archive.linksNote': '2026-11-13 時点の確認: 人民網のリンクは接続できず、山西新聞網はエラー（504 / 404）を返します。正常に読めるのは鳳凰網だけです。リンクの状態は変わります。この注記は一度の確認結果だけを記録したもので、切れたリンクも痕跡として残しています。'
+      'archive.linksNote': '2026-11-13 時点の確認: 人民網のリンクは接続できず、山西新聞網はエラー（504 / 404）を返します。正常に読めるのは鳳凰網だけです。リンクの状態は変わります。この注記は一度の確認結果だけを記録したもので、切れた 2 本のリンクは本ページ（a-reason-for-korea）への同一リンクとして残してあります。'
     },
     attr: {
       'meta.description': '猫と善意と韓国についての、ある抖音（Douyin）の投稿と、その裏にある四つの理由。好きな気持ちには、きちんとした理由があっていい。しかも冷静さも手放さない。',
@@ -336,7 +336,7 @@ window.SITE_I18N = {
       'archive.link3': '펑황망 · 같은 기사',
       'archive.statusDead': '연결 끊김',
       'archive.statusLive': '접속 가능',
-      'archive.linksNote': '2026-11-13 확인: 인민망 링크는 연결되지 않고, 산시신문망은 오류(504 / 404)를 반환한다. 정상적으로 읽을 수 있는 곳은 펑황망뿐이다. 링크 상태는 언제든 바뀔 수 있으며 이 기록은 한 번의 확인 결과일 뿐이다. 끊긴 링크도 흔적으로 남겨 둔다.'
+      'archive.linksNote': '2026-11-13 확인: 인민망 링크는 연결되지 않고, 산시신문망은 오류(504 / 404)를 반환한다. 정상적으로 읽을 수 있는 곳은 펑황망뿐이다. 링크 상태는 언제든 바뀔 수 있으며 이 기록은 한 번의 확인 결과일 뿐이다. 끊긴 2개 외부 링크는 본 페이지(a-reason-for-korea)를 가리키는 동일 링크로 남겨 두었다.'
     },
     attr: {
       'meta.description': '고양이와 선의, 한국에 관한 더우인 공유 글 하나와 그 뒤의 네 가지 이유. 어떤 곳을 좋아하는 데는 이유가 있어도 좋고, 판단력을 유지해도 좋다.',

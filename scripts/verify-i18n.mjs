@@ -31,10 +31,13 @@ const REQUIRED_ASSETS = [
   '../assets/clipping-hkcd.jpg'
 ];
 const ARCHIVE_LINKS = [
-  'https://gd.people.com.cn/n/2014/0703/c123932-21570067-3.html',
-  'https://news.sxrb.com/sxxww/xwpd/gjxw/3941327.shtml',
+  'https://dujeongil-galaxy.github.io/a-reason-for-korea/',
+  'https://dujeongil-galaxy.github.io/a-reason-for-korea/',
   'https://news.ifeng.com/c/7fk6pvzKGtR'
 ];
+/* 旧死链域名：站长 2026-11-13 指令，前两条已失效的外链统一改指本页，
+   这两个域名不得再出现在任何页面（机器强制防回退）。 */
+const FORBIDDEN_DEAD_DOMAINS = ['gd.people.com.cn', 'news.sxrb.com'];
 /* Mobile switcher labels: every one is a two-letter uppercase Latin code.
    No CJK glyph anywhere, including Chinese — the whole set must be one system. */
 const SHORT_LABELS = { zh: 'CN', en: 'EN', jp: 'JP', ko: 'KR' };
@@ -135,6 +138,9 @@ function verify(state) {
   if (!source.includes('不核实其中细节')) errors.push('zh: archive caveat missing');
   for (const link of ARCHIVE_LINKS) {
     if (!source.includes(link)) errors.push('zh: archived report link missing -> ' + link);
+  }
+  for (const dom of FORBIDDEN_DEAD_DOMAINS) {
+    if (source.includes(dom)) errors.push('zh: 旧死链域名不得复现 -> ' + dom);
   }
 
   /* 1c. mobile switcher labels + accessible full names */
@@ -267,6 +273,9 @@ function verify(state) {
     for (const link of ARCHIVE_LINKS) {
       if (!page.includes(link)) errors.push(lang + ': archived report link missing -> ' + link);
     }
+    for (const dom of FORBIDDEN_DEAD_DOMAINS) {
+      if (page.includes(dom)) errors.push(lang + ': 旧死链域名不得复现 -> ' + dom);
+    }
     const boundary = (d.html || {})['archive.boundary'];
     if (!boundary || !page.includes(boundary)) {
       errors.push(lang + ': archive boundary statement missing or altered');
@@ -361,6 +370,11 @@ const faults = [
   } },
   { name: 'archived report link removed', mutate: s => {
     s.pages.ko = s.pages.ko.replace(ARCHIVE_LINKS[1], '');
+  } },
+  { name: 'dead-domain reintroduced into Chinese source', mutate: s => {
+    s.source = s.source.replace(
+      'href="https://dujeongil-galaxy.github.io/a-reason-for-korea/"',
+      'href="https://gd.people.com.cn/n/2014/0703/c123932-21570067-3.html"');
   } },
   { name: 'clipping image path not relativised', mutate: s => {
     s.pages.en = s.pages.en.replace('../assets/clipping-hkcd.jpg', 'assets/clipping-hkcd.jpg');
