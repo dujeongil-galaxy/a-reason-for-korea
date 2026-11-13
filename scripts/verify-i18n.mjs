@@ -37,6 +37,20 @@ const ARCHIVE_LINKS = [
 ];
 /* Mobile switcher labels: Latin/region codes, never CJK glyphs for ja/ko. */
 const SHORT_LABELS = { zh: '中', en: 'EN', ja: 'JP', ko: 'KR' };
+/* Two archives are dead, one is alive; the check date must stay visible. */
+const STATUS_COUNTS = { dead: 2, live: 1 };
+const OWNER_MARKERS = {
+  en: 'owner of this site', ja: 'このサイトの持ち主', ko: '이 사이트의 주인'
+};
+/* Anonymous attribution and "still available" claims must never come back. */
+const ANONYMOUS_MARKERS = [
+  '有人留下一张网页截图', '读者提供',
+  'Someone left behind', 'supplied by a reader',
+  'ある人が一枚', '読者から提供された',
+  '어떤 분이 스크린샷', '독자가 제공한',
+  'are still available in a few public archives',
+  'いくつかのアーカイブに残っており', '몇 곳의 아카이브에 남아 있어'
+];
 
 /* ---------- extraction helpers ---------- */
 function extractNodes(html) {
@@ -126,6 +140,22 @@ function verify(state) {
   if (!/clip:\s*rect\(/.test(state.css)) {
     errors.push('css: full language name is not visually hidden with clip');
   }
+
+  /* 1d. clipping attribution is explicit; link status is marked with a date */
+  if (!source.includes('这张网页截图是站长给我的')) {
+    errors.push('zh: clipping attribution no longer names the site owner');
+  }
+  if (!source.includes('站长提供的这张网页截图')) {
+    errors.push('zh: caption no longer credits the site owner');
+  }
+  for (const marker of ANONYMOUS_MARKERS) {
+    if (source.includes(marker)) errors.push('zh: anonymous/outdated wording returned -> ' + marker);
+  }
+  for (const [kind, count] of Object.entries(STATUS_COUNTS)) {
+    const n = (source.match(new RegExp('class="link-status is-' + kind + '"', 'g')) || []).length;
+    if (n !== count) errors.push('zh: link status ' + kind + ' count is ' + n + ', expected ' + count);
+  }
+  if (!source.includes('2026-11-13 核查')) errors.push('zh: link check date/note missing');
 
   /* 2. dictionaries exist and key sets match */
   for (const lang of ['zh', ...LANGS]) {
@@ -221,6 +251,22 @@ function verify(state) {
       errors.push(lang + ': archive boundary statement missing or altered');
     }
 
+    /* link status badges, check date and explicit attribution */
+    for (const [kind, count] of Object.entries(STATUS_COUNTS)) {
+      const n = (page.match(new RegExp('class="link-status is-' + kind + '"', 'g')) || []).length;
+      if (n !== count) errors.push(lang + ': link status ' + kind + ' count is ' + n + ', expected ' + count);
+    }
+    if (!page.includes('2026-11-13')) errors.push(lang + ': link check date missing');
+    const owner = OWNER_MARKERS[lang];
+    for (const key of ['archive.intro', 'archive.caption']) {
+      if (!(nodes[key] || '').includes(owner)) {
+        errors.push(lang + ': owner attribution missing in ' + key);
+      }
+    }
+    for (const marker of ANONYMOUS_MARKERS) {
+      if (page.includes(marker)) errors.push(lang + ': anonymous/outdated wording returned -> ' + marker);
+    }
+
     /* no Chinese body copy left behind */
     for (const marker of CHINESE_MARKERS) {
       if (page.includes(marker)) errors.push(lang + ': untranslated Chinese left in page -> ' + marker);
@@ -314,6 +360,34 @@ const faults = [
   } },
   { name: 'clip-based sr-only rule removed', mutate: s => {
     s.css = s.css.replace('clip: rect(0, 0, 0, 0);', 'clip: unset;');
+  } },
+  { name: 'Chinese clipping attribution anonymised', mutate: s => {
+    s.source = s.source.replace('这张网页截图是站长给我的', '有人留下一张网页截图');
+  } },
+  { name: 'Chinese caption credits a reader again', mutate: s => {
+    s.source = s.source.replace('站长提供的这张网页截图', '读者提供的一张网页截图');
+  } },
+  { name: 'English intro anonymised again', mutate: s => {
+    s.pages.en = s.pages.en.replace('This screenshot came from the owner of this site', 'Someone left behind a screenshot');
+  } },
+  { name: 'Japanese caption credits a reader again', mutate: s => {
+    s.pages.ja = s.pages.ja.replace('このサイトの持ち主が提供したスクリーンショット', '読者から提供されたスクリーンショット');
+  } },
+  { name: 'dead-link badge removed', mutate: s => {
+    s.pages.ko = s.pages.ko.replace(/<span class="link-status is-dead"[^>]*>[^<]*<\/span>\s*/, '');
+  } },
+  { name: 'all three links marked as live', mutate: s => {
+    s.pages.en = s.pages.en.replace(/class="link-status is-dead"/g, 'class="link-status is-live"');
+  } },
+  { name: 'source page loses its live badge', mutate: s => {
+    s.source = s.source.replace('class="link-status is-live"', 'class="link-status is-dead"');
+  } },
+  { name: 'link check note deleted', mutate: s => {
+    s.pages.ja = s.pages.ja.replace(/<p class="archive-links-note"[\s\S]*?<\/p>/, '');
+  } },
+  { name: 'boundary claims archives are still available', mutate: s => {
+    s.pages.en = s.pages.en.replace('Reports on the same story once appeared in a few public archives',
+      'Reports on the same story are still available in a few public archives');
   } }
 ];
 
