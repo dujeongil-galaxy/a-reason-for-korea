@@ -2,6 +2,14 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-13 · 日语版路径统一 ja→jp
+
+- `351aa6d` — 站长指令：日语版的 `ja` 全部改成 `jp`，包括文件夹和网址。路径/文件夹/内部标识层与语言切换器已有的 **JP** 徽标统一，语言代码层保持 ISO。
+  - **改了什么**：文件夹 `ja/` → `jp/`（git mv）；根页与四页的 hreflang 链接网址 `/a-reason-for-korea/ja/` → `/jp/`；语言切换器 href `ja/`、`../ja/` → `jp/`、`../jp/`；`data-lang-link="ja"` → `"jp"`；`assets/i18n.js` 字典键 `ja:` → `jp:`；`scripts/build-i18n.mjs`（`LANGS`、`HTML_LANG`、新增 `LANG_ATTR = { jp: 'ja' }` 负责切换器 `<a lang>` 回填 ISO）与 `scripts/verify-i18n.mjs`（`LANGS` / `HTML_LANG` / `SHORT_LABELS` / `OWNER_MARKERS` / `AI_MARKERS` / 全部故障注入改键）同步；en/ko/jp 三页全部由脚本重新生成，不手改；README 网址表与文件树、PITFALLS 第 2 / 第 9 条同步。
+  - **什么没改、为什么**：W3C 语言代码层不动——`<html lang="ja">`、`hreflang="ja"`、切换器 `<a lang="ja">` 仍按 ISO 639-1 用 `ja`（`jp` 不是合法语言代码，改了 hreflang 信号会失效），`styles.css` 的 `html[lang="ja"]` 字体栈选择器也依赖这一点。三层各管各的：视觉缩写 `JP` ／ 路径与内部标识 `jp` ／ W3C 语言代码 `ja`。
+  - **旧网址**：`/ja/` 改名后为 404，不留 redirect stub（会违背「文件夹统一」的本意）；如有外链需要可后续在 Pages 层加跳转。
+  - 校验：`node scripts/verify-i18n.mjs` → **VERIFY OK（84 译文节点 + 11 译文属性 + 四语）· SELF-TEST 35/35 注入故障全拒**。
+
 ## 2026-11-13 · 首版上线
 
 - `0a1b003` — 首版：单页站点「哈韩，也要有一个理由」。
