@@ -50,3 +50,17 @@
 - CDP 四语 × 两种视口（1440 桌面 / 真实 390px 设备模拟）共 **8 例全绿**：剪报图 `naturalWidth×Height = 890×386` 加载成功、四语 `alt` 已本地化、CSS 加载、`docScrollWidth <= innerWidth`（1425/1440、390/390）、窄屏图片宽 328px 不溢出、三条链接齐全、teaser 指向 `#archive`、滚动并等待兜底后 `revealHidden = 0`。
 - 桌面与移动端截图逐语肉眼验收：剪报图完整清晰、图注与边界声明可读、英/日/韩无豆腐块乱码、无重叠或异常留白；DOM 探针确认附页是 `main` 最后一节、页脚紧随其后。
 - 新增两条踩坑记录：[PITFALLS.md](PITFALLS.md) 第 7—8 条（`\b` 正则误匹配 `data-i18n-*` 尾部；验收脚本在滚动前检查 reveal 会假红）。
+
+## 2026-11-13 · 窄屏语言切换器短标签修正
+
+- `54f7678` — 站长反馈：韩文页窄屏高亮显示繁体汉字「韓」不对，日语也该用 `JP` 而不是「日」。中文原文一字未删。
+  - 四个页面共用的短标签由 `中 / EN / 日 / 韓` 改为 **`中 / EN / JP / KR`**：日/韩统一用两字母拉丁地区缩写，不再用单个汉字，也不再混简繁。桌面仍显示全名 `中文 / English / 日本語 / 한국어`，不受影响。
+  - 技术层的 `lang` / `hreflang` 仍是 ISO 639-1 的 `zh / en / ja / ko`，与给人看的视觉缩写互不冲突；这一点写进了 [PITFALLS.md](PITFALLS.md) 第 9 条。
+  - 顺带修可访问性缺陷：窄屏原先用 `.lang-long { display: none }` 隐藏全名，读屏只剩缩写可念。改为 1px + `clip: rect(...)` 视觉隐藏（全名仍在可访问性树里），短标签加 `aria-hidden="true"`，`.lang-switch a` 加 `position: relative` 承接定位。
+  - `verify-i18n.mjs` 新增校验：四个短标签的值、`aria-hidden`、CSS 禁止 `display: none` 且必须有 `clip: rect(...)`，中文源页与三张生成页都查；新增 6 项对应故障注入（累计 20 项）。
+
+### 短标签修正已跑过的校验
+
+- `node --check`（`i18n.js` / `app.js` / 两个脚本）、`build-i18n.mjs`、`verify-i18n.mjs` 全通过：**81 节点 / 11 属性 / 4 语一致，20/20 故意造错全部判红**（新增 6 项：汉字回退、日文不是 JP、标签丢失、`aria-hidden` 缺失、`display:none` 回归、`clip` 被删）。
+- CDP 四语 × 两种视口共 **8 例全绿**：四个短标签均为 `中/EN/JP/KR`、全名四语正确、`aria-hidden` 齐全、当前语言高亮正确；`docScrollWidth <= innerWidth`（1425/1440、390/390），切换器与品牌 `overlap < 0`，切换器右缘未超出 header；桌面 `shortDisplay=none / longWidth=23`，窄屏 `shortDisplay=inline / longWidth=1 / clip=rect(...)`。
+- 窄屏 header 特写截图逐语肉眼验收：韩文页 `KR` 高亮、中文页「中」高亮，无「韓」「日」汉字残留，无裁切或重叠。
