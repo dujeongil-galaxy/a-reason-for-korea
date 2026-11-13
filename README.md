@@ -2,11 +2,22 @@
 
 > 不是因为舞台有多亮，是因为街角那只猫，有人给它留了一碗水。
 
-一个关于「喜欢一个地方，能不能说出一个像样的理由」的单页网站。缘起是一条抖音分享：
+一个关于「喜欢一个地方，能不能说出一个像样的理由」的网站。缘起是一条抖音分享：
 
 > 「希望很多猫咪都生长在韩国吧」 #这个世界不能没有小猫 #韩国 #善意 #正能量
 
-**线上地址**：https://dujeongil-galaxy.github.io/a-reason-for-korea/
+## 四种语言，四个独立网址
+
+| 语言 | 网址 |
+| --- | --- |
+| 中文（源文案） | https://dujeongil-galaxy.github.io/a-reason-for-korea/ |
+| English | https://dujeongil-galaxy.github.io/a-reason-for-korea/en/ |
+| 日本語 | https://dujeongil-galaxy.github.io/a-reason-for-korea/ja/ |
+| 한국어 | https://dujeongil-galaxy.github.io/a-reason-for-korea/ko/ |
+
+每页右上角可切换语言，当前语言高亮；窄屏自动改为短标签（中 / EN / 日 / 韓）。四个页面各有自己的 `hreflang`、`canonical` 与 `og:url`，都是**完整翻译后的静态 HTML**——关掉 JavaScript 也能正常阅读，方便单独分享与收录。
+
+**中文原文没有删除、也没有复制成第二份**：`index.html` 是唯一的中文源文案，中文页仍是默认首页。
 
 ## 这一页在说什么
 
@@ -17,42 +28,60 @@
 3. **喜欢不是免检** —— 喜欢不等于替一切辩护，也不等于把一个真实的国家想象成精修图。保留判断，才叫「有理由」。
 4. 把喜欢带回自己身边 —— 一碗干净的水、不弃养、领养代替购买。
 
-页面还有一个小互动「给小猫留一盏灯」和一个「写下你自己的理由」卡片生成器。
+页面还有两个小互动：「给小猫留一盏灯」和「写下你自己的理由」卡片生成器。它们在四种语言里都是本地化文案。
 
 ## 内容边界（重要）
 
 - 本站是**个人观点页**，不引用未经核实的数据，不写「某国人都如何」这类全称判断，也不代表任何机构。
 - 「延伸阅读」只列公开可访问的链接（原抖音分享、话题文章、一篇关于韩国猫岛计划的报道），仅作线索；本站不对其中的事实、数据与时效性作核查或背书。
-- 第 03 条刻意写明了「喜欢不是免检」：喜欢一部分，同时保留自己的判断。这是整页的底线。
+- 第 03 条四语一致地写明「喜欢不是免检」：喜欢一部分，同时保留自己的判断。这是整页的底线。
+- 译文是人工撰写的自然表达，不是逐字直译；版式小标签（栏目名、理由小标题）在日/韩页也做了本地化，产品名（WorkBuddy / GitHub Pages / Douyin）与来源名保留原文。插画里纸箱上的 `CAT` 属于图案，不翻译。
 
 ## 文件结构
 
 ```
-index.html          页面结构 + 内联 SVG 插画
-assets/styles.css   样式、响应式、暗色模式、动效降级
-assets/app.js       滚动淡入 / 点灯计数 / 理由卡片 / 复制
-favicon.svg         猫爪图标
-.nojekyll           让 GitHub Pages 跳过 Jekyll
-CHANGELOG.md        改动记账（带真实提交号）
+index.html                    唯一中文源文案（含 data-i18n 钩子、语言切换器、hreflang）
+en/index.html                 英文静态页（脚本生成，勿手改）
+ja/index.html                 日文静态页（脚本生成，勿手改）
+ko/index.html                 韩文静态页（脚本生成，勿手改）
+assets/styles.css             样式、响应式、语言字体栈、暗色模式、动效降级
+assets/i18n.js                en/ja/ko 译文 + 四语属性 / 运行时文案
+assets/app.js                 滚动淡入 / 点灯计数 / 理由卡片 / 复制
+favicon.svg                   猫爪图标
+scripts/build-i18n.mjs        由 index.html + 字典生成三张语言页
+scripts/verify-i18n.mjs       四语一致性校验 + 7 项故障注入自检
+.nojekyll                     让 GitHub Pages 跳过 Jekyll
+CHANGELOG.md / PITFALLS.md    改动记账与踩坑记录
 ```
+
+## 改文案之后怎么做
+
+中文只改 `index.html`，其他语言只改 `assets/i18n.js`，**不要直接编辑 `en/`、`ja/`、`ko/` 里的 HTML**（它们会被覆盖）：
+
+```bash
+node scripts/build-i18n.mjs     # 重新生成三张语言页
+node scripts/verify-i18n.mjs    # 校验；内含故意造错的自检，必须 7/7 判红
+```
+
+校验会检查四语 key 是否齐全、中文是否被删、生成页是否与字典逐字一致、资源路径 / 语言切换链接 / canonical 是否正确。
 
 ## 本地预览
 
-所有资源都是相对路径，直接双击 `index.html` 就能看；或者起个静态服务：
+所有资源都是相对路径，中文页直接双击 `index.html` 就能看；语言页也可以直接打开对应文件。若想完整模拟线上子路径：
 
 ```bash
 python -m http.server 8000
-# 打开 http://localhost:8000
+# http://localhost:8000/  ·  /en/  ·  /ja/  ·  /ko/
 ```
 
 ## 技术与部署
 
-- 纯静态 HTML / CSS / JS，**无构建、无第三方依赖、无网络请求、无埋点**。
+- 纯静态 HTML / CSS / JS，**无第三方库、无网络请求、无埋点**（构建脚本只在开发时跑）。
 - 「留一盏灯」的计数只写在访问者自己的 `localStorage`，不上传，且页面已明确说明这一点。
-- 用户输入用 `textContent` 渲染，不进 `innerHTML`。
+- 用户输入用 `textContent` 渲染，不进 `innerHTML`；字典里的 HTML 片段是人工维护的可信内容，校验脚本会拦截可执行标记。
 - 支持响应式、键盘焦点、跳转正文、`prefers-reduced-motion` 与系统暗色模式。
-- GitHub Pages 从 **main 分支 / 根目录** 发布；改完 `git push` 即自动更新。
+- GitHub Pages 从 **main 分支 / 根目录** 发布；四个入口一次推送全部更新。
 
 ## 记账
 
-改动与提交号见 [CHANGELOG.md](CHANGELOG.md)。
+改动与真实提交号见 [CHANGELOG.md](CHANGELOG.md)，踩过的坑见 [PITFALLS.md](PITFALLS.md)。

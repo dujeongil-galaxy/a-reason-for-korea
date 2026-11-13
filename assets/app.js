@@ -1,9 +1,24 @@
 /* ============================================================
-   哈韩，也要有一个理由 — interactions
-   No network calls. No tracking. Everything stays in this page.
+   哈韩，也要有一个理由 — interactions (4 languages)
+
+   Page copy for every language is baked into that language's static
+   HTML by scripts/build-i18n.mjs. This file only handles:
+     - scroll reveal
+     - the lamp counter
+     - the "write your own reason" card
+   Runtime strings come from window.SITE_I18N[body[data-lang]].js.
+
+   No network calls. No tracking. User input goes through textContent.
    ============================================================ */
 (function () {
   'use strict';
+
+  var lang = document.body.getAttribute('data-lang') || 'zh';
+  var all = window.SITE_I18N || {};
+  var strings = (all[lang] && all[lang].js) || (all.zh && all.zh.js) || {};
+  function t(key, fallback) {
+    return Object.prototype.hasOwnProperty.call(strings, key) ? strings[key] : fallback;
+  }
 
   /* ---- scroll reveal (progressive enhancement, never hides content) ---- */
   var revealItems = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
@@ -46,6 +61,7 @@
   var lampButton = document.getElementById('lampButton');
   var lampButtonText = document.getElementById('lampButtonText');
   var lampCountEl = document.getElementById('lampCount');
+  var lampOffText = lampButtonText ? lampButtonText.textContent : ''; /* already localised in HTML */
   var count = 0;
 
   try {
@@ -62,7 +78,9 @@
     if (lampCountEl) { lampCountEl.textContent = String(count); }
     if (count > 0 && lampArt) { lampArt.classList.add('is-lit'); }
     if (count > 0 && lampButton) { lampButton.classList.add('is-on'); }
-    if (lampButtonText) { lampButtonText.textContent = count > 0 ? '再留一盏灯' : '留一盏灯'; }
+    if (lampButtonText) {
+      lampButtonText.textContent = count > 0 ? t('lamp.on', '再留一盏灯') : lampOffText;
+    }
   }
 
   renderLamp();
@@ -88,7 +106,7 @@
   var cardText = document.getElementById('cardText');
   var copyCard = document.getElementById('copyCard');
   var copyStatus = document.getElementById('copyStatus');
-  var fallbackText = '我喜欢这里，因为它让善意有落脚的地方。';
+  var fallbackText = t('card.fallback', '我喜欢这里，因为它让善意有落脚的地方。');
 
   function buildCard() {
     if (!input || !cardText || !cardArea) { return; }
@@ -131,11 +149,11 @@
   if (copyCard) {
     copyCard.addEventListener('click', function () {
       var text = (cardText && cardText.textContent) || '';
-      var full = text + '\n—— 哈韩，也要有一个理由 · 这个世界不能没有小猫';
+      var full = text + t('copy.suffix', '\n—— 哈韩，也要有一个理由 · 这个世界不能没有小猫');
       copyToClipboard(full).then(function () {
-        if (copyStatus) { copyStatus.textContent = '已复制，可以贴给朋友了。'; }
+        if (copyStatus) { copyStatus.textContent = t('copy.ok', '已复制，可以贴给朋友了。'); }
       }).catch(function () {
-        if (copyStatus) { copyStatus.textContent = '复制没成功，可以直接选中卡片文字。'; }
+        if (copyStatus) { copyStatus.textContent = t('copy.fail', '复制没成功，可以直接选中卡片文字。'); }
       });
     });
   }

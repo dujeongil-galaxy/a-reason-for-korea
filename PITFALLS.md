@@ -21,3 +21,22 @@
 - **现象**：`git push` 会打一行 `.../versions/1.2.0/.../git-credential-manager.exe: No such file or directory`，但推送实际成功。
 - **说明**：本机 `git credential fill` 仍能非交互取到可用 token（classic `ghp_`，scope `repo, workflow`）；那行只是 helper 探测失败的噪音，不是认证失败。
 - **规则**：看到这行不要误判成 push 失败，以 `git ls-remote` / push 退出码和远端分支为准。
+
+## 4. 生成页替换相对路径时，替换串不能补闭合引号
+
+- **现象**：生成脚本写 `out.replace(/\b(href|src)="(assets\/|favicon\.svg)/g, '$1="../$2"')`，结果生成页里变成 `href="../assets/"styles.css"`——多出一个引号，CSS 直接失效。
+- **原因**：正则只吃掉 `href="assets/` 这一段，原字符串剩下的 `styles.css"` 还在；替换串里又补了闭合引号，于是引号多了一个。
+- **规则**：这类「只加前缀」的替换，替换串结尾**不要带引号**：`'$1="../$2'`。
+- **为什么能立刻抓到**：`verify-i18n.mjs` 的资源检查要求生成页出现 `../assets/styles.css` 等四个精确路径，第一次跑就判红。
+
+## 5. 截图缩放会把小字「压没」，不要凭它判断元素重叠
+
+- **现象**：加语言切换器后，四语首屏截图里右上角的「Source ↗」看起来只剩 `urce ↗`，像被切换器盖住。
+- **真因**：1440px 截图被缩小展示，小字笔画糊掉了；CDP 实测切换器与源码按钮间距 20px（`overlap = -20`），`scrollWidth == clientWidth`，没有任何重叠或压缩。
+- **规则**：判断重叠、裁切、溢出一律用 `getBoundingClientRect()` 与 `scrollWidth / clientWidth` 的数值，截图只用来看整体观感和字体缺字。
+
+## 6. 多语言站点：中文只留一份，靠校验防漂移
+
+- **现象**：四语页面最容易出现的维护事故，是中文源文案和字典里的中文副本不一致，或某个语言漏翻一个 key，页面悄悄退回中文。
+- **规则**：`index.html` 是唯一中文源；`assets/i18n.js` 只存 en/ja/ko 译文与四语的属性 / JS 文案；生成页由脚本产出、不手改。
+- **强制层**：`scripts/verify-i18n.mjs` 逐字比对 69 个译文节点、10 个属性、四语 key 集合、中文关键串是否还在、资源路径与切换器状态，并内置 7 项故意造错的自检（漏 key / 中文残留 / 错 lang / 路径未加前缀 / 中文被删 / 属性漂移 / 高亮错误），必须 7/7 判红才算通过。
