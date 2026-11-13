@@ -2,6 +2,13 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-13 · 附页失效外链统一口径
+
+- `7f0d1a3` — 站长指令：附页「同题公开报道存档 · 外部链接」里前两条失效外链（人民网广东频道、山西新闻网，均 404/504）不再保留原死链，href 统一改为 `https://dujeongil-galaxy.github.io/a-reason-for-korea/`；凤凰网仍可访问，保留。四语核查说明末句改为「前两条已失效的外链统一指向本页（a-reason-for-korea）留存」。
+  - **改了什么**：`index.html`（中文源）两条失效 `<a>` 的 `href`；`assets/i18n.js` 的 en/jp/ko 三语 `archive.linksNote`；`scripts/verify-i18n.mjs` 的 `ARCHIVE_LINKS` 常量前两项改为本页 URL，新增 `FORBIDDEN_DEAD_DOMAINS`（旧 `gd.people.com.cn` / `news.sxrb.com`）断言 + 一条「死链域名被加回」故障注入；`en/index.html` / `jp/index.html` / `ko/index.html` 由 `build-i18n.mjs` 重建（构建逐字复制中文源 href）。
+  - **为什么**：原死链本身已是「这一页曾经存在过」的痕迹（附页主题），但 404/504 既打不开又误导；站长要求「失效的都是 404，统一口径本页」。`is-dead` 仍 2 个、`is-live` 仍 1 个，徽章与核查日期不变。
+  - **机器强制**：`verify-i18n.mjs` 新增「旧死链域名不得复现」断言（中文源 + 三张生成页）；`SELF-TEST` 由 35/35 升到 **36/36**。
+
 ## 2026-11-13 · 日语版路径统一 ja→jp
 
 - `351aa6d` — 站长指令：日语版的 `ja` 全部改成 `jp`，包括文件夹和网址。路径/文件夹/内部标识层与语言切换器已有的 **JP** 徽标统一，语言代码层保持 ISO。
