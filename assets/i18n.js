@@ -1,8 +1,8 @@
 /* ============================================================
-   i18n dictionary — zh / en / ja / ko
+   i18n dictionary — zh / en / jp / ko
 
    IMPORTANT: Chinese page copy lives ONLY in index.html (`data-i18n`
-   nodes are the source of truth). This file carries en/ja/ko `html`
+   nodes are the source of truth). This file carries en/jp/ko `html`
    translations plus `attr` and `js` strings for all four languages.
    scripts/verify-i18n.mjs asserts the key sets stay in sync.
 
@@ -142,7 +142,7 @@ window.SITE_I18N = {
     }
   },
 
-  ja: {
+  jp: {
     html: {
       'meta.title': '韓国が好きなら、理由も欲しい · 世界に猫は欠かせない',
       'skip': '本文へスキップ',

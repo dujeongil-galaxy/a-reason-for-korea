@@ -12,7 +12,7 @@
 | --- | --- |
 | 中文（源文案） | https://dujeongil-galaxy.github.io/a-reason-for-korea/ |
 | English | https://dujeongil-galaxy.github.io/a-reason-for-korea/en/ |
-| 日本語 | https://dujeongil-galaxy.github.io/a-reason-for-korea/ja/ |
+| 日本語 | https://dujeongil-galaxy.github.io/a-reason-for-korea/jp/ |
 | 한국어 | https://dujeongil-galaxy.github.io/a-reason-for-korea/ko/ |
 
 每页右上角可切换语言，当前语言高亮；窄屏自动改为短标签（`CN / EN / JP / KR`）——四个一律是两字母大写拉丁地区缩写，不用「中」「日」「韓」这类单字汉字，也不混简繁。短标签带 `aria-hidden`，语言全名以视觉隐藏方式保留给读屏软件。四个页面各有自己的 `hreflang`、`canonical` 与 `og:url`，都是**完整翻译后的静态 HTML**——关掉 JavaScript 也能正常阅读，方便单独分享与收录。
@@ -49,10 +49,10 @@
 ```
 index.html                    唯一中文源文案（含 data-i18n 钩子、语言切换器、hreflang）
 en/index.html                 英文静态页（脚本生成，勿手改）
-ja/index.html                 日文静态页（脚本生成，勿手改）
+jp/index.html                 日文静态页（脚本生成，勿手改）
 ko/index.html                 韩文静态页（脚本生成，勿手改）
 assets/styles.css             样式、响应式、语言字体栈、暗色模式、动效降级
-assets/i18n.js                en/ja/ko 译文 + 四语属性 / 运行时文案
+assets/i18n.js                en/jp/ko 译文 + 四语属性 / 运行时文案
 assets/app.js                 滚动淡入 / 点灯计数 / 理由卡片 / 复制
 assets/clipping-hkcd.jpg      附页剪报（站长发给 AI，原样未修改）
 favicon.svg                   猫爪图标

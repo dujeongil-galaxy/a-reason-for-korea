@@ -38,7 +38,7 @@
 ## 6. 多语言站点：中文只留一份，靠校验防漂移
 
 - **现象**：四语页面最容易出现的维护事故，是中文源文案和字典里的中文副本不一致，或某个语言漏翻一个 key，页面悄悄退回中文。
-- **规则**：`index.html` 是唯一中文源；`assets/i18n.js` 只存 en/ja/ko 译文与四语的属性 / JS 文案；生成页由脚本产出、不手改。
+- **规则**：`index.html` 是唯一中文源；`assets/i18n.js` 只存 en/jp/ko 译文与四语的属性 / JS 文案；生成页由脚本产出、不手改。
 - **强制层**：`scripts/verify-i18n.mjs` 逐字比对 81 个译文节点、11 个属性、四语 key 集合、中文关键串是否还在、附页章节与边界声明、剪报图片与存档链接、资源路径与切换器状态，并内置 14 项故意造错的自检，必须 14/14 判红才算通过。
 
 ## 7. 新增可翻译属性时，`\b` 边界会咬到 `data-i18n-*` 自己
@@ -59,6 +59,7 @@
 
 - **现象**：窄屏切换器原先用 `中 / EN / 日 / 韓`，韩文页高亮显示繁体汉字「韓」，站长一眼看出不对；日语也该是 `JP` 而不是「日」。三个汉字 + 一个拉丁缩写，体系混着，还暗含简繁体不一致。
 - **规则**：短标签统一成 `CN / EN / JP / KR`，**四个一律两字母大写拉丁地区缩写，不留汉字例外**；不要用单个汉字指代语言，更不要混简繁。技术层的 `lang` / `hreflang` 仍按 ISO 639-1 用 `zh / en / ja / ko`，两套互不冲突：一个是给人看的视觉缩写，一个是给机器读的语言代码。
+- **路径层也统一（2026-11-13 站长指令：ja 改 jp）**：文件夹名、canonical / og:url / hreflang 链接的网址、语言切换器 href、`data-lang-link`、字典键、`body data-lang` 全部用 `jp`，与 JP 徽标一致；旧 `/ja/` 网址不再保留（改声誉留 redirect stub 会违背「文件夹统一」的本意）。**但 ISO 语言代码层不动**：`<html lang>` / `hreflang` / 切换器 `<a lang>` 仍是 `ja`（jp 不是合法语言代码，改了 hreflang 信号失效），`styles.css` 的 `html[lang="ja"]` 字体栈选择器也依赖这一点。三层各管各的：视觉缩写 `JP` ／ 路径与内部标识 `jp` ／ W3C 语言代码 `ja`。强制层：`build-i18n.mjs` 的 `LANGS` 用 `jp`、`LANG_ATTR = { jp: 'ja' }` 负责切换器 lang 回填 ISO；`verify-i18n.mjs` 的 `LANGS` / `HTML_LANG` / `SHORT_LABELS` / 故障注入同步改键，35 项自检必须全拒。
 - **顺带修掉的真问题**：窄屏原先用 `.lang-long { display: none }` 隐藏语言全名，读屏软件只剩「JP」「KR」这类缩写可念。改成 `clip` 视觉隐藏（1px + `position: absolute`，仍留在可访问性树里），短标签加 `aria-hidden="true"`。
 - **强制层**：`verify-i18n.mjs` 校验四个短标签的值、每个标签都匹配 `/^[A-Z]{2}$/`、`aria-hidden`、CSS 不允许 `display: none` 且必须有 `clip: rect(...)`；对应故障注入覆盖汉字回退（含中文）、非大写拉丁、日文不是 JP、标签丢失、`aria-hidden` 缺失、`display:none` 回归、`clip` 被删，必须判红。
 

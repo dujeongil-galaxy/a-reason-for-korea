@@ -18,8 +18,8 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SITE = 'https://dujeongil-galaxy.github.io/a-reason-for-korea/';
-const LANGS = ['en', 'ja', 'ko'];
-const HTML_LANG = { en: 'en', ja: 'ja', ko: 'ko', zh: 'zh-CN' };
+const LANGS = ['en', 'jp', 'ko'];
+const HTML_LANG = { en: 'en', jp: 'ja', ko: 'ko', zh: 'zh-CN' };
 const ATTR_TARGETS = new Set(['aria-label', 'placeholder', 'content', 'alt']);
 const CHINESE_MARKERS = [
   '哈韩，也要', '善意落在细节里', '喜欢不是免检',
@@ -37,17 +37,17 @@ const ARCHIVE_LINKS = [
 ];
 /* Mobile switcher labels: every one is a two-letter uppercase Latin code.
    No CJK glyph anywhere, including Chinese — the whole set must be one system. */
-const SHORT_LABELS = { zh: 'CN', en: 'EN', ja: 'JP', ko: 'KR' };
+const SHORT_LABELS = { zh: 'CN', en: 'EN', jp: 'JP', ko: 'KR' };
 const SHORT_LABEL_PATTERN = /^[A-Z]{2}$/;
 /* Two archives are dead, one is alive; the check date must stay visible. */
 const STATUS_COUNTS = { dead: 2, live: 1 };
 const OWNER_MARKERS = {
-  en: 'owner of this site', ja: 'このサイトの持ち主', ko: '이 사이트의 주인'
+  en: 'owner of this site', jp: 'このサイトの持ち主', ko: '이 사이트의 주인'
 };
 /* The clipping was handed by the site owner TO THE AI. No anonymous source,
    and no first-person "me" — the page is not spoken by the site owner. */
 const AI_MARKERS = {
-  zh: '站长给 AI 的', en: 'to the AI', ja: 'AI に渡した', ko: 'AI에게 건넨'
+  zh: '站长给 AI 的', en: 'to the AI', jp: 'AI に渡した', ko: 'AI에게 건넨'
 };
 const FIRST_PERSON_MARKERS = [
   '站长给我的',
@@ -331,7 +331,7 @@ console.log('VERIFY OK  ·  ' + Object.keys(extractNodes(state.source)).length +
 /* ---------- injected-fault self-test ---------- */
 const clone = (s) => JSON.parse(JSON.stringify(s));
 const faults = [
-  { name: 'missing translation key', mutate: s => { delete s.dict.ja.html['r3.title']; } },
+  { name: 'missing translation key', mutate: s => { delete s.dict.jp.html['r3.title']; } },
   { name: 'Chinese leftover in translated page', mutate: s => {
     s.pages.en = s.pages.en.replace('Four reasons, one line I will not cross', '四个理由，一条底线');
   } },
@@ -339,7 +339,7 @@ const faults = [
     s.pages.ko = s.pages.ko.replace('<html lang="ko">', '<html lang="zh-CN">');
   } },
   { name: 'unprefixed asset path', mutate: s => {
-    s.pages.ja = s.pages.ja.replace('../assets/app.js', 'assets/app.js');
+    s.pages.jp = s.pages.jp.replace('../assets/app.js', 'assets/app.js');
   } },
   { name: 'Chinese source deleted', mutate: s => { s.source = s.source.replace('喜欢不是免检', ''); } },
   { name: 'attr drift between zh dict and HTML', mutate: s => {
@@ -357,7 +357,7 @@ const faults = [
     s.source = s.source.replace('不核实其中细节', '');
   } },
   { name: 'archive boundary statement dropped in translation', mutate: s => {
-    s.pages.ja = s.pages.ja.replace(s.dict.ja.html['archive.boundary'], '');
+    s.pages.jp = s.pages.jp.replace(s.dict.jp.html['archive.boundary'], '');
   } },
   { name: 'archived report link removed', mutate: s => {
     s.pages.ko = s.pages.ko.replace(ARCHIVE_LINKS[1], '');
@@ -378,7 +378,7 @@ const faults = [
     s.pages.en = s.pages.en.replace('aria-hidden="true">CN<', 'aria-hidden="true">cn<');
   } },
   { name: 'Japanese short label is not JP', mutate: s => {
-    s.pages.ja = s.pages.ja.replace('aria-hidden="true">JP<', 'aria-hidden="true">日<');
+    s.pages.jp = s.pages.jp.replace('aria-hidden="true">JP<', 'aria-hidden="true">日<');
   } },
   { name: 'short label missing from generated page', mutate: s => {
     s.pages.ko = s.pages.ko.replace(/<span class="lang-short"[^>]*>EN<\/span>/, '');
@@ -410,7 +410,7 @@ const faults = [
     s.pages.en = s.pages.en.replace('to the AI', '');
   } },
   { name: 'Japanese intro slips back to first person', mutate: s => {
-    s.pages.ja = s.pages.ja.replace('このスクリーンショットは、このサイトの持ち主が AI に渡したものです。',
+    s.pages.jp = s.pages.jp.replace('このスクリーンショットは、このサイトの持ち主が AI に渡したものです。',
       'このスクリーンショットは、このサイトの持ち主から届いたものです。');
   } },
   { name: 'Korean intro slips back to first person', mutate: s => {
@@ -418,7 +418,7 @@ const faults = [
       '이 스크린샷은 이 사이트의 주인이 건네준 것입니다.');
   } },
   { name: 'Japanese caption credits a reader again', mutate: s => {
-    s.pages.ja = s.pages.ja.replace('このサイトの持ち主が提供したスクリーンショット', '読者から提供されたスクリーンショット');
+    s.pages.jp = s.pages.jp.replace('このサイトの持ち主が提供したスクリーンショット', '読者から提供されたスクリーンショット');
   } },
   { name: 'dead-link badge removed', mutate: s => {
     s.pages.ko = s.pages.ko.replace(/<span class="link-status is-dead"[^>]*>[^<]*<\/span>\s*/, '');
@@ -430,7 +430,7 @@ const faults = [
     s.source = s.source.replace('class="link-status is-live"', 'class="link-status is-dead"');
   } },
   { name: 'link check note deleted', mutate: s => {
-    s.pages.ja = s.pages.ja.replace(/<p class="archive-links-note"[\s\S]*?<\/p>/, '');
+    s.pages.jp = s.pages.jp.replace(/<p class="archive-links-note"[\s\S]*?<\/p>/, '');
   } },
   { name: 'boundary claims archives are still available', mutate: s => {
     s.pages.en = s.pages.en.replace('Reports on the same story once appeared in a few public archives',

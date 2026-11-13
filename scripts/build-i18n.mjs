@@ -1,5 +1,5 @@
 /* ============================================================
-   Build the en / ja / ko static pages from index.html + i18n.js.
+   Build the en / jp / ko static pages from index.html + i18n.js.
 
    index.html is the ONLY source of Chinese copy. Every language page
    is fully translated HTML: it renders correctly even with JS off,
@@ -15,8 +15,8 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SITE = 'https://dujeongil-galaxy.github.io/a-reason-for-korea/';
-const LANGS = ['en', 'ja', 'ko'];
-const HTML_LANG = { zh: 'zh-CN', en: 'en', ja: 'ja', ko: 'ko' };
+const LANGS = ['en', 'jp', 'ko'];
+const HTML_LANG = { zh: 'zh-CN', en: 'en', jp: 'ja', ko: 'ko' };
 const ATTR_TARGETS = new Set(['aria-label', 'placeholder', 'content', 'alt']);
 
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -70,12 +70,18 @@ function translateAttrs(html, dict) {
 }
 
 /* --- 3. language switch links + current state --- */
+/* 路径/文件夹/内部标识层 = jp（2026-11-13 站长指令：文件夹与网址从 ja 统一为 jp，
+   与语言切换器的 JP 徽标一致）；W3C 语言代码层仍按 ISO 639-1：日语页的
+   <html lang> / hreflang / <a lang> 保持 "ja"（jp 不是合法语言代码），
+   styles.css 的 html[lang="ja"] 字体栈选择器也依赖这一点。 */
+const LANG_ATTR = { jp: 'ja' };
+
 function rewriteLangLinks(html, lang) {
   return html.replace(/<a\s+data-lang-link="([a-z]+)"[^>]*>/g, (match, code) => {
     const href = code === 'zh' ? '../' : '../' + code + '/';
     const current = code === lang ? ' class="is-current" aria-current="page"' : '';
     return '<a data-lang-link="' + code + '" href="' + href + '" lang="' +
-      (code === 'zh' ? 'zh' : code) + '"' + current + '>';
+      (code === 'zh' ? 'zh' : (LANG_ATTR[code] || code)) + '"' + current + '>';
   });
 }
 
