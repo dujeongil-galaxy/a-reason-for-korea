@@ -44,6 +44,17 @@ const STATUS_COUNTS = { dead: 2, live: 1 };
 const OWNER_MARKERS = {
   en: 'owner of this site', ja: 'このサイトの持ち主', ko: '이 사이트의 주인'
 };
+/* The clipping was handed by the site owner TO THE AI. No anonymous source,
+   and no first-person "me" — the page is not spoken by the site owner. */
+const AI_MARKERS = {
+  zh: '站长给 AI 的', en: 'to the AI', ja: 'AI に渡した', ko: 'AI에게 건넨'
+};
+const FIRST_PERSON_MARKERS = [
+  '站长给我的',
+  'This screenshot came from the owner of this site',
+  'このサイトの持ち主から届いた',
+  '이 사이트의 주인이 건네준 것입니다'
+];
 /* Anonymous attribution and "still available" claims must never come back. */
 const ANONYMOUS_MARKERS = [
   '有人留下一张网页截图', '读者提供',
@@ -147,14 +158,17 @@ function verify(state) {
   }
 
   /* 1d. clipping attribution is explicit; link status is marked with a date */
-  if (!source.includes('这张网页截图是站长给我的')) {
-    errors.push('zh: clipping attribution no longer names the site owner');
+  if (!source.includes('这张网页截图是' + AI_MARKERS.zh)) {
+    errors.push('zh: clipping attribution no longer says the owner gave it to the AI');
   }
   if (!source.includes('站长提供的这张网页截图')) {
     errors.push('zh: caption no longer credits the site owner');
   }
   for (const marker of ANONYMOUS_MARKERS) {
     if (source.includes(marker)) errors.push('zh: anonymous/outdated wording returned -> ' + marker);
+  }
+  for (const marker of FIRST_PERSON_MARKERS) {
+    if (source.includes(marker)) errors.push('zh: first-person attribution returned -> ' + marker);
   }
   for (const [kind, count] of Object.entries(STATUS_COUNTS)) {
     const n = (source.match(new RegExp('class="link-status is-' + kind + '"', 'g')) || []).length;
@@ -273,6 +287,12 @@ function verify(state) {
     for (const marker of ANONYMOUS_MARKERS) {
       if (page.includes(marker)) errors.push(lang + ': anonymous/outdated wording returned -> ' + marker);
     }
+    if (!(nodes['archive.intro'] || '').includes(AI_MARKERS[lang])) {
+      errors.push(lang + ': archive intro no longer says the clipping was given to the AI');
+    }
+    for (const marker of FIRST_PERSON_MARKERS) {
+      if (page.includes(marker)) errors.push(lang + ': first-person attribution returned -> ' + marker);
+    }
 
     /* no Chinese body copy left behind */
     for (const marker of CHINESE_MARKERS) {
@@ -375,13 +395,27 @@ const faults = [
     s.css = s.css.replace('clip: rect(0, 0, 0, 0);', 'clip: unset;');
   } },
   { name: 'Chinese clipping attribution anonymised', mutate: s => {
-    s.source = s.source.replace('这张网页截图是站长给我的', '有人留下一张网页截图');
+    s.source = s.source.replace('这张网页截图是站长给 AI 的', '有人留下一张网页截图');
+  } },
+  { name: 'Chinese intro slips back to first person "me"', mutate: s => {
+    s.source = s.source.replace('这张网页截图是站长给 AI 的', '这张网页截图是站长给我的');
   } },
   { name: 'Chinese caption credits a reader again', mutate: s => {
     s.source = s.source.replace('站长提供的这张网页截图', '读者提供的一张网页截图');
   } },
   { name: 'English intro anonymised again', mutate: s => {
-    s.pages.en = s.pages.en.replace('This screenshot came from the owner of this site', 'Someone left behind a screenshot');
+    s.pages.en = s.pages.en.replace('The owner of this site gave this screenshot to the AI', 'Someone left behind a screenshot');
+  } },
+  { name: 'English intro loses the AI recipient', mutate: s => {
+    s.pages.en = s.pages.en.replace('to the AI', '');
+  } },
+  { name: 'Japanese intro slips back to first person', mutate: s => {
+    s.pages.ja = s.pages.ja.replace('このスクリーンショットは、このサイトの持ち主が AI に渡したものです。',
+      'このスクリーンショットは、このサイトの持ち主から届いたものです。');
+  } },
+  { name: 'Korean intro slips back to first person', mutate: s => {
+    s.pages.ko = s.pages.ko.replace('이 스크린샷은 이 사이트의 주인이 AI에게 건넨 것입니다.',
+      '이 스크린샷은 이 사이트의 주인이 건네준 것입니다.');
   } },
   { name: 'Japanese caption credits a reader again', mutate: s => {
     s.pages.ja = s.pages.ja.replace('このサイトの持ち主が提供したスクリーンショット', '読者から提供されたスクリーンショット');
