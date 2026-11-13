@@ -142,6 +142,8 @@ function verify(state) {
   for (const dom of FORBIDDEN_DEAD_DOMAINS) {
     if (source.includes(dom)) errors.push('zh: 旧死链域名不得复现 -> ' + dom);
   }
+  /* 死链口径统一为 404：核查说明不得再出现 504（站长 2026-11-13 指令） */
+  if (source.includes('504')) errors.push('zh: 死链核查说明不得出现 504，统一口径为 404');
 
   /* 1c. mobile switcher labels + accessible full names */
   const sourceShorts = shortLabels(source);
@@ -287,6 +289,8 @@ function verify(state) {
       if (n !== count) errors.push(lang + ': link status ' + kind + ' count is ' + n + ', expected ' + count);
     }
     if (!page.includes('2026-11-13')) errors.push(lang + ': link check date missing');
+    /* 死链口径统一为 404：生成页核查说明不得出现 504 */
+    if (page.includes('504')) errors.push(lang + ': 死链核查说明不得出现 504，统一口径为 404');
     const owner = OWNER_MARKERS[lang];
     for (const key of ['archive.intro', 'archive.caption']) {
       if (!(nodes[key] || '').includes(owner)) {
@@ -449,6 +453,9 @@ const faults = [
   { name: 'boundary claims archives are still available', mutate: s => {
     s.pages.en = s.pages.en.replace('Reports on the same story once appeared in a few public archives',
       'Reports on the same story are still available in a few public archives');
+  } },
+  { name: 'dead-link note reverts to 504', mutate: s => {
+    s.pages.ko = s.pages.ko.replace('404를 반환한다', '504 / 404를 반환한다');
   } }
 ];
 
