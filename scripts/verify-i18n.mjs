@@ -35,6 +35,8 @@ const ARCHIVE_LINKS = [
   'https://news.sxrb.com/sxxww/xwpd/gjxw/3941327.shtml',
   'https://news.ifeng.com/c/7fk6pvzKGtR'
 ];
+/* Mobile switcher labels: Latin/region codes, never CJK glyphs for ja/ko. */
+const SHORT_LABELS = { zh: '中', en: 'EN', ja: 'JP', ko: 'KR' };
 
 /* ---------- extraction helpers ---------- */
 function extractNodes(html) {
@@ -62,6 +64,14 @@ function extractAttrs(html) {
 
 function assetRefs(html) {
   return [...html.matchAll(/\b(?:href|src)="([^"]*(?:assets\/|favicon\.svg)[^"]*)"/g)].map(m => m[1]);
+}
+
+function shortLabels(html) {
+  const out = {};
+  const re = /<a data-lang-link="([a-z]+)"[^>]*>[\s\S]*?<span class="lang-short"([^>]*)>([^<]*)<\/span>/g;
+  let m;
+  while ((m = re.exec(html))) out[m[1]] = { label: m[3], attrs: m[2] };
+  return out;
 }
 
 function sameKeys(a, b) {
@@ -98,6 +108,23 @@ function verify(state) {
   if (!source.includes('不核实其中细节')) errors.push('zh: archive caveat missing');
   for (const link of ARCHIVE_LINKS) {
     if (!source.includes(link)) errors.push('zh: archived report link missing -> ' + link);
+  }
+
+  /* 1c. mobile switcher labels + accessible full names */
+  const sourceShorts = shortLabels(source);
+  for (const [code, expected] of Object.entries(SHORT_LABELS)) {
+    const got = sourceShorts[code];
+    if (!got) { errors.push('zh: missing short label -> ' + code); continue; }
+    if (got.label !== expected) errors.push('zh: wrong short label ' + code + ' -> ' + got.label);
+    if (!got.attrs.includes('aria-hidden="true"')) {
+      errors.push('zh: short label needs aria-hidden -> ' + code);
+    }
+  }
+  if (state.css.includes('.lang-long { display: none; }')) {
+    errors.push('css: full language name uses display:none and is lost to screen readers');
+  }
+  if (!/clip:\s*rect\(/.test(state.css)) {
+    errors.push('css: full language name is not visually hidden with clip');
   }
 
   /* 2. dictionaries exist and key sets match */
@@ -158,6 +185,15 @@ function verify(state) {
     }
 
     /* language switch */
+    const shorts = shortLabels(page);
+    for (const [code, expected] of Object.entries(SHORT_LABELS)) {
+      const got = shorts[code];
+      if (!got || got.label !== expected) {
+        errors.push(lang + ': wrong or missing short label -> ' + code);
+      } else if (!got.attrs.includes('aria-hidden="true"')) {
+        errors.push(lang + ': short label needs aria-hidden -> ' + code);
+      }
+    }
     for (const code of ['zh', ...LANGS]) {
       const m = page.match(new RegExp('<a data-lang-link="' + code + '"[^>]*>'));
       if (!m) { errors.push(lang + ': missing lang link -> ' + code); continue; }
@@ -201,6 +237,7 @@ const state = {
   source: fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8'),
   pages: {},
   dict: sandbox.window.SITE_I18N,
+  css: fs.readFileSync(path.join(ROOT, 'assets/styles.css'), 'utf8'),
   assetExists: fs.existsSync(path.join(ROOT, 'assets/clipping-hkcd.jpg'))
 };
 for (const lang of LANGS) {
@@ -257,6 +294,26 @@ const faults = [
   } },
   { name: 'image alt left untranslated', mutate: s => {
     s.pages.en = s.pages.en.replace(s.dict.en.attr['archive.imgAlt'], '一张香港商报网的网页截图');
+  } },
+  { name: 'short label falls back to CJK glyph', mutate: s => {
+    s.source = s.source.replace('aria-hidden="true">KR<', 'aria-hidden="true">韓<');
+  } },
+  { name: 'Japanese short label is not JP', mutate: s => {
+    s.pages.ja = s.pages.ja.replace('aria-hidden="true">JP<', 'aria-hidden="true">日<');
+  } },
+  { name: 'short label missing from generated page', mutate: s => {
+    s.pages.ko = s.pages.ko.replace(/<span class="lang-short"[^>]*>EN<\/span>/, '');
+  } },
+  { name: 'short label not hidden from screen readers', mutate: s => {
+    s.pages.en = s.pages.en.replace('<span class="lang-short" aria-hidden="true">中</span>',
+      '<span class="lang-short">中</span>');
+  } },
+  { name: 'full language name back to display:none', mutate: s => {
+    s.css = s.css.replace('.lang-short { display: inline; }',
+      '.lang-long { display: none; }\n  .lang-short { display: inline; }');
+  } },
+  { name: 'clip-based sr-only rule removed', mutate: s => {
+    s.css = s.css.replace('clip: rect(0, 0, 0, 0);', 'clip: unset;');
   } }
 ];
 

@@ -132,6 +132,7 @@ ol, ul { padding: 0; list-style: none; }
 }
 .lang-switch a {
   display: inline-flex; align-items: center; justify-content: center;
+  position: relative;
   min-width: 34px; padding: 4px 10px; border-radius: 999px;
   font-size: 11.5px; line-height: 1.45; text-decoration: none;
   color: var(--ink-faint); white-space: nowrap;
@@ -530,7 +531,11 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
   .header-inner { gap: 14px; }
   .site-nav { gap: 14px; }
   .site-nav a { font-size: 13px; }
-  .lang-long { display: none; }
+  /* keep the full language name for screen readers while showing the short code */
+  .lang-long {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+  }
   .lang-short { display: inline; }
 }
 @media (max-width: 720px) {
