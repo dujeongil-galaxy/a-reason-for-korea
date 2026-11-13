@@ -21,7 +21,8 @@ window.SITE_I18N = {
       'aria.langSwitch': '语言切换',
       'aria.heroArt': '插画：一只猫坐在屋檐下，旁边放着一只水碗',
       'aria.lampArt': '插画：纸箱里蜷着一只猫，上方有一盏尚未点亮的灯',
-      'placeholder.reason': '例如：因为有人愿意为一碗水弯腰'
+      'placeholder.reason': '例如：因为有人愿意为一碗水弯腰',
+      'archive.imgAlt': '一张香港商报网的网页截图，可见网站标志、栏目导航与一行繁体中文标题；截图止于标题，未包含正文'
     },
     js: {
       'lamp.on': '再留一盏灯',
@@ -102,7 +103,19 @@ window.SITE_I18N = {
       'footer.quote': 'The world needs cats.<br><span>And may every liking have a reason it can say out loud.</span>',
       'footer.meta.design': 'Design & code · WorkBuddy',
       'footer.meta.host': 'Hosted · GitHub Pages',
-      'footer.meta.source': 'View source <span aria-hidden="true">↗</span>'
+      'footer.meta.source': 'View source <span aria-hidden="true">↗</span>',
+      'archive.teaser': 'Appendix: a clipping that almost got lost <span aria-hidden="true">↓</span>',
+      'archive.kicker': 'KEEPSAKE · ARCHIVE',
+      'archive.head': 'A page that was almost impossible to find',
+      'archive.intro': 'Someone left behind a screenshot and said that page can no longer be found, however hard you search. It belongs to none of the reasons above, and it is not here to settle any argument — just a wish not to let one particular moment be washed away. So it lives here, as an appendix.',
+      'archive.caption': 'Image / a screenshot supplied by a reader, from Hong Kong Commercial Daily (hkcd.com). The text in the image is reproduced as-is and has not been altered; the screenshot stops at the headline, contains no article text and shows no clear publication date. Copyright remains with the original publisher.',
+      'archive.viewFull': 'View the full image <span aria-hidden="true">↗</span>',
+      'archive.boundary': 'All this image can confirm is the one screen it captured. Reports on the same story are still available in a few public archives, linked on this page; this site does not verify their details, does not endorse their wording and takes no position on them. Nor is this evidence for the four reasons above. Remembering something is not the same as drawing a conclusion about it.',
+      'archive.close': 'Sometimes not forgetting is just smoothing a piece of paper and slipping it into a book.',
+      'archive.linksLabel': 'PUBLIC ARCHIVES OF THE SAME STORY · EXTERNAL LINKS',
+      'archive.link1': 'People\'s Daily Online (Guangdong) · 2014.07.03',
+      'archive.link2': 'Shanxi News · same story',
+      'archive.link3': 'Ifeng News · same story'
     },
     attr: {
       'meta.description': 'One Douyin share about cats, kindness and Korea, and the four reasons behind it. Liking a place can have a real reason — and still keep its judgment.',
@@ -114,7 +127,8 @@ window.SITE_I18N = {
       'aria.langSwitch': 'Language',
       'aria.heroArt': 'Illustration: a cat sitting under the eaves, with a bowl of water',
       'aria.lampArt': 'Illustration: a cat curled up in a cardboard box, with a lamp above that is not yet lit',
-      'placeholder.reason': 'For example: because someone bent down to leave a bowl of water'
+      'placeholder.reason': 'For example: because someone bent down to leave a bowl of water',
+      'archive.imgAlt': 'A screenshot of a Hong Kong Commercial Daily web page showing the site logo, section navigation and one headline in traditional Chinese. The image stops at the headline and contains no article text.'
     },
     js: {
       'lamp.on': 'Leave one more light',
@@ -195,7 +209,19 @@ window.SITE_I18N = {
       'footer.quote': '世界に猫は欠かせない。<br><span>そして、どんな「好き」にも、口にできる理由がありますように。</span>',
       'footer.meta.design': 'デザインとコード · WorkBuddy',
       'footer.meta.host': 'ホスティング · GitHub Pages',
-      'footer.meta.source': 'ソースを見る <span aria-hidden="true">↗</span>'
+      'footer.meta.source': 'ソースを見る <span aria-hidden="true">↗</span>',
+      'archive.teaser': '付録：もう見つからない、ある一ページ <span aria-hidden="true">↓</span>',
+      'archive.kicker': 'KEEPSAKE · 記録',
+      'archive.head': '探しても出てこなかった、一ページの切り抜き',
+      'archive.intro': 'ある人が一枚のスクリーンショットを残していった。あのページは、いくら探してももう出てこないという。上のどの理由にも属さないし、何かの結論を出すためのものでもない。ただ、ひとつの具体的な瞬間を時間に流されたくないという気持ちだけだ。だからここに、付録として置いておく。',
+      'archive.caption': '図 / 読者から提供されたスクリーンショット。出典：香港商報網（hkcd.com）。図中の文字はそのままで、当サイトでは改変していません。画像は見出しで途切れ、本文は含まれず、明確な公開日も写っていません。著作権は元のサイトに帰属します。',
+      'archive.viewFull': '元画像を見る <span aria-hidden="true">↗</span>',
+      'archive.boundary': 'この画像が確認できるのは、写っているその一画面だけです。同じ話題の公開記事はいくつかのアーカイブに残っており、このページにリンクを挙げていますが、当サイトはその細部を検証せず、記述を保証もせず、いかなる立場も示しません。また、上の四つの理由の根拠でもありません。何かを覚えていることと、それについて結論を出すことは別です。',
+      'archive.close': '忘れたくないという気持ちは、紙を伸ばして本にはさむこと、それだけのときもある。',
+      'archive.linksLabel': '同じ話題の公開アーカイブ · 外部リンク',
+      'archive.link1': '人民網 広東チャンネル · 2014.07.03',
+      'archive.link2': '山西新聞網 · 同題記事',
+      'archive.link3': '鳳凰網 · 同題記事'
     },
     attr: {
       'meta.description': '猫と善意と韓国についての、ある抖音（Douyin）の投稿と、その裏にある四つの理由。好きな気持ちには、きちんとした理由があっていい。しかも冷静さも手放さない。',
@@ -207,7 +233,8 @@ window.SITE_I18N = {
       'aria.langSwitch': '言語',
       'aria.heroArt': 'イラスト：軒先に座る猫と、水の入った器',
       'aria.lampArt': 'イラスト：段ボールの中で丸まる猫と、まだ点いていない上の灯り',
-      'placeholder.reason': '例：誰かが水を置くために腰をかがめてくれたから'
+      'placeholder.reason': '例：誰かが水を置くために腰をかがめてくれたから',
+      'archive.imgAlt': '香港商報網のページを写したスクリーンショット。サイトのロゴ、欄目ナビゲーション、繁体字の見出し一行が見える。画像は見出しで途切れており、本文は含まれていない。'
     },
     js: {
       'lamp.on': 'もう一度ともす',
@@ -288,7 +315,19 @@ window.SITE_I18N = {
       'footer.quote': '이 세상엔 고양이가 필요하다.<br><span>그리고 모든 좋아함에는, 입으로 꺼낼 수 있는 이유가 있기를.</span>',
       'footer.meta.design': '디자인과 코드 · WorkBuddy',
       'footer.meta.host': '호스팅 · GitHub Pages',
-      'footer.meta.source': '소스 보기 <span aria-hidden="true">↗</span>'
+      'footer.meta.source': '소스 보기 <span aria-hidden="true">↗</span>',
+      'archive.teaser': '부록: 거의 찾을 수 없게 된 한 페이지 <span aria-hidden="true">↓</span>',
+      'archive.kicker': 'KEEPSAKE · 기록',
+      'archive.head': '아무리 찾아도 나오지 않던 한 페이지',
+      'archive.intro': '어떤 분이 스크린샷 한 장을 남겼다. 아무리 검색해도 이제 그 페이지가 나오지 않는다고 했다. 위의 어떤 이유에도 속하지 않고, 누군가 대신 결론을 내려주려는 것도 아니다. 그저 어떤 구체적인 순간이 시간에 씻겨 가길 원치 않았을 뿐이다. 그래서 여기 부록으로 두었다.',
+      'archive.caption': '그림 / 독자가 제공한 스크린샷, 출처: 홍콩상보망(hkcd.com). 그림 속 글자는 원문 그대로이며 이 사이트에서 수정하지 않았다. 화면은 제목에서 끊겨 본문이 없고, 명확한 게시 날짜도 보이지 않는다. 저작권은 원 사이트에 있다.',
+      'archive.viewFull': '원본 이미지 보기 <span aria-hidden="true">↗</span>',
+      'archive.boundary': '이 그림이 확인해 주는 건, 찍힌 그 한 화면뿐이다. 같은 내용을 다룬 공개 기사는 몇 곳의 아카이브에 남아 있어 이 페이지에 링크했지만, 이 사이트는 그 세부 내용을 검증하지 않고, 표현을 보증하지 않으며, 어떤 입장도 대변하지 않는다. 또한 위의 네 가지 이유를 뒷받침하는 근거도 아니다. 무언가를 기억하는 것과 그것에 대해 결론을 내리는 것은 다르다.',
+      'archive.close': '잊고 싶지 않다는 마음은, 종이 한 장을 펴서 책 사이에 끼워 두는 일일 때도 있다.',
+      'archive.linksLabel': '같은 기사의 공개 아카이브 · 외부 링크',
+      'archive.link1': '인민망 광동 · 2014.07.03',
+      'archive.link2': '산시신문망 · 같은 기사',
+      'archive.link3': '펑황망 · 같은 기사'
     },
     attr: {
       'meta.description': '고양이와 선의, 한국에 관한 더우인 공유 글 하나와 그 뒤의 네 가지 이유. 어떤 곳을 좋아하는 데는 이유가 있어도 좋고, 판단력을 유지해도 좋다.',
@@ -300,7 +339,8 @@ window.SITE_I18N = {
       'aria.langSwitch': '언어',
       'aria.heroArt': '삽화: 처마 아래 앉은 고양이와 물그릇',
       'aria.lampArt': '삽화: 상자 안에 웅크린 고양이와, 아직 켜지지 않은 위쪽 전등',
-      'placeholder.reason': '예: 누군가 물 한 그릇을 놓으려고 허리를 굽혔기 때문에'
+      'placeholder.reason': '예: 누군가 물 한 그릇을 놓으려고 허리를 굽혔기 때문에',
+      'archive.imgAlt': '홍콩상보망(hkcd.com) 웹페이지 스크린샷. 사이트 로고, 섹션 메뉴와 번체 중국어 제목 한 줄이 보인다. 화면은 제목에서 끊겨 있으며 본문은 포함되지 않았다.'
     },
     js: {
       'lamp.on': '한 번 더 켜기',

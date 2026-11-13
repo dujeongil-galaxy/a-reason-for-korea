@@ -17,7 +17,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SITE = 'https://dujeongil-galaxy.github.io/a-reason-for-korea/';
 const LANGS = ['en', 'ja', 'ko'];
 const HTML_LANG = { zh: 'zh-CN', en: 'en', ja: 'ja', ko: 'ko' };
-const ATTR_TARGETS = new Set(['aria-label', 'placeholder', 'content']);
+const ATTR_TARGETS = new Set(['aria-label', 'placeholder', 'content', 'alt']);
 
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -56,9 +56,14 @@ function translateAttrs(html, dict) {
         missing.push(key);
         continue;
       }
-      const re = new RegExp('\\b' + esc(target) + '="[^"]*"');
+      /* Match a real attribute only: `alt="..."`, never the tail of
+         `data-i18n-alt="..."`. Keeping this independent of attribute
+         order is what makes adding a new translatable attribute safe. */
+      const re = new RegExp('(^|\\s)' + esc(target) + '="[^"]*"');
       const val = target + '="' + dict[key] + '"';
-      out = re.test(out) ? out.replace(re, val) : out + ' ' + val;
+      out = re.test(out)
+        ? out.replace(re, (_m, lead) => lead + val)
+        : out + ' ' + val;
     }
     return '<' + tag + out + '>';
   });

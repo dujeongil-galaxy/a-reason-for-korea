@@ -20,13 +20,20 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SITE = 'https://dujeongil-galaxy.github.io/a-reason-for-korea/';
 const LANGS = ['en', 'ja', 'ko'];
 const HTML_LANG = { en: 'en', ja: 'ja', ko: 'ko', zh: 'zh-CN' };
-const ATTR_TARGETS = new Set(['aria-label', 'placeholder', 'content']);
+const ATTR_TARGETS = new Set(['aria-label', 'placeholder', 'content', 'alt']);
 const CHINESE_MARKERS = [
   '哈韩，也要', '善意落在细节里', '喜欢不是免检',
-  '这个世界不能没有小猫', '给小猫留一盏灯', '延伸阅读'
+  '这个世界不能没有小猫', '给小猫留一盏灯', '延伸阅读',
+  '一页差点找不到的旧报', '不想遗忘', '记得一件事，不等于替它下结论'
 ];
 const REQUIRED_ASSETS = [
-  '../assets/styles.css', '../assets/i18n.js', '../assets/app.js', '../favicon.svg'
+  '../assets/styles.css', '../assets/i18n.js', '../assets/app.js', '../favicon.svg',
+  '../assets/clipping-hkcd.jpg'
+];
+const ARCHIVE_LINKS = [
+  'https://gd.people.com.cn/n/2014/0703/c123932-21570067-3.html',
+  'https://news.sxrb.com/sxxww/xwpd/gjxw/3941327.shtml',
+  'https://news.ifeng.com/c/7fk6pvzKGtR'
 ];
 
 /* ---------- extraction helpers ---------- */
@@ -46,7 +53,7 @@ function extractAttrs(html) {
     const attrs = m[2];
     for (const a of attrs.matchAll(/data-i18n-([a-z-]+)="([^"]+)"/g)) {
       if (!ATTR_TARGETS.has(a[1])) continue;
-      const found = attrs.match(new RegExp('\\b' + a[1] + '="([^"]*)"'));
+      const found = attrs.match(new RegExp('(?:^|\\s)' + a[1] + '="([^"]*)"'));
       out[a[2]] = found ? found[1] : null;
     }
   }
@@ -79,6 +86,19 @@ function verify(state) {
   }
   if (!source.includes('<html lang="zh-CN">')) errors.push('zh: root lang is not zh-CN');
   if (!source.includes('<body data-lang="zh">')) errors.push('zh: body data-lang is not zh');
+
+  /* 1b. the kept clipping: section, image and its caveats must survive */
+  if (!source.includes('<section class="section archive" id="archive">')) {
+    errors.push('zh: archive section missing');
+  }
+  if (!assetRefs(source).includes('assets/clipping-hkcd.jpg')) {
+    errors.push('zh: clipping image not referenced');
+  }
+  if (!state.assetExists) errors.push('archive: clipping image file missing from assets/');
+  if (!source.includes('不核实其中细节')) errors.push('zh: archive caveat missing');
+  for (const link of ARCHIVE_LINKS) {
+    if (!source.includes(link)) errors.push('zh: archived report link missing -> ' + link);
+  }
 
   /* 2. dictionaries exist and key sets match */
   for (const lang of ['zh', ...LANGS]) {
@@ -153,6 +173,18 @@ function verify(state) {
       if (!tag.includes('href="' + expected + '"')) errors.push(lang + ': wrong lang href -> ' + code);
     }
 
+    /* archive in every language, including the boundary statement */
+    if (!page.includes('<section class="section archive" id="archive">')) {
+      errors.push(lang + ': archive section missing');
+    }
+    for (const link of ARCHIVE_LINKS) {
+      if (!page.includes(link)) errors.push(lang + ': archived report link missing -> ' + link);
+    }
+    const boundary = (d.html || {})['archive.boundary'];
+    if (!boundary || !page.includes(boundary)) {
+      errors.push(lang + ': archive boundary statement missing or altered');
+    }
+
     /* no Chinese body copy left behind */
     for (const marker of CHINESE_MARKERS) {
       if (page.includes(marker)) errors.push(lang + ': untranslated Chinese left in page -> ' + marker);
@@ -168,7 +200,8 @@ vm.runInNewContext(fs.readFileSync(path.join(ROOT, 'assets/i18n.js'), 'utf8'), s
 const state = {
   source: fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8'),
   pages: {},
-  dict: sandbox.window.SITE_I18N
+  dict: sandbox.window.SITE_I18N,
+  assetExists: fs.existsSync(path.join(ROOT, 'assets/clipping-hkcd.jpg'))
 };
 for (const lang of LANGS) {
   const file = path.join(ROOT, lang, 'index.html');
@@ -183,7 +216,7 @@ if (realErrors.length) {
 }
 console.log('VERIFY OK  ·  ' + Object.keys(extractNodes(state.source)).length +
   ' translated nodes  ·  ' + Object.keys(extractAttrs(state.source)).length +
-  ' translated attributes  ·  4 languages');
+  ' translated attributes  ·  4 languages  ·  archive: 4 pages + 1 image + 3 links');
 
 /* ---------- injected-fault self-test ---------- */
 const clone = (s) => JSON.parse(JSON.stringify(s));
@@ -205,6 +238,25 @@ const faults = [
   { name: 'broken language switch highlight', mutate: s => {
     s.pages.en = s.pages.en.replace('<a data-lang-link="en" href="../en/" lang="en" class="is-current" aria-current="page">',
       '<a data-lang-link="en" href="../en/" lang="en">');
+  } },
+  { name: 'clipping image file missing', mutate: s => { s.assetExists = false; } },
+  { name: 'archive heading deleted from Chinese source', mutate: s => {
+    s.source = s.source.replace('一页差点找不到的旧报', '');
+  } },
+  { name: 'archive caveat removed from Chinese source', mutate: s => {
+    s.source = s.source.replace('不核实其中细节', '');
+  } },
+  { name: 'archive boundary statement dropped in translation', mutate: s => {
+    s.pages.ja = s.pages.ja.replace(s.dict.ja.html['archive.boundary'], '');
+  } },
+  { name: 'archived report link removed', mutate: s => {
+    s.pages.ko = s.pages.ko.replace(ARCHIVE_LINKS[1], '');
+  } },
+  { name: 'clipping image path not relativised', mutate: s => {
+    s.pages.en = s.pages.en.replace('../assets/clipping-hkcd.jpg', 'assets/clipping-hkcd.jpg');
+  } },
+  { name: 'image alt left untranslated', mutate: s => {
+    s.pages.en = s.pages.en.replace(s.dict.en.attr['archive.imgAlt'], '一张香港商报网的网页截图');
   } }
 ];
 
