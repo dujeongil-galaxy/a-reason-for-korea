@@ -67,6 +67,18 @@ const ANONYMOUS_MARKERS = [
   'are still available in a few public archives',
   'いくつかのアーカイブに残っており', '몇 곳의 아카이브에 남아 있어'
 ];
+/* 抖音 的国际产品名是 TikTok。中文源页保留「抖音」，v.douyin.com 是原始
+   分享链接域名、不改。en/jp/ko 译文里不得再出现 Douyin / 더우인 / 抖音。
+   （站长 2026-11-16 指令，机器强制防回退。） */
+const PRODUCT_NAME = 'TikTok';
+const STALE_PRODUCT_NAMES = ['Douyin', '더우인', '抖音'];
+/* 中文源里四处提到抖音的原文，逐条核对，避免「改一处留一处」蒙混过关。 */
+const ZH_PRODUCT_COPY = [
+  '一条关于猫、善意与韩国的抖音分享',
+  '一条抖音分享，和它背后的四个理由。',
+  '来自一条抖音分享',
+  '那条抖音视频：'
+];
 
 /* ---------- extraction helpers ---------- */
 function extractNodes(html) {
@@ -198,6 +210,35 @@ function verify(state) {
   for (const key of Object.keys(zhAttrs)) {
     if (dict.zh && dict.zh.attr[key] !== zhAttrs[key]) {
       errors.push('zh: dictionary attr out of sync with HTML -> ' + key);
+    }
+  }
+
+  /* 2b. 产品名口径：中文源保留「抖音」，非中文译文一律写 TikTok */
+  for (const marker of ZH_PRODUCT_COPY) {
+    if (!source.includes(marker)) {
+      errors.push('zh: Chinese source must keep the original 抖音 copy -> ' + marker);
+    }
+  }
+  for (const lang of LANGS) {
+    const d = dict[lang] || {};
+    const values = { ...(d.html || {}), ...(d.attr || {}), ...(d.js || {}) };
+    for (const [key, value] of Object.entries(values)) {
+      for (const stale of STALE_PRODUCT_NAMES) {
+        if (String(value).includes(stale)) {
+          errors.push(lang + ': stale product name "' + stale + '" -> ' + key);
+        }
+      }
+    }
+    const page = pages[lang] || '';
+    /* 只去掉 href 属性与脚本；v.douyin.com 是小写，不会命中大写 Douyin */
+    const visible = page.replace(/href="[^"]*"/g, '').replace(/<script[\s\S]*?<\/script>/g, '');
+    for (const stale of STALE_PRODUCT_NAMES) {
+      if (visible.includes(stale)) {
+        errors.push(lang + ': generated page still shows stale name -> ' + stale);
+      }
+    }
+    if (!page.includes(PRODUCT_NAME)) {
+      errors.push(lang + ': ' + PRODUCT_NAME + ' missing from generated page');
     }
   }
 
@@ -456,6 +497,21 @@ const faults = [
   } },
   { name: 'dead-link note reverts to 504', mutate: s => {
     s.pages.ko = s.pages.ko.replace('404를 반환한다', '504 / 404를 반환한다');
+  } },
+  { name: 'English product name reverts to Douyin', mutate: s => {
+    s.dict.en.html['hero.sub'] = s.dict.en.html['hero.sub'].replace('One TikTok share', 'One Douyin share');
+  } },
+  { name: 'Japanese badge reverts to Douyin kanji', mutate: s => {
+    s.dict.jp.html['origin.badge'] = '抖音（Douyin）の投稿より';
+  } },
+  { name: 'Korean reading link reverts to 더우인', mutate: s => {
+    s.dict.ko.html['read1.title'] = '그 더우인 영상: 많은 고양이들이 한국에서 자랐으면 좋겠다';
+  } },
+  { name: 'TikTok removed from generated English page', mutate: s => {
+    s.pages.en = s.pages.en.replace(/TikTok/g, 'Tik Tok');
+  } },
+  { name: 'Chinese source loses the original word 抖音', mutate: s => {
+    s.source = s.source.replace(/一条抖音分享/g, '一条短视频分享');
   } }
 ];
 
