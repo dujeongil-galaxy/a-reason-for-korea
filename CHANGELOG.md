@@ -2,6 +2,14 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-16 14:27 · 译文产品名统一为 TikTok（`19b1330`）
+
+- `19b1330` — 站长指令：「抖音是 TikTok 不是 douyin」，检查机翻后修正 en/jp/ko 译文里的产品名；中文源页与原始链接域名不动。
+  - **改了什么**：`assets/i18n.js` 共 12 处 —— en 的 `hero.sub` / `origin.badge` / `read1.title` / `meta.description`（`Douyin` → `TikTok`）；jp 的同一组（「抖音（Douyin）」「あの抖音」→ `TikTok`）；ko 的同一组（`더우인(Douyin)` / `그 더우인` → `TikTok`）。其中日文公共从句「ある抖音（Douyin）の投稿と、その裏にある四つの理由。」在 `hero.sub` 与 `meta.description` 各出现一次，一次替换两处。`en/jp/ko/index.html` 由 `scripts/build-i18n.mjs` 重建，每语页 4 处 `TikTok`。
+  - **没改什么**：中文源 `index.html` 四处「抖音」原文（meta description / hero.sub / origin.badge / read1.title）一字未动；`https://v.douyin.com/ETkls6EwUXo/` 是那条原始分享的真实链接，href 与可读文字 `v.douyin.com` 全部保留（URL 不是译文）。
+  - **机器强制**：`scripts/verify-i18n.mjs` 新增 2b 段断言 —— ① 中文源四处抖音原文逐条核对（`ZH_PRODUCT_COPY`）；② en/jp/ko 字典与生成页不得出现 `Douyin` / `더우인` / `抖音`（检查可见文本，排除 href 与 script）；③ 每语生成页必须出现 `TikTok`。配套 **5 组**故障注入（en/jp/ko 各自回退旧名、生成页删掉 TikTok、中文源被改掉），`SELF-TEST` 由 37/37 升到 **42/42** 全判红。README「译文口径」段落同步改为 `TikTok` 并写明 URL 例外。
+  - **验收**：`node scripts/build-i18n.mjs` 三页重建成功；`node scripts/verify-i18n.mjs` 输出 `VERIFY OK · 84 translated nodes · 11 translated attributes · 4 languages` 且 `SELF-TEST 42/42 injected faults rejected`；三张生成页 grep 旧名（排除 URL）无残留。
+
 ## 2026-11-13 · 死链口径统一为 404（去掉 504 措辞）
 
 - `1931a4e` — 站长指令：附页「同题公开报道存档 · 外部链接」核查说明里，人民网「已无法连接」与山西新闻网「返回错误（504 / 404）」口径不统一，统一改成「均已失效（返回 404）」，去掉 504 与无状态码的「已无法连接」两种说法。
