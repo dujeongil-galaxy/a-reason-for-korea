@@ -2,6 +2,11 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-17 22:56 · 接入 Google AdSense：元标记 + Auto Ads 全站挂载（`18dac5e`）
+
+- `18dac5e` — 站长指令：把已验证的 AdSense 接到本站。唯一源页 `index.html` 的 `</head>` 前幂等插入 `<meta name="google-adsense-account" content="ca-pub-5270311938787209">` 与 `adsbygoogle.js`（pub-5270311938787209）两行；en/jp/ko 三语页由 `scripts/build-i18n.mjs` 重新生成（各 84 处翻译节点，标记随模板透传）。Auto Ads 为主机级开关，过审后四语页自动投放，无需逐页加广告单元。
+  - **验证**：重建成功；`verify-i18n.mjs` VERIFY OK（84 nodes / 11 attributes / 4 languages）且 SELF-TEST 42/42 全数命中；四页 grep `adsbygoogle` 各 1 处。
+
 ## 2026-11-16 14:27 · 译文产品名统一为 TikTok（`19b1330`）
 
 - `19b1330` — 站长指令：「抖音是 TikTok 不是 douyin」，检查机翻后修正 en/jp/ko 译文里的产品名；中文源页与原始链接域名不动。
