@@ -2,6 +2,15 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-21 18:05 · 延伸阅读新增一条同频视频链接（`9c2738a`）
+
+- `9c2738a` — 站长给出一条抖音视频（「为了防止韩国人想不开，操碎了心」），要求把这条视频放上站。不写作者名、粉丝数与点赞数，只留标题与链接。
+  - **落点**：放在「延伸阅读」章节、原分享下方，作为第二条链接（`read4`）。理由：它与站点「善意落在细节里 / 怎么对待最弱小的那一个」同频，但不是论据——「延伸阅读」本来就只挂公开链接、末尾已有「不核查、不背书、不作断言」的免责声明，自动覆盖新条目；塞进「缘起」会破坏原分享的单一叙事，塞进「四个理由」会变成论据，都不符合本站的内容边界。
+  - **改了什么**：`index.html`（中文源）延伸阅读列表新增一个 `<li>`（标签 `近例`、标题「另一条抖音视频：为了防止韩国人想不开，操碎了心」、链接 `https://v.douyin.com/kDbYuYZROUU/`）；`assets/i18n.js` 的 en/jp/ko 各补 `read4.tag` / `read4.title` 两个键（译文按既有口径写 TikTok，不出现 Douyin / 抖音）；`en/jp/ko/index.html` 由 `scripts/build-i18n.mjs` 重建，不手改。
+  - **没改什么**：作者、粉丝数、点赞数一概不写（站长明确不喜欢这些）；原分享、四条理由、点灯互动、附页全部不动；四语章节结构与视觉无变化。
+  - **校验**：`node scripts/build-i18n.mjs` 重建成功（每语 86 节点）；`node scripts/verify-i18n.mjs` → `VERIFY OK · 86 translated nodes · 11 translated attributes · 4 languages`（原 84 节点 +2）且 `SELF-TEST 42/42 injected faults rejected`；四页 grep 新链接各 1 处；四页扫描确认无「两活宝 / 万赞 / 粉丝 / 关注」等作者与数据字样。
+  - **推送状态**：本地已提交，尚未推送。GitHub 连接器 MCP 与本地 `x-access-token` 凭据对 `a-reason-for-korea` 均无写权限（均返回 403 `Resource not accessible by integration`），重新授权连接器后仍失败。需在 GitHub App 安装页给该 App 授予本仓库 Contents 写权限，或由站长本地推送后再补记。
+
 ## 2026-11-17 22:56 · 接入 Google AdSense：元标记 + Auto Ads 全站挂载（`18dac5e`）
 
 - `18dac5e` — 站长指令：把已验证的 AdSense 接到本站。唯一源页 `index.html` 的 `</head>` 前幂等插入 `<meta name="google-adsense-account" content="ca-pub-5270311938787209">` 与 `adsbygoogle.js`（pub-5270311938787209）两行；en/jp/ko 三语页由 `scripts/build-i18n.mjs` 重新生成（各 84 处翻译节点，标记随模板透传）。Auto Ads 为主机级开关，过审后四语页自动投放，无需逐页加广告单元。
