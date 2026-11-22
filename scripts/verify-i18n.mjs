@@ -83,6 +83,24 @@ const ZH_PRODUCT_COPY = [
    国际产品名 TikTok —— 不是逐字机翻的 Douyin，也不是含糊的旧标签「近例」。 */
 const READ4_TAG = { zh: '抖音', en: 'TikTok', jp: 'TikTok', ko: 'TikTok' };
 const STALE_READ4_TAGS = ['近例', 'Another', 'もう一本', '또 하나'];
+/* 站长推荐（2026-11-22 指令）：片名线索来自盗版站，但该域名绝不能出现在页面上；
+   引导去 Netflix 支持正版，中国大陆链接的邀请码必须逐字保留。 */
+const FORBIDDEN_PIRATE_DOMAINS = ['ncat30.com'];
+const PICKS_LINKS = ['https://www.netflix.com/', 'https://nfshare.cn/?sid=5rfpUarUEd'];
+const PICKS_HEAD = {
+  zh: '站长推荐', en: 'Picks from the webmaster', jp: '運営のおすすめ', ko: '운영자 추천'
+};
+const MUSIC_SOON = {
+  zh: '此专区正在建设中，请稍安勿躁',
+  en: 'This section is under construction. Please stay tuned.',
+  jp: 'このコーナーは準備中です。しばらくお待ちください。',
+  ko: '이 코너는 준비 중입니다. 조금만 기다려 주세요.'
+};
+const PICKS_ZH_NODES = {
+  'picks.head': '站长推荐',
+  'picks.film.title': '《哦！文姬》',
+  'picks.music.soon': '此专区正在建设中，请稍安勿躁'
+};
 
 /* ---------- extraction helpers ---------- */
 function extractNodes(html) {
@@ -160,6 +178,20 @@ function verify(state) {
   }
   /* 死链口径统一为 404：核查说明不得再出现 504（站长 2026-11-13 指令） */
   if (source.includes('504')) errors.push('zh: 死链核查说明不得出现 504，统一口径为 404');
+
+  /* 1d. 站长推荐：盗版站不得出现，正版引导与邀请码必须逐字保留 */
+  if (!source.includes('<section class="section picks" id="picks">')) {
+    errors.push('zh: picks section missing');
+  }
+  for (const link of PICKS_LINKS) {
+    if (!source.includes(link)) errors.push('zh: picks link missing -> ' + link);
+  }
+  for (const dom of FORBIDDEN_PIRATE_DOMAINS) {
+    if (source.includes(dom)) errors.push('zh: 盗版站域名不得出现 -> ' + dom);
+  }
+  for (const [key, expected] of Object.entries(PICKS_ZH_NODES)) {
+    if (zhNodes[key] !== expected) errors.push('zh: picks node wrong -> ' + key);
+  }
 
   /* 1c. mobile switcher labels + accessible full names */
   const sourceShorts = shortLabels(source);
@@ -373,6 +405,19 @@ function verify(state) {
       if (page.includes(marker)) errors.push(lang + ': first-person attribution returned -> ' + marker);
     }
 
+    /* 站长推荐：四语链接一致，盗版域名禁入，标题与占位句逐字锁定 */
+    if (!page.includes('<section class="section picks" id="picks">')) {
+      errors.push(lang + ': picks section missing');
+    }
+    for (const link of PICKS_LINKS) {
+      if (!page.includes(link)) errors.push(lang + ': picks link missing -> ' + link);
+    }
+    for (const dom of FORBIDDEN_PIRATE_DOMAINS) {
+      if (page.includes(dom)) errors.push(lang + ': 盗版站域名不得出现 -> ' + dom);
+    }
+    if ((nodes['picks.head'] || '') !== PICKS_HEAD[lang]) errors.push(lang + ': picks heading drift');
+    if ((nodes['picks.music.soon'] || '') !== MUSIC_SOON[lang]) errors.push(lang + ': music placeholder drift');
+
     /* no Chinese body copy left behind */
     for (const marker of CHINESE_MARKERS) {
       if (page.includes(marker)) errors.push(lang + ': untranslated Chinese left in page -> ' + marker);
@@ -552,6 +597,21 @@ const faults = [
   } },
   { name: 'generated Korean page read4 tag tampered', mutate: s => {
     s.pages.ko = s.pages.ko.replace('data-i18n="read4.tag">TikTok<', 'data-i18n="read4.tag">또 하나<');
+  } },
+  { name: 'pirate site link reintroduced', mutate: s => {
+    s.source = s.source.replace('https://www.netflix.com/', 'https://www.ncat30.com/detail/30464.html');
+  } },
+  { name: 'invitation code stripped from China link', mutate: s => {
+    s.pages.en = s.pages.en.replace('https://nfshare.cn/?sid=5rfpUarUEd', 'https://nfshare.cn/');
+  } },
+  { name: 'Chinese music placeholder removed', mutate: s => {
+    s.source = s.source.replace('此专区正在建设中，请稍安勿躁', '');
+  } },
+  { name: 'English picks heading machine-translated', mutate: s => {
+    s.dict.en.html['picks.head'] = 'Webmaster recommend';
+  } },
+  { name: 'Korean music placeholder left in Chinese', mutate: s => {
+    s.dict.ko.html['picks.music.soon'] = '此专区正在建设中，请稍安勿躁';
   } }
 ];
 
