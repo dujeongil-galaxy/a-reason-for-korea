@@ -2,6 +2,15 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-22 · 推荐内容加预览图（长期规则）
+
+- `072a6df` — 站长指出《哦！文姬》推荐卡没有预览图，要求「带图推是最好的，以后也遵循这个规则」。这条作为本站推荐区的**长期约定**：每条推荐都要有来自正版资料站的预览图，本地化引用，四语 alt + 来源说明齐全。
+  - **选图**：盗版站素材一概不用。TMDB 有 Cloudflare 验证、Naver 搜索页是 JS 渲染，最终从 Letterboxd 影片页取到片方宣传剧照——罗文姬与李熙俊在废车场奔跑，正好对应「追查肇事逃逸」的剧情。原图 1200×675 / 386 KB，用 ffmpeg `-q:v 5` 压到 **174 KB**，存为 `assets/oh-my-gran-still.jpg`。
+  - **改了什么**：`index.html` 电影卡在标签与片名之间插入 `<figure>`（图片 + 来源说明），四语 `alt` 与 `picks.film.imageCredit` 手写翻译；`assets/styles.css` 新增 `.pick-figure / .pick-image / .pick-image-credit`；`en/jp/ko/index.html` 由 `build-i18n.mjs` 重建（每语 98 节点 / 12 属性）。
+  - **踩坑（见 PITFALLS 第 19 条）**：图片写了 `width="1200" height="675"` 但 CSS 漏了 `height:auto`，HTML 尺寸属性压过 `aspect-ratio`，CDP 实测渲染成 **441×675 竖长条**；补 `height:auto` 后为正确的 **441×248（16:9）**。已加机器断言防回退。
+  - **校验**：`verify-i18n.mjs` VERIFY OK + **SELF-TEST 56/56**（53 + 3）；真实文件两次注入（删图片引用、删 `height:auto`）均精准判红、恢复后全绿。CDP 渲染确认 `naturalWidth=1200 / complete=true / renderedHeight=248`，桌面两栏对齐、手机 390px 文字与来源说明完整；320/360/390/414 四档 `overflowElements=0`。
+  - **文档同步**：README 故障注入 53 → 56，写明「推荐必须带预览图」长期规则；PITFALLS 第 19 条。
+
 ## 2026-11-22 · 极窄屏（320px）横向溢出修复
 
 - `678866b` — 站长问「手机端加了站长推荐会不会溢出」。量化审计结论：**推荐区块本身不溢出**（320/360/390/414 四档 `picks.right` 均等于视口宽度），但 320px 下页面整体有 **6px 横向溢出**，源头是**原有的**顶部语言切换器 `.lang-switch`（right=326），与本次新增无关。

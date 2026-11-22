@@ -123,3 +123,11 @@
 - **规则**：溢出检测一律以 `documentElement.clientWidth` 为边界，逐个比对元素 `getBoundingClientRect().right`，同时比对 `scrollWidth` 是否大于 `clientWidth`。**不要拿 `innerWidth` 当屏幕宽度**。
 - **本次结论**：溢出源是顶部 `.lang-switch`（right=326），不是新加的「站长推荐」（picks right=320）。修法是 `@media (max-width: 360px)` 收紧 header gap 12→8px、brand 15→14px、语言按钮 `padding 10→7px` / `min-width 34→30px`。320/360/390/414 四档 `scrollWidth` 全部等于视口宽度，溢出 0。
 - **强制层**：`verify-i18n.mjs` 1e 段断言窄屏规则存在 + 1 组故障注入（删掉 media block 后只报这两条），`SELF-TEST 52 → 53/53`。
+
+## 19. 推荐内容默认带预览图；图片的 HTML 尺寸属性会压过 CSS 比例
+
+- **现象**：站长看了「站长推荐」卡片后说「哦，文姬！没有预览图吗。带图推是最好的。以后也遵循这个规则」。当时卡片只有文字，确实少了最直观的一眼信息。
+- **规则（长期）**：每条推荐必须配一张预览图，来源限于**正版电影 / 音乐资料站**（本次用 Letterboxd 收录的片方宣传剧照），**不用盗版站素材、不挂外链图床**；图片下载到 `assets/` 本地引用，避免外链失效；四语 alt 与来源说明齐全。首图 `assets/oh-my-gran-still.jpg` 用 ffmpeg 从 1200×675 原图压到 174 KB（原 386 KB）。
+- **踩坑**：图片标签写了 `width="1200" height="675"`（为 CLS 预留空间），CSS 写了 `width:100%; aspect-ratio:16/9` 却没写 `height:auto`——**HTML 的 height 属性作为 presentational hint 压过了 aspect-ratio**，实测渲染成 441×675 的竖长条而不是 16:9 横幅。加 `height:auto` 后变成正确的 441×248。
+- **规则**：凡是用 `width`/`height` 属性 + CSS `aspect-ratio` 的响应式图片，CSS 里必须写 `height:auto`；或者干脆不写 HTML 尺寸属性。上线前用 CDP 读 `naturalWidth` 与 `getBoundingClientRect()` 实测比例，别只看截图。
+- **强制层**：`verify-i18n.mjs` 1d 段新增图片引用 / 文件存在 / `height:auto` 断言，生成页新增四语来源说明逐字断言，3 组故障注入（删图片引用、来源说明留中文、删 `height:auto`），`SELF-TEST 53 → 56/56`。
