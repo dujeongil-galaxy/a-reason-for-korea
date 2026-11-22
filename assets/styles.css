@@ -495,7 +495,6 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
 /* 电影卡：剧照横向铺满整卡，标题/简介/按钮/注记全部落到图下方 */
 .pick-figure-still { margin: 0; }
 .pick-figure-still .pick-image { aspect-ratio: 16 / 9; }
-.pick-card-feature { grid-column: 1 / -1; order: -1; }
 .pick-poster-row-feature { display: flex; flex-direction: column; gap: 0; }
 .pick-poster-row-feature .pick-figure-still { width: 100%; }
 .pick-poster-row-feature .pick-poster-body { margin-top: 18px; }
