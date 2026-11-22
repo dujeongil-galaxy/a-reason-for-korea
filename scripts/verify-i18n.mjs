@@ -108,12 +108,13 @@ const MUSIC_SOON = {
   ko: '이 코너는 준비 중입니다. 조금만 기다려 주세요.'
 };
 /* 整块 actions：zh=aff（港区）、en=Prime Video（美区）、jp=Apple TV（日区）、ko=YouTube（韩区）；
-   primary 逐语锁定，防止地区规则被改回旧版。note 为红字 Netflix 提示，四页通用。 */
+   primary 逐语锁定。红字 note：中文保留原文；en/jp/ko 逐语本地化为「中国大陆用户点这里访问 Netflix」，
+   「这里」必须指向 aff 入口（AFF_LINK），不得回退成旧版机翻的「搜索片名观看」。 */
 const PICKS_ACTIONS_EXPECT = {
   zh: { primary: 'aff', note: '到 Netflix 搜索片名观看 · 请支持正版' },
-  en: { primary: 'amazon', note: 'Find the title on Netflix and watch it there — please support the official release' },
-  jp: { primary: 'apple', note: 'Netflix で作品名を検索してご覧ください。正版で応援しましょう' },
-  ko: { primary: 'youtube', note: 'Netflix에서 제목을 검색해 보세요. 정식 서비스로 응원해 주세요' }
+  en: { primary: 'amazon', note: 'Viewers in mainland China: <a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">click here</a> to access Netflix.' },
+  jp: { primary: 'apple', note: '中国大陸からご覧になる場合は、<a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">こちら</a>から Netflix にアクセスできます。' },
+  ko: { primary: 'youtube', note: '중국 본토 시청자는 <a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">여기</a>를 눌러 Netflix에 접속하세요.' }
 };
 /* 按钮文案逐语本地化锁定：不直译、不机翻、不漂移 */
 const PICKS_PRIMARY_LABEL = {
@@ -475,12 +476,13 @@ function verify(state) {
     const want = PICKS_ACTIONS_EXPECT[lang];
     if (!actions.includes(want.note)) errors.push(lang + ': Netflix note wording drift');
     if (!actions.includes(PICKS_PRIMARY_LABEL[lang])) errors.push(lang + ': primary button label drift');
-    if (!/class="pick-link pick-link-featured"/.test(actions)) errors.push(lang + ': featured button class missing');
-    if (!actions.includes(PRIMARY_LINK[want.primary])) {
+    const featuredHref = (actions.match(/class="pick-link pick-link-featured"\s+href="([^"]+)"/) || [])[1] || '';
+    if (!featuredHref) errors.push(lang + ': featured button class missing');
+    if (!featuredHref.includes(PRIMARY_LINK[want.primary])) {
       errors.push(lang + ': primary link missing -> ' + want.primary);
     }
     for (const [key, link] of Object.entries(PRIMARY_LINK)) {
-      if (key !== want.primary && actions.includes(link)) {
+      if (key !== want.primary && featuredHref.includes(link)) {
         errors.push(lang + ': wrong-region primary link -> ' + key);
       }
     }
@@ -489,8 +491,13 @@ function verify(state) {
         errors.push(lang + ': YouTube link forbidden in this region -> ' + dom);
       }
     }
-    if (want.primary !== 'aff' && (actions.includes(AFF_LINK) || actions.includes('5rfpUarUEd'))) {
-      errors.push(lang + ': aff link/code forbidden outside the Chinese HK-region page');
+    if (want.primary !== 'aff') {
+      if (featuredHref.includes(AFF_LINK) || featuredHref.includes('5rfpUarUEd')) {
+        errors.push(lang + ': aff link/code forbidden as primary button outside the Chinese page');
+      }
+      if (!want.note.includes(AFF_LINK)) {
+        errors.push(lang + ': localized Netflix note must link the aff entry');
+      }
     }
     for (const calque of FORBIDDEN_REGION_CALQUES) {
       if (actions.includes(calque)) errors.push(lang + ': Hong Kong region must not be translated into foreign copy -> ' + calque);
@@ -720,8 +727,17 @@ const faults = [
     s.dict.ko.html['picks.film.actions'] = s.dict.ko.html['picks.film.actions']
       .replace(YOUTUBE_LINK, 'https://www.netflix.com/');
   } },
-  { name: 'Netflix note wording drifted in Korean', mutate: s => {
-    s.dict.ko.html['picks.film.actions'] = s.dict.ko.html['picks.film.actions'].replace('Netflix에서 제목을 검색해 보세요. 정식 서비스로 응원해 주세요', 'Netflix에서 보세요');
+  { name: 'Korean Netflix note reverted to machine-translated search wording', mutate: s => {
+    s.dict.ko.html['picks.film.actions'] = s.dict.ko.html['picks.film.actions']
+      .replace('중국 본토 시청자는 <a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">여기</a>를 눌러 Netflix에 접속하세요.', 'Netflix에서 제목을 검색해 보세요. 정식 서비스로 응원해 주세요');
+  } },
+  { name: 'English Netflix note link stripped of the aff entry', mutate: s => {
+    s.dict.en.html['picks.film.actions'] = s.dict.en.html['picks.film.actions']
+      .replace(AFF_LINK, 'https://nfshare.cn/');
+  } },
+  { name: 'Japanese Netflix note reverted to machine-translated search wording', mutate: s => {
+    s.dict.jp.html['picks.film.actions'] = s.dict.jp.html['picks.film.actions']
+      .replace('中国大陸からご覧になる場合は、<a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">こちら</a>から Netflix にアクセスできます。', 'Netflix で作品名を検索してご覧ください。正版で応援しましょう');
   } },
   { name: 'invitation code stripped from Chinese page', mutate: s => {
     s.source = s.source.replace('5rfpUarUEd', '');
