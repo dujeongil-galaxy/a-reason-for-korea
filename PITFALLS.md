@@ -199,3 +199,11 @@
 - **Viki 的 offer URL 是「第 3 集」**：`/videos/1027036v-...-episode-3` 直接当卡内链接会让读者从第三集开始看。要从 episode 页 HTML 里反查剧集主页（`https://www.viki.com/tv/NNNNc-slug`）再挂。
 - **状态码不能只看 200**：`watcha.com/contents/*` 从非韩区访问是 **451**（地域封锁），`watch.amazon.com` 是 **302** 跳 `amazon.com/gp/video/detail/*` 后 200。判死链要 `curl -L` 看落地页，别把地域封锁当成链接坏了。
 - **机器强制**：`DRAMA_SUB` 锁链接与逐语文案、`SUB_DOMAINS` 锁域名前缀；断言「有渠道必须有且仅一条」「订阅按钮必须排在 featured 与红字之前」「无渠道区禁挂」「中文页禁挂外区订阅」。注入验证：真实文件把 jp 的 U-NEXT 换成 netflix 直链 → 判红 5 条，恢复全绿；总计 **99/99**。
+
+## 28. 撤掉一个专区，要连字典键、CSS 和故障注入一起撤
+
+- **现象**：站长说「韩国音乐那个专区撤了，删一行代码」，中文源其实是一个 4 行 `<article class="pick-card pick-card-soon">`，而且四语字典里还有 `picks.music.label` / `picks.music.soon` 共 6 键，CSS 里还有 `.pick-card-soon` / `.pick-placeholder`。
+- **只删 HTML 会怎样**：`verify-i18n.mjs` 的「html key set != index.html key set」立刻对 en/jp/ko 三语判红——字典键仍在、源节点没了。所以**删节点必须同时删字典键**（用独立 .cjs 行过滤，不要 bash 内联改）。
+- **旧故障注入会失效**：原来的「Korean music placeholder left in Chinese」是往字典里塞中文占位句（触发 note drift），占位断言删掉后这条注入变成永远不判红，自测报 `! self-test missed`。「Chinese music placeholder removed」那条也一样失效。撤功能时要**把依赖旧文案的注入一起换掉**，否则自测数量看着对、实际有空转。
+- **反向断言**：撤掉的东西要锁住「不许回来」——新增 `MUSIC_FORBIDDEN`（类名 + 4 语占位文案），中文源和三语页都查一遍。真实文件把音乐卡塞回中文源 → 判红 8 条（5 条回退 + 3 条字典键集失配），确认锁生效。
+- **计数**：99 → **100/100**；build 每语 128 → 126 节点；四语 × 四档宽度 `overflow=0`。
