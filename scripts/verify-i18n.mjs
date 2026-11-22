@@ -83,14 +83,18 @@ const ZH_PRODUCT_COPY = [
    国际产品名 TikTok —— 不是逐字机翻的 Douyin，也不是含糊的旧标签「近例」。 */
 const READ4_TAG = { zh: '抖音', en: 'TikTok', jp: 'TikTok', ko: 'TikTok' };
 const STALE_READ4_TAGS = ['近例', 'Another', 'もう一本', '또 하나'];
-/* 站长推荐（2026-11-22 终版规则）：片名线索来自盗版站，但该域名绝不能出现在页面上；
-   主按钮按地区定：中文按港区挂 aff；英文按美区、日文按日区——YouTube 均无租买 → aff；
-   韩文按韩区——YouTube 可租买 → YouTube 按钮（撤掉 aff）。邀请码 zh/en/jp 逐字保留。
-   港区口径只有中文源可写，外文一律不直译；Netflix 只作红色加粗提示行、四页均不得成链接。 */
+/* 站长推荐（2026-11-22 按区复核版）：片名线索来自盗版站，但该域名绝不能出现在页面上；
+   主按钮按地区定：中文按港区挂 aff（邀请码逐字保留）；英文按美区挂 Prime Video 租买页；
+   日文按日区挂 Apple TV 租买页（日区 Netflix / Amazon JP / YouTube 均无此片）；
+   韩文按韩区挂 YouTube 租买页。港区口径只有中文源可写，外文一律不直译；
+   Netflix 只作红色加粗提示行、四页均不得成链接。 */
 const FORBIDDEN_PIRATE_DOMAINS = ['ncat30.com'];
 const AFF_LINK = 'https://nfshare.cn/?sid=5rfpUarUEd';
+const AMAZON_LINK = 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.3a505a12-509d-4f34-af76-47f0ea441f72';
+const APPLE_TV_LINK = 'https://itunes.apple.com/jp/movie/%E3%82%AA-%E3%83%A0%E3%83%8B-%E5%AD%97%E5%B9%95%E7%89%88/id1691528206?uo=4';
 const YOUTUBE_LINK = 'https://youtu.be/cflWf3XKeFI?si=pZ-WkU6w5wYkh4Wq';
 const YOUTUBE_DOMAINS = ['https://youtu.be/', 'youtube.com/watch'];
+const PRIMARY_LINK = { aff: AFF_LINK, amazon: AMAZON_LINK, apple: APPLE_TV_LINK, youtube: YOUTUBE_LINK };
 const FORBIDDEN_NETFLIX_LINK = 'https://www.netflix.com/';
 /* 外文页按钮文案禁止直译中文语境的「港区」划分；中文源保留原始口径不受此限 */
 const FORBIDDEN_REGION_CALQUES = ['Hong Kong, China', '중국 홍콩', '香港地区', '香港地域'];
@@ -103,19 +107,19 @@ const MUSIC_SOON = {
   jp: 'このコーナーは準備中です。しばらくお待ちください。',
   ko: '이 코너는 준비 중입니다. 조금만 기다려 주세요.'
 };
-/* 整块 actions：zh/en/jp 主按钮=aff（jp 本轮由无链接改为 aff），ko 主按钮=YouTube；
+/* 整块 actions：zh=aff（港区）、en=Prime Video（美区）、jp=Apple TV（日区）、ko=YouTube（韩区）；
    primary 逐语锁定，防止地区规则被改回旧版。note 为红字 Netflix 提示，四页通用。 */
 const PICKS_ACTIONS_EXPECT = {
   zh: { primary: 'aff', note: '到 Netflix 搜索片名观看 · 请支持正版' },
-  en: { primary: 'aff', note: 'Find the title on Netflix and watch it there — please support the official release' },
-  jp: { primary: 'aff', note: 'Netflix で作品名を検索してご覧ください。正版で応援しましょう' },
+  en: { primary: 'amazon', note: 'Find the title on Netflix and watch it there — please support the official release' },
+  jp: { primary: 'apple', note: 'Netflix で作品名を検索してご覧ください。正版で応援しましょう' },
   ko: { primary: 'youtube', note: 'Netflix에서 제목을 검색해 보세요. 정식 서비스로 응원해 주세요' }
 };
 /* 按钮文案逐语本地化锁定：不直译、不机翻、不漂移 */
 const PICKS_PRIMARY_LABEL = {
   zh: '中国香港地区：通过此链接开通（邀请码 5rfpUarUEd）',
-  en: 'Get access through this link (invitation code 5rfpUarUEd)',
-  jp: 'このリンクから視聴権を取得（招待コード 5rfpUarUEd）',
+  en: 'Rent or buy on Prime Video',
+  jp: 'Apple TV でレンタル・購入する · 正版で応援しましょう',
   ko: 'YouTube에서 대여하거나 구매하기 · 정식 서비스로 응원해 주세요'
 };
 const PICKS_ZH_NODES = {
@@ -462,7 +466,7 @@ function verify(state) {
       if (page.includes(marker)) errors.push(lang + ': first-person attribution returned -> ' + marker);
     }
 
-    /* 站长推荐：主按钮按区——en/jp 挂 aff 邀请码链接，ko 挂 YouTube 租买链接；
+    /* 站长推荐：主按钮按区——zh=aff（港区）、en=Prime Video、jp=Apple TV、ko=YouTube；
        外文一律不直译港区；盗版域名与 Netflix 链接一律禁入。 */
     if (!page.includes('<section class="section picks" id="picks">')) {
       errors.push(lang + ': picks section missing');
@@ -472,17 +476,21 @@ function verify(state) {
     if (!actions.includes(want.note)) errors.push(lang + ': Netflix note wording drift');
     if (!actions.includes(PICKS_PRIMARY_LABEL[lang])) errors.push(lang + ': primary button label drift');
     if (!/class="pick-link pick-link-featured"/.test(actions)) errors.push(lang + ': featured button class missing');
-    if (want.primary === 'aff') {
-      if (!actions.includes(AFF_LINK)) errors.push(lang + ': aff link missing');
-      if (!actions.includes('5rfpUarUEd')) errors.push(lang + ': invitation code missing');
-      for (const dom of YOUTUBE_DOMAINS) {
-        if (actions.includes(dom)) errors.push(lang + ': YouTube link forbidden where no rent/buy -> ' + dom);
+    if (!actions.includes(PRIMARY_LINK[want.primary])) {
+      errors.push(lang + ': primary link missing -> ' + want.primary);
+    }
+    for (const [key, link] of Object.entries(PRIMARY_LINK)) {
+      if (key !== want.primary && actions.includes(link)) {
+        errors.push(lang + ': wrong-region primary link -> ' + key);
       }
-    } else {
-      if (!actions.includes(YOUTUBE_LINK)) errors.push(lang + ': YouTube rent/buy link missing');
-      if (actions.includes(AFF_LINK) || actions.includes('5rfpUarUEd')) {
-        errors.push(lang + ': aff link/code forbidden where YouTube rent/buy exists');
+    }
+    for (const dom of YOUTUBE_DOMAINS) {
+      if (want.primary !== 'youtube' && actions.includes(dom)) {
+        errors.push(lang + ': YouTube link forbidden in this region -> ' + dom);
       }
+    }
+    if (want.primary !== 'aff' && (actions.includes(AFF_LINK) || actions.includes('5rfpUarUEd'))) {
+      errors.push(lang + ': aff link/code forbidden outside the Chinese HK-region page');
     }
     for (const calque of FORBIDDEN_REGION_CALQUES) {
       if (actions.includes(calque)) errors.push(lang + ': Hong Kong region must not be translated into foreign copy -> ' + calque);
@@ -682,7 +690,7 @@ const faults = [
     s.source = s.source.replace(AFF_LINK, 'https://www.ncat30.com/detail/30464.html');
   } },
   { name: 'YouTube purchase link reintroduced into US English page', mutate: s => {
-    s.pages.en = s.pages.en.replace(AFF_LINK, YOUTUBE_LINK);
+    s.pages.en = s.pages.en.replace(AMAZON_LINK, YOUTUBE_LINK);
   } },
   { name: 'Netflix red bold note styling stripped', mutate: s => {
     s.css = s.css.replace('color: #C5221F; font-weight: 700;', 'color: var(--ink-soft); font-weight: 400;');
@@ -690,18 +698,22 @@ const faults = [
   { name: 'Netflix note line removed from source', mutate: s => {
     s.source = s.source.replace('<p class="pick-netflix-note">到 Netflix 搜索片名观看 · 请支持正版</p>', '');
   } },
-  { name: 'aff link stripped from English page', mutate: s => {
-    s.pages.en = s.pages.en.replace(AFF_LINK, 'https://nfshare.cn/');
+  { name: 'Prime Video link stripped from English page', mutate: s => {
+    s.pages.en = s.pages.en.replace(AMAZON_LINK, 'https://nfshare.cn/');
   } },
-  { name: 'Hong Kong region calque reintroduced into English aff button', mutate: s => {
+  { name: 'Hong Kong region calque reintroduced into English button', mutate: s => {
     s.dict.en.html['picks.film.actions'] = s.dict.en.html['picks.film.actions']
-      .replace('>Get access through this link', '>Hong Kong, China: get access through this link');
+      .replace('>Rent or buy on Prime Video', '>Hong Kong, China: rent or buy on Prime Video');
   } },
-  { name: 'JP page given a YouTube link (no JP rent/buy)', mutate: s => {
+  { name: 'JP page given a YouTube link (JP rent/buy is on Apple TV)', mutate: s => {
     s.dict.jp.html['picks.film.actions'] = s.dict.jp.html['picks.film.actions']
-      .replace(AFF_LINK, YOUTUBE_LINK);
+      .replace(APPLE_TV_LINK, YOUTUBE_LINK);
   } },
-  { name: 'KO page switched back to aff (KR has YouTube rent/buy)', mutate: s => {
+  { name: 'JP page switched back to the HK-region aff link', mutate: s => {
+    s.dict.jp.html['picks.film.actions'] = s.dict.jp.html['picks.film.actions']
+      .replace(APPLE_TV_LINK, AFF_LINK);
+  } },
+  { name: 'KO page switched to the US Prime Video link', mutate: s => {
     s.dict.ko.html['picks.film.actions'] = s.dict.en.html['picks.film.actions'];
   } },
   { name: 'KO YouTube link stripped', mutate: s => {
@@ -711,8 +723,8 @@ const faults = [
   { name: 'Netflix note wording drifted in Korean', mutate: s => {
     s.dict.ko.html['picks.film.actions'] = s.dict.ko.html['picks.film.actions'].replace('Netflix에서 제목을 검색해 보세요. 정식 서비스로 응원해 주세요', 'Netflix에서 보세요');
   } },
-  { name: 'invitation code stripped from China link', mutate: s => {
-    s.pages.en = s.pages.en.replace(AFF_LINK, 'https://nfshare.cn/');
+  { name: 'invitation code stripped from Chinese page', mutate: s => {
+    s.source = s.source.replace('5rfpUarUEd', '');
   } },
   { name: 'Chinese music placeholder removed', mutate: s => {
     s.source = s.source.replace('此专区正在建设中，请稍安勿躁', '');
