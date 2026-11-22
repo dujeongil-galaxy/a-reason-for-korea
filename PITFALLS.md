@@ -101,3 +101,10 @@
 - **规则**：按字节批量替换时逐条断言**实际命中次数**（不是想当然写 1）；命中 2 次就 `want=2` 一次替换两处。防回退断言列出**全部**中文原文片段逐条核对（`ZH_PRODUCT_COPY` 4 条），故障注入用全局 `/g` 替换把同串一次改干净。
 - **边界**：产品名不等于域名。`https://v.douyin.com/ETkls6EwUXo/` 是原始分享的真实链接，href 与可读文字 `v.douyin.com` 一律不动；断言查生成页可见文本时要先剥掉 `href="…"` 和 `<script>`，且旧名用大写 `Douyin` 匹配，避免误伤小写域名。
 - **强制层**：`verify-i18n.mjs` 2b 段（中文原文 4 条 + 三语禁旧名 + 三语必含 `TikTok`）+ 5 组故障注入，`SELF-TEST 42/42` 全判红（`19b1330`）。
+
+## 16. 推送 403：账号有权限不等于令牌有权限
+
+- **现象**：本地 `git push` 与 GitHub 连接器写入同一仓库都返回 403。用 `curl /repos/dujeongil-galaxy/a-reason-for-korea` 看到 `"push": true`，据此判断「权限够，是 git 传凭据方式不对」，于是绕了一圈改 URL 内嵌凭据、测 `GIT_TRACE_CURL`、给连接器重授权，全无效。真正原因：本地那把 fine-grained PAT 的 **Contents 权限是只读**。
+- **真因**：`/repos/...` 的 `permissions` 字段反映的是**发起请求的账号在该仓库的权限**，不是**这把令牌被授予的权限**。fine-grained PAT 的权限是独立的一层，必须单独看。此外 GitHub App 安装令牌（`x-access-token`，前缀 `ghs_`）与连接器走的 integration 令牌是另外两套身份，都可能没有本站 Contents 写权限。
+- **规则**：诊断顺序应为 ① `curl -X POST /repos/<o>/<r>/git/blobs` 做最小写探测 → ② 看响应是 `Resource not accessible by personal access token`（PAT 权限不足）还是 `by integration`（App/连接器授权范围不足）→ ③ 再决定去 PAT 页改 Contents 还是去 App 安装页勾仓库。**不要拿 `/repos` 的 `push: true` 当令牌可写的证据**；认证失败用 reconnect，权限不足别去 reconnect。
+- **解决**：让站长新建 fine-grained PAT（Resource owner 选组织、Only select repositories 勾本站、Repository permissions → Contents: Read and write），用 `git -c credential.helper= push "https://x-access-token:<PAT>@github.com/<o>/<r>.git" main` 直推；令牌只走 shell 变量，不写文件、不进日志、不改 `origin`。本次 `c231dc5` 三笔据此推送成功（`00c724f..1f9ca34`）。

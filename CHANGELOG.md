@@ -11,7 +11,8 @@
   - **同步坑**：动手前本地落后远端 4 个提交（`69afbb7..00c724f`，含新增 `read4` 那条链接），先 `git fetch origin && git merge --ff-only origin/main` 快进再改，否则会在旧结构上动手。
   - **校验**：`build` 重建（每语 86 节点）；`verify` → `VERIFY OK` + `SELF-TEST 47/47`（原 42 + 5）；按项目硬性要求又用真实文件注入一次故障（把 `read4.tag` 改回「近例」），确认**仅新增断言判红**且退出码 1，恢复后复跑全绿；四页标签扫描 `抖音 / TikTok / TikTok / TikTok`，三语页 `Douyin|더우인|抖音` 计数均为 0。
   - **文档同步**：README 故障注入计数 35 → 47（此前漏同步），并补记 read4 标签口径。
-  - **推送状态（未上线）**：`c231dc5` + `9e4295b` 已在本地提交，但推送被 403 拦下——本地凭据是 `x-access-token`（GitHub App 安装令牌），`git push` 报 `Permission to dujeongil-galaxy/a-reason-for-korea.git denied`；改用已连接的 GitHub 连接器写入，同样返回 `403 Resource not accessible by integration`（连空 tree 都建不了，探测未产生提交）。与 `9c2738a` 那次是同一个坑：该 App 的仓库授权范围不含本站，或缺 Contents 写权限。**待站长在 GitHub App 安装页把 `a-reason-for-korea` 加入授权并给 Contents: Read & Write 后重推**，或由站长用有 `repo` 权限的凭据本地推送。已导出 `git format-patch` 补丁备用。
+  - **推送状态（已上线）**：`c231dc5`（代码）+ `9e4295b`（记账、故障计数 47）+ `1f9ca34`（403 诊断记账）三笔，在站长提供 fine-grained PAT 后推送成功（`00c724f..1f9ca34 main -> main`）。Pages 部署后线上核对：中文 `read4.tag` = `抖音`，en/jp/ko = `TikTok`（运行时 `assets/i18n.js` 三语同为 `TikTok`）；三语页 `Douyin|더우인|抖音` 计数 0，中文页「抖音」只出现在正文（符合中文口径）。此前导出的 `format-patch` 补丁作废，无需应用。
+  - **403 排查结论（见 PITFALLS 第 16 条）**：本地原凭据 `x-access-token`（GitHub App 安装令牌）无本仓库写权限；GitHub 连接器同样 `403 Resource not accessible by integration`。`/repos/...` 返回的 `push: true` 反映的是**账号**权限而非**令牌**权限，不能作为令牌可写的依据。最终以 Repository access 含本站、Contents: Read and write 的 fine-grained PAT（`github_pat_` 开头）直连推送成功；推送时令牌只走命令行变量，不落盘、不写日志。
 
 ## 2026-11-21 18:05 · 延伸阅读新增一条同频视频链接（`9c2738a`）
 
@@ -20,7 +21,7 @@
   - **改了什么**：`index.html`（中文源）延伸阅读列表新增一个 `<li>`（标签 `近例`、标题「另一条抖音视频：为了防止韩国人想不开，操碎了心」、链接 `https://v.douyin.com/kDbYuYZROUU/`）；`assets/i18n.js` 的 en/jp/ko 各补 `read4.tag` / `read4.title` 两个键（译文按既有口径写 TikTok，不出现 Douyin / 抖音）；`en/jp/ko/index.html` 由 `scripts/build-i18n.mjs` 重建，不手改。
   - **没改什么**：作者、粉丝数、点赞数一概不写（站长明确不喜欢这些）；原分享、四条理由、点灯互动、附页全部不动；四语章节结构与视觉无变化。
   - **校验**：`node scripts/build-i18n.mjs` 重建成功（每语 86 节点）；`node scripts/verify-i18n.mjs` → `VERIFY OK · 86 translated nodes · 11 translated attributes · 4 languages`（原 84 节点 +2）且 `SELF-TEST 42/42 injected faults rejected`；四页 grep 新链接各 1 处；四页扫描确认无「两活宝 / 万赞 / 粉丝 / 关注」等作者与数据字样。
-  - **推送状态**：本地已提交，尚未推送。GitHub 连接器 MCP 与本地 `x-access-token` 凭据对 `a-reason-for-korea` 均无写权限（均返回 403 `Resource not accessible by integration`），重新授权连接器后仍失败。需在 GitHub App 安装页给该 App 授予本仓库 Contents 写权限，或由站长本地推送后再补记。
+  - **推送状态**：已提交为 `9c2738a` 并推送上线；`00c724f` 为后续基线，本地已快进同步。
 
 ## 2026-11-17 22:56 · 接入 Google AdSense：元标记 + Auto Ads 全站挂载（`18dac5e`）
 
