@@ -58,7 +58,7 @@ assets/app.js                 滚动淡入 / 点灯计数 / 理由卡片 / 复�
 assets/clipping-hkcd.jpg      附页剪报（站长发给 AI，原样未修改）
 favicon.svg                   猫爪图标
 scripts/build-i18n.mjs        由 index.html + 字典生成三张语言页
-scripts/verify-i18n.mjs       四语一致性 + 附页 + 切换器 + 链接状态 + 归属措辞 + 产品名/read4 标签 + 站长推荐正版引导口径校验 + 52 项故障注入自检
+scripts/verify-i18n.mjs       四语一致性 + 附页 + 切换器 + 链接状态 + 归属措辞 + 产品名/read4 标签 + 站长推荐正版引导 + 极窄屏防溢出校验 + 53 项故障注入自检
 .nojekyll                     让 GitHub Pages 跳过 Jekyll
 CHANGELOG.md / PITFALLS.md    改动记账与踩坑记录
 ```
@@ -69,7 +69,7 @@ CHANGELOG.md / PITFALLS.md    改动记账与踩坑记录
 
 ```bash
 node scripts/build-i18n.mjs     # 重新生成三张语言页
-node scripts/verify-i18n.mjs    # 校验；内含故意造错的自检，必须 52/52 判红
+node scripts/verify-i18n.mjs    # 校验；内含故意造错的自检，必须 53/53 判红
 ```
 
 校验会检查四语 key 是否齐全（84 个节点 / 11 个属性）、中文是否被删、生成页是否与字典逐字一致、资源路径 / 语言切换链接 / canonical 是否正确，以及附页章节、边界声明、剪报图片归属措辞、三条存档链接及其状态标记在四语里是否都在。

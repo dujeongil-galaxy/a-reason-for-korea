@@ -2,6 +2,14 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-22 · 极窄屏（320px）横向溢出修复
+
+- `678866b` — 站长问「手机端加了站长推荐会不会溢出」。量化审计结论：**推荐区块本身不溢出**（320/360/390/414 四档 `picks.right` 均等于视口宽度），但 320px 下页面整体有 **6px 横向溢出**，源头是**原有的**顶部语言切换器 `.lang-switch`（right=326），与本次新增无关。
+  - **诊断坑**：第一版审计用 `window.innerWidth` 当屏幕宽度，320px 时它返回 326（layout viewport 被最宽内容撑开），于是误报「0 溢出」。改用 `documentElement.clientWidth`（320）后准确抓到 `.lang-switch` 与其内部 `한국어` 链接两处越界。见 PITFALLS 第 18 条。
+  - **改了什么**：`assets/styles.css` 新增 `@media (max-width: 360px)`——header gap 12→8px、brand 15→14px、`.lang-switch a` 的 min-width 34→30px / padding 10→7px；只影响 ≤360px，360px 及以上视觉不变。`scripts/verify-i18n.mjs` 1e 段新增窄屏规则断言 + 1 组故障注入。
+  - **验证**：`verify-i18n.mjs` VERIFY OK + **SELF-TEST 53/53**（52 + 1）；真实文件删掉 media block 后只报「narrow-viewport guard missing / lang switch not tightened」两条、退出码 1，恢复后全绿。CDP 四档重测：`innerWidth = scrollWidth = bodyScrollWidth = clientWidth`（320/360/390/414），`overflowElements = 0`。截图 `D:/WorkBuddy-Cache/shots/picks-mobile-check.png`。
+  - **文档同步**：README 故障注入 52 → 53；PITFALLS 第 18 条「手机溢出要看 clientWidth，不是 innerWidth」。
+
 ## 2026-11-22 · 新增「站长推荐」区块（韩国影视 + 音乐占位）
 
 - `b3003c1` — 站长指令：在「延伸阅读」旁边新增「站长推荐」，用来收集韩国歌曲与韩国电影（电视剧也算）。电影先推荐《哦！文姬》，但站长给的片源链接是盗版站，**不得挂出**；要引导读者去 Netflix 支持正版，中国大陆链接 `https://nfshare.cn/?sid=5rfpUarUEd` 的邀请码必须保留。音乐暂时占位，备注「此专区正在建设中，请稍安勿躁」。

@@ -115,3 +115,11 @@
 - **规则**：盗版 URL 只用于**离线确认片名**（本次为 2020 年韩国电影《哦！文姬》，原名 `오! 문희`、国际名 `Oh! My Gran`）。页面只写片名与一句剧情，不放该域名、不引用其海报、不写「资源」字样；引导语落到 Netflix 官方站，中国大陆购买链接逐字保留邀请码 `sid=5rfpUarUEd`。
 - **片名不机翻**：en 用国际发行名 `Oh! My Gran`，jp/ko 用原名 `『오! 문희』` 并附国际名；不要译成 `Oh! Moon-hee` 之外的自造名，也不要把中文「哦！文姬」直译成拼音。
 - **强制层**：`verify-i18n.mjs` 新增 `FORBIDDEN_PIRATE_DOMAINS`（四页 + 中文源禁 `ncat30.com`）、`PICKS_LINKS`（Netflix 与带邀请码的 nfshare 必须逐字在四页出现）、`PICKS_HEAD` / `MUSIC_SOON` 四语逐字断言 + 5 组故障注入，`SELF-TEST 52/52`。
+
+## 18. 手机溢出要看 clientWidth，不是 innerWidth
+
+- **现象**：320px 视口审计时 `window.innerWidth` 返回 **326**、`documentElement.scrollWidth` 也是 326，但 `clientWidth` 是 320。第一版审计脚本拿 `innerWidth` 当屏幕宽度，于是报「溢出元素 0」，漏掉了真实存在的 6px 横向滚动。
+- **真因**：移动端 layout viewport 会被最宽内容撑开，`innerWidth` 跟着变成撑开后的宽度；只有 `documentElement.clientWidth` 才是设备视口的真实宽度。
+- **规则**：溢出检测一律以 `documentElement.clientWidth` 为边界，逐个比对元素 `getBoundingClientRect().right`，同时比对 `scrollWidth` 是否大于 `clientWidth`。**不要拿 `innerWidth` 当屏幕宽度**。
+- **本次结论**：溢出源是顶部 `.lang-switch`（right=326），不是新加的「站长推荐」（picks right=320）。修法是 `@media (max-width: 360px)` 收紧 header gap 12→8px、brand 15→14px、语言按钮 `padding 10→7px` / `min-width 34→30px`。320/360/390/414 四档 `scrollWidth` 全部等于视口宽度，溢出 0。
+- **强制层**：`verify-i18n.mjs` 1e 段断言窄屏规则存在 + 1 组故障注入（删掉 media block 后只报这两条），`SELF-TEST 52 → 53/53`。
