@@ -471,6 +471,11 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
 }
 .pick-link:hover { border-color: var(--accent); background: var(--surface-2); }
 .pick-link-featured { color: var(--accent); border-color: var(--accent); font-weight: 700; }
+/* 奈飞原按钮文案降级为红字提示（站长 2026-11-22 指令），不再是可点按钮 */
+.pick-netflix-note {
+  margin: -2px 0 0; font-size: 12.5px; line-height: 1.65;
+  color: #C5221F; font-weight: 700;
+}
 .pick-note { font-size: 12px; color: var(--ink-faint); margin-top: 16px; line-height: 1.7; }
 .pick-card-soon { display: flex; flex-direction: column; justify-content: center; min-height: 260px; }
 .pick-placeholder {

@@ -84,9 +84,12 @@ const ZH_PRODUCT_COPY = [
 const READ4_TAG = { zh: '抖音', en: 'TikTok', jp: 'TikTok', ko: 'TikTok' };
 const STALE_READ4_TAGS = ['近例', 'Another', 'もう一本', '또 하나'];
 /* 站长推荐（2026-11-22 指令）：片名线索来自盗版站，但该域名绝不能出现在页面上；
-   引导去 Netflix 支持正版，中国大陆链接的邀请码必须逐字保留。 */
+   中国大陆一律按港区算——aff 邀请码链接保留（zh/en/ko），邀请码逐字保留；
+   日区不挂任何购买链接，只留 Netflix 正版推荐文字；
+   奈飞原文案降级为红色加粗提示行，四页通用。YouTube 链接一律不得出现。 */
 const FORBIDDEN_PIRATE_DOMAINS = ['ncat30.com'];
-const PICKS_LINKS = ['https://www.netflix.com/', 'https://nfshare.cn/?sid=5rfpUarUEd'];
+const FORBIDDEN_PURCHASE_LINKS = ['https://youtu.be/', 'youtube.com/watch', 'https://www.netflix.com/'];
+const AFF_LINK = 'https://nfshare.cn/?sid=5rfpUarUEd';
 const PICKS_HEAD = {
   zh: '站长推荐', en: 'Picks from the webmaster', jp: '運営のおすすめ', ko: '운영자 추천'
 };
@@ -95,6 +98,13 @@ const MUSIC_SOON = {
   en: 'This section is under construction. Please stay tuned.',
   jp: 'このコーナーは準備中です。しばらくお待ちください。',
   ko: '이 코너는 준비 중입니다. 조금만 기다려 주세요.'
+};
+/* 整块 actions：zh 源 + en/ko 含 aff 链接与邀请码，jp 只有 Netflix 文字、无任何 <a> */
+const PICKS_ACTIONS_EXPECT = {
+  zh: { aff: true, note: '到 Netflix 搜索片名观看 · 请支持正版' },
+  en: { aff: true, note: 'Find the title on Netflix and watch it there — please support the official release' },
+  jp: { aff: false, note: 'Netflix で作品名を検索してご覧ください。正版で応援しましょう' },
+  ko: { aff: true, note: 'Netflix에서 제목을 검색해 보세요. 정식 서비스로 응원해 주세요' }
 };
 const PICKS_ZH_NODES = {
   'picks.head': '站长推荐',
@@ -191,8 +201,20 @@ function verify(state) {
   if (!source.includes('<section class="section picks" id="picks">')) {
     errors.push('zh: picks section missing');
   }
-  for (const link of PICKS_LINKS) {
-    if (!source.includes(link)) errors.push('zh: picks link missing -> ' + link);
+  /* 中文源整块 actions：aff 邀请码链接 + 红字 Netflix 原文 */
+  const zhActions = zhNodes['picks.film.actions'] || '';
+  if (!source.includes('data-i18n="picks.film.actions"')) {
+    errors.push('zh: picks actions block missing');
+  }
+  if (!zhActions.includes(AFF_LINK)) errors.push('zh: aff link missing from actions block');
+  if (!zhActions.includes('5rfpUarUEd')) errors.push('zh: invitation code missing from actions block');
+  if (!zhActions.includes('中国香港地区')) errors.push('zh: HK-region wording missing');
+  if (!zhActions.includes(PICKS_ACTIONS_EXPECT.zh.note)) errors.push('zh: Netflix note wording drift');
+  if (!/\.pick-netflix-note\s*\{[^}]*color:\s*#C5221F[^}]*font-weight:\s*700/.test(state.css)) {
+    errors.push('zh: Netflix note must be red and bold');
+  }
+  for (const link of FORBIDDEN_PURCHASE_LINKS) {
+    if (source.includes(link)) errors.push('zh: purchase link forbidden -> ' + link);
   }
   for (const dom of FORBIDDEN_PIRATE_DOMAINS) {
     if (source.includes(dom)) errors.push('zh: 盗版站域名不得出现 -> ' + dom);
@@ -427,12 +449,25 @@ function verify(state) {
       if (page.includes(marker)) errors.push(lang + ': first-person attribution returned -> ' + marker);
     }
 
-    /* 站长推荐：四语链接一致，盗版域名禁入，标题与占位句逐字锁定 */
+    /* 站长推荐：zh/en/ko 挂 aff 邀请码链接，jp 不挂任何购买链接；盗版域名与 YouTube 一律禁入 */
     if (!page.includes('<section class="section picks" id="picks">')) {
       errors.push(lang + ': picks section missing');
     }
-    for (const link of PICKS_LINKS) {
-      if (!page.includes(link)) errors.push(lang + ': picks link missing -> ' + link);
+    const actions = nodes['picks.film.actions'] || '';
+    const want = PICKS_ACTIONS_EXPECT[lang];
+    if (!actions.includes(want.note)) errors.push(lang + ': Netflix note wording drift');
+    if (want.aff) {
+      if (!actions.includes(AFF_LINK)) errors.push(lang + ': aff link missing');
+      if (!actions.includes('5rfpUarUEd')) errors.push(lang + ': invitation code missing');
+      if (!/class="pick-link pick-link-featured"/.test(actions)) errors.push(lang + ': aff button class missing');
+    } else {
+      if (actions.includes('<a ') || actions.includes('href=')) {
+        errors.push(lang + ': JP page must not carry any purchase link');
+      }
+      if (actions.includes('5rfpUarUEd')) errors.push(lang + ': invitation code must not appear on JP page');
+    }
+    for (const link of FORBIDDEN_PURCHASE_LINKS) {
+      if (page.includes(link)) errors.push(lang + ': purchase link forbidden -> ' + link);
     }
     for (const dom of FORBIDDEN_PIRATE_DOMAINS) {
       if (page.includes(dom)) errors.push(lang + ': 盗版站域名不得出现 -> ' + dom);
@@ -625,10 +660,28 @@ const faults = [
     s.pages.ko = s.pages.ko.replace('data-i18n="read4.tag">TikTok<', 'data-i18n="read4.tag">또 하나<');
   } },
   { name: 'pirate site link reintroduced', mutate: s => {
-    s.source = s.source.replace('https://www.netflix.com/', 'https://www.ncat30.com/detail/30464.html');
+    s.source = s.source.replace(AFF_LINK, 'https://www.ncat30.com/detail/30464.html');
+  } },
+  { name: 'YouTube purchase link reintroduced', mutate: s => {
+    s.pages.en = s.pages.en.replace(AFF_LINK, 'https://youtu.be/cflWf3XKeFI');
+  } },
+  { name: 'Netflix red bold note styling stripped', mutate: s => {
+    s.css = s.css.replace('color: #C5221F; font-weight: 700;', 'color: var(--ink-soft); font-weight: 400;');
+  } },
+  { name: 'Netflix note line removed from source', mutate: s => {
+    s.source = s.source.replace('<p class="pick-netflix-note">到 Netflix 搜索片名观看 · 请支持正版</p>', '');
+  } },
+  { name: 'aff link stripped from English page', mutate: s => {
+    s.pages.en = s.pages.en.replace(AFF_LINK, 'https://nfshare.cn/');
+  } },
+  { name: 'JP page given an affiliate link', mutate: s => {
+    s.dict.jp.html['picks.film.actions'] = s.dict.en.html['picks.film.actions'];
+  } },
+  { name: 'Netflix note wording drifted in Korean', mutate: s => {
+    s.dict.ko.html['picks.film.actions'] = s.dict.ko.html['picks.film.actions'].replace('Netflix에서 제목을 검색해 보세요. 정식 서비스로 응원해 주세요', 'Netflix에서 보세요');
   } },
   { name: 'invitation code stripped from China link', mutate: s => {
-    s.pages.en = s.pages.en.replace('https://nfshare.cn/?sid=5rfpUarUEd', 'https://nfshare.cn/');
+    s.pages.en = s.pages.en.replace(AFF_LINK, 'https://nfshare.cn/');
   } },
   { name: 'Chinese music placeholder removed', mutate: s => {
     s.source = s.source.replace('此专区正在建设中，请稍安勿躁', '');
