@@ -46,7 +46,14 @@
       <a href="#reasons" data-i18n="nav.reasons">이유</a>
       <a href="#lamp" data-i18n="nav.lamp">불 켜기</a>
       <a href="#reading" data-i18n="nav.reading">더 읽기</a>
-      <a href="#picks" data-i18n="nav.picks">운영자 추천</a>
+      <div class="nav-dropdown">
+        <a href="#picks" data-i18n="nav.picks">운영자 추천</a>
+        <div class="nav-dropdown-menu">
+          <a href="#picks" data-i18n="nav.picks.drama">한국 드라마 보기</a>
+          <a href="#picks-kpop" data-i18n="nav.picks.kpop">K-pop 듣기</a>
+          <a href="#picks-games" data-i18n="nav.picks.game">게임 하기</a>
+        </div>
+      </div>
     </nav>
     <div class="lang-switch" role="group" aria-label="언어" data-i18n-aria-label="aria.langSwitch">
       <a data-lang-link="zh" href="../" lang="zh"><span class="lang-long">中文</span><span class="lang-short" aria-hidden="true">CN</span></a>
@@ -389,6 +396,7 @@
           <h2 data-i18n="picks.head">운영자 추천</h2>
         </div>
       </div>
+      <p class="picks-subhead" data-i18n="picks.subhead">한국 드라마 보기</p>
       <div class="picks-grid reveal">
         <article class="pick-card">
           <p class="pick-card-label" data-i18n="picks.drama1.label">드라마 · 2023</p>
@@ -407,14 +415,18 @@
         </article>
         <article class="pick-card">
           <p class="pick-card-label" data-i18n="picks.film.label">영화·드라마</p>
-          <figure class="pick-figure">
-            <img class="pick-image" src="../assets/oh-my-gran-still.jpg" width="1200" height="675" loading="lazy" alt="영화 『오! 문희』 스틸컷: 문희 할머니와 아들이 고철장에서 달리는 장면" data-i18n-alt="picks.film.imageAlt">
-            <figcaption class="pick-image-credit" data-i18n="picks.film.imageCredit">『오! 문희』 스틸컷(홍보용 자료, Letterboxd 수록)</figcaption>
-          </figure>
-          <h3 class="pick-title" data-i18n="picks.film.title">『오! 문희』(Oh! My Gran)</h3>
-          <p class="pick-desc" data-i18n="picks.film.desc">알츠하이머를 앓고 있는 문희 할머니는 손녀가 당한 뺑소니 사고의 유일한 목격자입니다. 흐려지는 기억과 싸우며 아들과 함께 범인을 찾아나서죠. 2020년 한국 영화, 웃음과 눈물이 한 노인에게 모입니다.</p>
-          <div class="pick-actions" data-i18n="picks.film.actions"><a class="pick-link pick-link-featured" href="https://youtu.be/cflWf3XKeFI?si=pZ-WkU6w5wYkh4Wq" target="_blank" rel="noopener noreferrer">YouTube에서 대여하거나 구매하기 · 정식 서비스로 응원해 주세요</a><p class="pick-netflix-note">중국 본토 시청자는 <a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">여기</a>를 눌러 Netflix에 접속하세요.</p></div>
-          <p class="pick-note" data-i18n="picks.film.note">이 사이트는 불법 복제본을 제공하거나 연결하지 않습니다.</p>
+          <div class="pick-poster-row">
+            <figure class="pick-figure pick-figure-still">
+              <img class="pick-image" src="../assets/oh-my-gran-still.jpg" width="1200" height="675" loading="lazy" alt="영화 『오! 문희』 스틸컷: 문희 할머니와 아들이 고철장에서 달리는 장면" data-i18n-alt="picks.film.imageAlt">
+              <figcaption class="pick-image-credit" data-i18n="picks.film.imageCredit">『오! 문희』 스틸컷(홍보용 자료, Letterboxd 수록)</figcaption>
+            </figure>
+            <div class="pick-poster-body">
+              <h3 class="pick-title" data-i18n="picks.film.title">『오! 문희』(Oh! My Gran)</h3>
+              <p class="pick-desc" data-i18n="picks.film.desc">알츠하이머를 앓고 있는 문희 할머니는 손녀가 당한 뺑소니 사고의 유일한 목격자입니다. 흐려지는 기억과 싸우며 아들과 함께 범인을 찾아나서죠. 2020년 한국 영화, 웃음과 눈물이 한 노인에게 모입니다.</p>
+              <div class="pick-actions" data-i18n="picks.film.actions"><a class="pick-link pick-link-featured" href="https://youtu.be/cflWf3XKeFI?si=pZ-WkU6w5wYkh4Wq" target="_blank" rel="noopener noreferrer">YouTube에서 대여하거나 구매하기 · 정식 서비스로 응원해 주세요</a><p class="pick-netflix-note">중국 본토 시청자는 <a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">여기</a>를 눌러 Netflix에 접속하세요.</p></div>
+              <p class="pick-note" data-i18n="picks.film.note">이 사이트는 불법 복제본을 제공하거나 연결하지 않습니다.</p>
+            </div>
+          </div>
         </article>
         <article class="pick-card">
           <p class="pick-card-label" data-i18n="picks.drama2.label">드라마 · 2015</p>
@@ -476,6 +488,14 @@
             </div>
           </div>
         </article>
+      </div>
+      <div class="picks-coming" id="picks-kpop">
+        <p class="picks-coming-title" data-i18n="nav.picks.kpop">K-pop 듣기</p>
+        <p class="picks-coming-note" data-i18n="picks.coming">준비 중입니다. 운영자가 데이터를 입력할 때까지 기다려 주세요.</p>
+      </div>
+      <div class="picks-coming" id="picks-games">
+        <p class="picks-coming-title" data-i18n="nav.picks.game">게임 하기</p>
+        <p class="picks-coming-note" data-i18n="picks.coming">준비 중입니다. 운영자가 데이터를 입력할 때까지 기다려 주세요.</p>
       </div>
     </div>
   </section>

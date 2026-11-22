@@ -45,7 +45,14 @@
       <a href="#reasons" data-i18n="nav.reasons">理由</a>
       <a href="#lamp" data-i18n="nav.lamp">留一盏灯</a>
       <a href="#reading" data-i18n="nav.reading">延伸阅读</a>
-      <a href="#picks" data-i18n="nav.picks">站长推荐</a>
+      <div class="nav-dropdown">
+        <a href="#picks" data-i18n="nav.picks">站长推荐</a>
+        <div class="nav-dropdown-menu">
+          <a href="#picks" data-i18n="nav.picks.drama">看韩剧</a>
+          <a href="#picks-kpop" data-i18n="nav.picks.kpop">听K-pop</a>
+          <a href="#picks-games" data-i18n="nav.picks.game">玩游戏</a>
+        </div>
+      </div>
     </nav>
     <div class="lang-switch" role="group" aria-label="语言切换" data-i18n-aria-label="aria.langSwitch">
       <a data-lang-link="zh" href="./" lang="zh" class="is-current" aria-current="page"><span class="lang-long">中文</span><span class="lang-short" aria-hidden="true">CN</span></a>
@@ -388,6 +395,7 @@
           <h2 data-i18n="picks.head">站长推荐</h2>
         </div>
       </div>
+      <p class="picks-subhead" data-i18n="picks.subhead">看韩剧</p>
       <div class="picks-grid reveal">
         <article class="pick-card">
           <p class="pick-card-label" data-i18n="picks.drama1.label">剧集 · 2023</p>
@@ -406,14 +414,18 @@
         </article>
         <article class="pick-card">
           <p class="pick-card-label" data-i18n="picks.film.label">电影与剧集</p>
-          <figure class="pick-figure">
-            <img class="pick-image" src="assets/oh-my-gran-still.jpg" width="1200" height="675" loading="lazy" alt="电影《哦！文姬》剧照：文姬奶奶与儿子在废车场奔跑" data-i18n-alt="picks.film.imageAlt">
-            <figcaption class="pick-image-credit" data-i18n="picks.film.imageCredit">剧照：《哦！文姬》片方宣传物料（经 Letterboxd 收录）</figcaption>
-          </figure>
-          <h3 class="pick-title" data-i18n="picks.film.title">《哦！文姬》</h3>
-          <p class="pick-desc" data-i18n="picks.film.desc">文姬奶奶患有阿尔茨海默症，却是孙女车祸唯一的目击者。她对抗遗忘，和儿子一起追查肇事逃逸者。2020 年的韩国电影，笑和眼泪都落在一个老人身上。</p>
-          <div class="pick-actions" data-i18n="picks.film.actions"><a class="pick-link pick-link-featured" href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">中国香港地区：通过此链接开通（邀请码 5rfpUarUEd）</a><p class="pick-netflix-note">到 Netflix 搜索片名观看 · 请支持正版</p></div>
-          <p class="pick-note" data-i18n="picks.film.note">本站不提供、也不链接盗版资源。</p>
+          <div class="pick-poster-row">
+            <figure class="pick-figure pick-figure-still">
+              <img class="pick-image" src="assets/oh-my-gran-still.jpg" width="1200" height="675" loading="lazy" alt="电影《哦！文姬》剧照：文姬奶奶与儿子在废车场奔跑" data-i18n-alt="picks.film.imageAlt">
+              <figcaption class="pick-image-credit" data-i18n="picks.film.imageCredit">剧照：《哦！文姬》片方宣传物料（经 Letterboxd 收录）</figcaption>
+            </figure>
+            <div class="pick-poster-body">
+              <h3 class="pick-title" data-i18n="picks.film.title">《哦！文姬》</h3>
+              <p class="pick-desc" data-i18n="picks.film.desc">文姬奶奶患有阿尔茨海默症，却是孙女车祸唯一的目击者。她对抗遗忘，和儿子一起追查肇事逃逸者。2020 年的韩国电影，笑和眼泪都落在一个老人身上。</p>
+              <div class="pick-actions" data-i18n="picks.film.actions"><a class="pick-link pick-link-featured" href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">中国香港地区：通过此链接开通（邀请码 5rfpUarUEd）</a><p class="pick-netflix-note">到 Netflix 搜索片名观看 · 请支持正版</p></div>
+              <p class="pick-note" data-i18n="picks.film.note">本站不提供、也不链接盗版资源。</p>
+            </div>
+          </div>
         </article>
         <article class="pick-card">
           <p class="pick-card-label" data-i18n="picks.drama2.label">剧集 · 2015</p>
@@ -475,6 +487,14 @@
             </div>
           </div>
         </article>
+      </div>
+      <div class="picks-coming" id="picks-kpop">
+        <p class="picks-coming-title" data-i18n="nav.picks.kpop">听K-pop</p>
+        <p class="picks-coming-note" data-i18n="picks.coming">正在开发中，请等待站长写入数据</p>
+      </div>
+      <div class="picks-coming" id="picks-games">
+        <p class="picks-coming-title" data-i18n="nav.picks.game">玩游戏</p>
+        <p class="picks-coming-note" data-i18n="picks.coming">正在开发中，请等待站长写入数据</p>
       </div>
     </div>
   </section>

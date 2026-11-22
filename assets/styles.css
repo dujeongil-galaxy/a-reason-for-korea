@@ -124,6 +124,21 @@ ol, ul { padding: 0; list-style: none; }
 }
 .site-nav a:hover { color: var(--accent); }
 .site-nav a:hover::after { right: 0; }
+/* 站长推荐二级菜单：只在桌面出现（≤720px 整条导航都隐藏，手机端不做） */
+.nav-dropdown { position: relative; }
+.nav-dropdown-menu {
+  display: none; position: absolute; top: calc(100% + 8px); left: 50%;
+  transform: translateX(-50%); min-width: 152px; padding: 8px; z-index: 30;
+  background: var(--surface); border: 1px solid var(--line-strong);
+  border-radius: 12px; box-shadow: var(--shadow-sm);
+}
+.nav-dropdown:hover .nav-dropdown-menu,
+.nav-dropdown:focus-within .nav-dropdown-menu { display: block; }
+.nav-dropdown-menu a {
+  display: block; padding: 9px 12px; border-radius: 8px; white-space: nowrap;
+}
+.nav-dropdown-menu a::after { display: none; }
+.nav-dropdown-menu a:hover { background: var(--surface-2); }
 /* ---------- language switch ---------- */
 .lang-switch {
   display: inline-flex; align-items: center; gap: 2px; flex: none;
@@ -446,6 +461,21 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
 
 /* ---------- webmaster picks ---------- */
 .picks-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+/* 二级菜单当前分类：与导航下拉的三项一一对应 */
+.picks-subhead {
+  display: inline-block; margin: -2px 0 18px; padding-bottom: 6px;
+  border-bottom: 2px solid var(--accent); color: var(--accent);
+  font-family: var(--serif); font-size: 15px; font-weight: 700;
+}
+/* K-pop / 游戏：先占位，等站长写入数据 */
+.picks-coming {
+  margin-top: 18px; padding: 24px 28px; border: 1px dashed var(--line-strong);
+  border-radius: var(--radius); background: var(--surface-2);
+}
+.picks-coming-title {
+  font-family: var(--serif); font-size: 1.1rem; font-weight: 700; color: var(--accent);
+}
+.picks-coming-note { margin: 8px 0 0; font-size: 13px; color: var(--ink-soft); line-height: 1.7; }
 .pick-card {
   background: var(--surface); border: 1px solid var(--line);
   border-radius: var(--radius); padding: clamp(22px, 3vw, 34px);
@@ -462,6 +492,9 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
 .pick-poster-row { display: grid; grid-template-columns: minmax(0, 132px) minmax(0, 1fr); gap: 18px; }
 .pick-figure-poster { margin: 0; }
 .pick-image-poster { width: 100%; height: auto; aspect-ratio: auto; object-fit: contain; }
+/* 电影卡也走「图 + 文」并排：六张卡高度一致，首卡不再留出大块空白 */
+.pick-figure-still { margin: 0; }
+.pick-figure-still .pick-image { aspect-ratio: 16 / 9; }
 .pick-poster-body { min-width: 0; }
 .pick-poster-body .pick-title { margin-top: 0; }
 @media (max-width: 420px) {

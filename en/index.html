@@ -46,7 +46,14 @@
       <a href="#reasons" data-i18n="nav.reasons">Reasons</a>
       <a href="#lamp" data-i18n="nav.lamp">Leave a light</a>
       <a href="#reading" data-i18n="nav.reading">Reading</a>
-      <a href="#picks" data-i18n="nav.picks">Picks from the webmaster</a>
+      <div class="nav-dropdown">
+        <a href="#picks" data-i18n="nav.picks">Picks from the webmaster</a>
+        <div class="nav-dropdown-menu">
+          <a href="#picks" data-i18n="nav.picks.drama">Watch K-dramas</a>
+          <a href="#picks-kpop" data-i18n="nav.picks.kpop">Listen to K-pop</a>
+          <a href="#picks-games" data-i18n="nav.picks.game">Play games</a>
+        </div>
+      </div>
     </nav>
     <div class="lang-switch" role="group" aria-label="Language" data-i18n-aria-label="aria.langSwitch">
       <a data-lang-link="zh" href="../" lang="zh"><span class="lang-long">中文</span><span class="lang-short" aria-hidden="true">CN</span></a>
@@ -389,6 +396,7 @@
           <h2 data-i18n="picks.head">Picks from the webmaster</h2>
         </div>
       </div>
+      <p class="picks-subhead" data-i18n="picks.subhead">Watch K-dramas</p>
       <div class="picks-grid reveal">
         <article class="pick-card">
           <p class="pick-card-label" data-i18n="picks.drama1.label">TV series · 2023</p>
@@ -407,14 +415,18 @@
         </article>
         <article class="pick-card">
           <p class="pick-card-label" data-i18n="picks.film.label">Film & TV</p>
-          <figure class="pick-figure">
-            <img class="pick-image" src="../assets/oh-my-gran-still.jpg" width="1200" height="675" loading="lazy" alt="Still from Oh! My Gran: Moon-hee and her son running through a scrapyard" data-i18n-alt="picks.film.imageAlt">
-            <figcaption class="pick-image-credit" data-i18n="picks.film.imageCredit">Still from Oh! My Gran (promotional material, via Letterboxd)</figcaption>
-          </figure>
-          <h3 class="pick-title" data-i18n="picks.film.title">Oh! My Gran (2020)</h3>
-          <p class="pick-desc" data-i18n="picks.film.desc">Moon-hee has Alzheimer’s, yet she is the only witness to the hit-and-run that left her granddaughter in a coma. Fighting her own failing memory, she and her son go after the driver. A Korean film that finds both laughter and tears in an old lady.</p>
-          <div class="pick-actions" data-i18n="picks.film.actions"><a class="pick-link pick-link-featured" href="https://watch.amazon.com/detail?gti=amzn1.dv.gti.3a505a12-509d-4f34-af76-47f0ea441f72" target="_blank" rel="noopener noreferrer">Rent or buy on Prime Video</a><p class="pick-netflix-note">Viewers in mainland China: <a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">click here</a> to access Netflix.</p></div>
-          <p class="pick-note" data-i18n="picks.film.note">This site neither hosts nor links to pirated copies.</p>
+          <div class="pick-poster-row">
+            <figure class="pick-figure pick-figure-still">
+              <img class="pick-image" src="../assets/oh-my-gran-still.jpg" width="1200" height="675" loading="lazy" alt="Still from Oh! My Gran: Moon-hee and her son running through a scrapyard" data-i18n-alt="picks.film.imageAlt">
+              <figcaption class="pick-image-credit" data-i18n="picks.film.imageCredit">Still from Oh! My Gran (promotional material, via Letterboxd)</figcaption>
+            </figure>
+            <div class="pick-poster-body">
+              <h3 class="pick-title" data-i18n="picks.film.title">Oh! My Gran (2020)</h3>
+              <p class="pick-desc" data-i18n="picks.film.desc">Moon-hee has Alzheimer’s, yet she is the only witness to the hit-and-run that left her granddaughter in a coma. Fighting her own failing memory, she and her son go after the driver. A Korean film that finds both laughter and tears in an old lady.</p>
+              <div class="pick-actions" data-i18n="picks.film.actions"><a class="pick-link pick-link-featured" href="https://watch.amazon.com/detail?gti=amzn1.dv.gti.3a505a12-509d-4f34-af76-47f0ea441f72" target="_blank" rel="noopener noreferrer">Rent or buy on Prime Video</a><p class="pick-netflix-note">Viewers in mainland China: <a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">click here</a> to access Netflix.</p></div>
+              <p class="pick-note" data-i18n="picks.film.note">This site neither hosts nor links to pirated copies.</p>
+            </div>
+          </div>
         </article>
         <article class="pick-card">
           <p class="pick-card-label" data-i18n="picks.drama2.label">TV series · 2015</p>
@@ -476,6 +488,14 @@
             </div>
           </div>
         </article>
+      </div>
+      <div class="picks-coming" id="picks-kpop">
+        <p class="picks-coming-title" data-i18n="nav.picks.kpop">Listen to K-pop</p>
+        <p class="picks-coming-note" data-i18n="picks.coming">Under construction. The webmaster is preparing the content.</p>
+      </div>
+      <div class="picks-coming" id="picks-games">
+        <p class="picks-coming-title" data-i18n="nav.picks.game">Play games</p>
+        <p class="picks-coming-note" data-i18n="picks.coming">Under construction. The webmaster is preparing the content.</p>
       </div>
     </div>
   </section>

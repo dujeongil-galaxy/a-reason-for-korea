@@ -101,6 +101,22 @@ const FORBIDDEN_REGION_CALQUES = ['Hong Kong, China', '중국 홍콩', '香港�
 const PICKS_HEAD = {
   zh: '站长推荐', en: 'Picks from the webmaster', jp: '運営のおすすめ', ko: '운영자 추천'
 };
+/* 站长推荐二级菜单（2026-11-22）：四语各三项，下拉只在桌面出现，手机端不做。
+   K-pop / 游戏先占位，等站长写入数据；标题下的分类名必须与菜单对应。 */
+const NAV_SUB = {
+  zh: { drama: '看韩剧', kpop: '听K-pop', game: '玩游戏' },
+  en: { drama: 'Watch K-dramas', kpop: 'Listen to K-pop', game: 'Play games' },
+  jp: { drama: '韓国ドラマを見る', kpop: 'K-popを聴く', game: 'ゲームを遊ぶ' },
+  ko: { drama: '한국 드라마 보기', kpop: 'K-pop 듣기', game: '게임 하기' }
+};
+const COMING_NOTE = {
+  zh: '正在开发中，请等待站长写入数据',
+  en: 'Under construction. The webmaster is preparing the content.',
+  jp: '準備中です。運営者がデータを入力するのをお待ちください。',
+  ko: '준비 중입니다. 운영자가 데이터를 입력할 때까지 기다려 주세요.'
+};
+const NAV_SUB_HREFS = ['#picks', '#picks-kpop', '#picks-games'];
+const escRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 /* 韩国音乐专区已撤（站长 2026-11-22）：四语一律不得再出现占位卡与占位文案。 */
 const MUSIC_FORBIDDEN = [
   'picks.music.label', 'picks.music.soon', 'pick-card-soon', 'pick-placeholder',
@@ -341,6 +357,22 @@ function verify(state) {
   for (const marker of MUSIC_FORBIDDEN) {
     if (source.includes(marker)) errors.push('zh: withdrawn music section returned -> ' + marker);
   }
+  /* 二级菜单 / 占位：中文源锚点、四语文案键位与两栏卡片结构 */
+  if ((zhNodes['picks.subhead'] || '') !== NAV_SUB.zh.drama) {
+    errors.push('zh: picks subhead must match the dropdown item');
+  }
+  for (const [id, label] of [['picks-kpop', NAV_SUB.zh.kpop], ['picks-games', NAV_SUB.zh.game]]) {
+    if (!source.includes('id="' + id + '"')) errors.push('zh: ' + id + ' placeholder anchor missing');
+    if ((source.match(new RegExp(escRe(label), 'g')) || []).length !== 2) {
+      errors.push('zh: ' + label + ' must appear in the dropdown and its placeholder');
+    }
+  }
+  if ((source.match(new RegExp(escRe(COMING_NOTE.zh), 'g')) || []).length !== 2) {
+    errors.push('zh: both placeholders must carry the coming-soon note');
+  }
+  if (!source.includes('class="pick-figure pick-figure-still"')) {
+    errors.push('zh: film card must use the same two-column layout as the drama cards');
+  }
   if (!assetRefs(source).includes(PICKS_IMAGE)) errors.push('zh: picks preview image not referenced');
   if (!state.picksImageExists) errors.push('picks: preview image file missing from assets/');
   /* HTML 的 width/height 属性会压过 aspect-ratio，必须有 height:auto 才是 16:9 */
@@ -399,6 +431,15 @@ function verify(state) {
   }
   if (!state.css.includes('@media (max-width: 420px)')) {
     errors.push('zh: poster row narrow-viewport guard missing');
+  }
+  if (!/\.pick-figure-still \.pick-image\s*\{[^}]*aspect-ratio:\s*16\s*\/\s*9/.test(state.css)) {
+    errors.push('zh: film still must keep 16:9 in the shared two-column layout');
+  }
+  if (!/\.nav-dropdown-menu\s*\{[^}]*display:\s*none/.test(state.css)) {
+    errors.push('css: nav dropdown must be closed by default');
+  }
+  if (!/\.nav-dropdown:hover \.nav-dropdown-menu[\s\S]*?display:\s*block/.test(state.css)) {
+    errors.push('css: nav dropdown hover/focus open rule missing');
   }
 
   /* 1e. 极窄屏：320px 视口曾被语言切换器撑宽 6px，收紧规则不得回退 */
@@ -625,6 +666,35 @@ function verify(state) {
        外文一律不直译港区；盗版域名与 Netflix 链接一律禁入。 */
     if (!page.includes('<section class="section picks" id="picks">')) {
       errors.push(lang + ': picks section missing');
+    }
+    /* 二级菜单：三项、顺序、锚点与标题下分类名必须一一对应；手机端不做下拉 */
+    const sub = NAV_SUB[lang];
+    const menu = (page.match(/<div class="nav-dropdown-menu">([\s\S]*?)<\/div>/) || [])[1] || '';
+    const menuLinks = [...menu.matchAll(/<a href="([^"]+)" data-i18n="[^"]+">([^<]+)<\/a>/g)];
+    if (menuLinks.length !== 3) {
+      errors.push(lang + ': nav dropdown must carry exactly three items');
+    } else {
+      for (let i = 0; i < 3; i++) {
+        const label = [sub.drama, sub.kpop, sub.game][i];
+        if (menuLinks[i][1] !== NAV_SUB_HREFS[i]) {
+          errors.push(lang + ': dropdown item ' + i + ' wrong anchor -> ' + menuLinks[i][1]);
+        }
+        if (menuLinks[i][2] !== label) {
+          errors.push(lang + ': dropdown item ' + i + ' wording drift -> ' + menuLinks[i][2]);
+        }
+      }
+    }
+    if ((nodes['picks.subhead'] || '') !== sub.drama) {
+      errors.push(lang + ': section subhead must match the first dropdown item');
+    }
+    for (const [id, label] of [['picks-kpop', sub.kpop], ['picks-games', sub.game]]) {
+      if (!page.includes('id="' + id + '"')) errors.push(lang + ': ' + id + ' placeholder missing');
+      if ((page.match(new RegExp(escRe(label), 'g')) || []).length !== 2) {
+        errors.push(lang + ': ' + id + ' label must appear in both dropdown and placeholder');
+      }
+    }
+    if (!page.includes(COMING_NOTE[lang])) {
+      errors.push(lang + ': placeholder coming-soon note missing');
     }
     const actions = nodes['picks.film.actions'] || '';
     const want = PICKS_ACTIONS_EXPECT[lang];
@@ -1150,6 +1220,25 @@ const faults = [
     s.pages.en = s.pages.en.replace(
       /(<a class="pick-link pick-link-sub"[^>]*>[^<]*<\/a>)(<a class="pick-link pick-link-featured"[^>]*>[^<]*<\/a>)/,
       '$2$1');
+  } },
+  /* 二级菜单 / 占位 / 两栏布局（2026-11-22） */
+  { name: 'nav dropdown K-pop item points to a dead anchor', mutate: s => {
+    s.pages.en = s.pages.en.replace('href="#picks-kpop"', 'href="#picks-nowhere"');
+  } },
+  { name: 'section subhead reverted to Chinese on Japanese page', mutate: s => {
+    s.pages.jp = s.pages.jp.replace(/(data-i18n="picks\.subhead">)[^<]*(<\/p>)/, '$1' + NAV_SUB.zh.drama + '$2');
+  } },
+  { name: 'Korean placeholder writing-in-progress note stripped', mutate: s => {
+    s.pages.ko = s.pages.ko.split(COMING_NOTE.ko).join('');
+  } },
+  { name: 'Chinese games placeholder anchor removed', mutate: s => {
+    s.source = s.source.replace('id="picks-games"', '');
+  } },
+  { name: 'nav dropdown left open by default in CSS', mutate: s => {
+    s.css = s.css.replace('display: none; position: absolute;', 'display: block; position: absolute;');
+  } },
+  { name: 'film card reverted to full-width layout', mutate: s => {
+    s.source = s.source.replace('class="pick-figure pick-figure-still"', 'class="pick-figure"');
   } }
 ];
 
