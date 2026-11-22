@@ -168,6 +168,40 @@ const DRAMA_NOTE = {
   jp: '中国大陸からご覧になる場合は、<a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">こちら</a>から Netflix にアクセスできます。',
   ko: '중국 본토 시청자는 <a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">여기</a>를 눌러 Netflix에 접속하세요.'
 };
+/* 订阅制渠道（2026-11-22 站长追问「只有订阅制，既然能买正版，为什么不挂」）：
+   按 JustWatch 逐区实查（apis.justwatch.com/graphql，country = US / JP / KR，2026-11-22 取数）。
+   只挂**非 Netflix** 的持牌订阅平台——Netflix 的入口就是那条红字 AFF，不许再挂 netflix.com 直链。
+   表里没有的 lang/slug（该区只有 Netflix，或查无订阅渠道）一律禁挂订阅按钮。 */
+const DRAMA_SUB = {
+  'en/drama2': {
+    url: 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.7498e914-8cdf-4f9c-ad95-4342e43e3c90',
+    label: 'Watch on Kocowa via Prime Video (subscription)'
+  },
+  'en/drama3': { url: 'https://www.viki.com/tv/20503c-my-love-from-the-star', label: 'Watch on Viki (subscription)' },
+  'en/drama4': { url: 'https://www.viki.com/tv/12699c-heirs', label: 'Watch on Viki (subscription)' },
+  'en/drama5': { url: 'https://www.viki.com/tv/614c-jewel-in-the-palace', label: 'Watch on Viki (subscription)' },
+  'jp/drama3': { url: 'https://video.unext.jp/episode/SID0003058/ED00073535', label: 'U-NEXT で見る（定額制）' },
+  'jp/drama4': { url: 'https://video.unext.jp/episode/SID0017711/ED00046626', label: 'U-NEXT で見る（定額制）' },
+  'jp/drama5': { url: 'https://video.unext.jp/episode/SID0020374/ED00094308', label: 'U-NEXT で見る（定額制）' },
+  'ko/drama1': { url: 'https://www.tving.com/contents/P001710496', label: 'TVING에서 보기 (정액제)' },
+  'ko/drama2': {
+    url: 'https://www.wavve.com/player/vod?contentid=K02_PS-2015161154-01-000.1',
+    label: 'wavve에서 보기 (정액제)'
+  },
+  'ko/drama3': { url: 'https://www.tving.com/contents/P001446333', label: 'TVING에서 보기 (정액제)' },
+  'ko/drama4': { url: 'https://watcha.com/contents/tRW31aR', label: '왓챠에서 보기 (정액제)' },
+  'ko/drama5': { url: 'https://www.tving.com/contents/P001790390', label: 'TVING에서 보기 (정액제)' }
+};
+/* 订阅渠道链接前缀白名单：境外持牌平台；netflix.com 与盗版域都不在内 */
+const SUB_DOMAINS = [
+  'https://www.viki.com/tv/',
+  'https://watch.amazon.com/detail?gti=',
+  'https://watch.amazon.co.jp/detail?gti=',
+  'https://video.unext.jp/episode/',
+  'https://www.tving.com/contents/',
+  'https://www.wavve.com/player/vod?contentid=',
+  'https://watcha.com/contents/'
+];
 /* SEO（2026-11-22 站长指令：按推荐执行 A+C+D 长尾）。
    title / description 关键词前置、金句后置；旧文艺标题不得回退。
    JSON-LD 逐语一段，inLanguage / url / keywords 必须与对应语言一致。 */
@@ -343,6 +377,10 @@ function verify(state) {
     }
     if (!actionsBlock.includes(DRAMA_NOTE.zh)) {
       errors.push('zh: ' + slug + ' Netflix note missing');
+    }
+    /* 中文页面向中国大陆读者：TVING / Viki / U-NEXT / wavve 在大陆均不可用，禁挂外区订阅按钮 */
+    if (actionsBlock.includes('pick-link-sub')) {
+      errors.push('zh: ' + slug + ' overseas subscription button forbidden on the Chinese page');
     }
   }
   /* 时间线顺序：DOM 中 drama1..drama5 依次出现，年份由新到旧 */
@@ -660,6 +698,39 @@ function verify(state) {
         }
       } else if (featured) {
         errors.push(lang + ': ' + slug + ' buy button forbidden where no rent/buy channel exists');
+      }
+      /* 订阅制渠道：按区实查到了才挂，且必须排在 featured 租买按钮与红字 AFF 之上；
+         查不到的区一律禁挂，避免「点进去没有这部片」的死链。 */
+      const subAnchor = (actions.match(/class="pick-link pick-link-sub"\s+href="([^"]+)"/) || [])[1] || '';
+      const subWant = DRAMA_SUB[lang + '/' + slug] || null;
+      const subCount = (actions.match(/pick-link-sub/g) || []).length;
+      if (subWant) {
+        if (!subAnchor) errors.push(lang + ': ' + slug + ' subscription button missing');
+        else {
+          if (!subAnchor.startsWith(subWant.url)) {
+            errors.push(lang + ': ' + slug + ' subscription link drift -> ' + subAnchor);
+          }
+          if (!SUB_DOMAINS.some(prefix => subAnchor.startsWith(prefix))) {
+            errors.push(lang + ': ' + slug + ' subscription link outside the licensed-platform allowlist');
+          }
+        }
+        if (!actions.includes(subWant.label)) {
+          errors.push(lang + ': ' + slug + ' subscription label drift');
+        }
+        if (subCount !== 1) {
+          errors.push(lang + ': ' + slug + ' must carry exactly one subscription button (got ' + subCount + ')');
+        }
+        const subAt = actions.indexOf('pick-link-sub');
+        const featAt = actions.indexOf('pick-link-featured');
+        const redAt = actions.indexOf('pick-netflix-note');
+        if (featAt > -1 && subAt > featAt) {
+          errors.push(lang + ': ' + slug + ' subscription button must sit above the buy button');
+        }
+        if (redAt > -1 && subAt > redAt) {
+          errors.push(lang + ': ' + slug + ' subscription button must sit above the aff note');
+        }
+      } else if (subCount) {
+        errors.push(lang + ': ' + slug + ' subscription button forbidden where the region has no licensed subscription channel');
       }
     }
 
@@ -1052,6 +1123,26 @@ const faults = [
   } },
   { name: 'poster native aspect-ratio guard removed', mutate: s => {
     s.css = s.css.replace('.pick-image-poster { width: 100%; height: auto; aspect-ratio: auto; object-fit: contain; }', '');
+  } },
+  /* 订阅制渠道（2026-11-22）：漂移 / 指向 Netflix / 重复 / 挂到无渠道区 / 被挤到购买按钮下面 */
+  { name: 'drama EN subscription link drifted off Viki', mutate: s => {
+    s.pages.en = s.pages.en.replace('https://www.viki.com/tv/20503c-my-love-from-the-star', 'https://www.viki.com/');
+  } },
+  { name: 'drama JP subscription button pointed at Netflix', mutate: s => {
+    s.pages.jp = s.pages.jp.replace('https://video.unext.jp/episode/SID0003058/ED00073535', 'https://www.netflix.com/title/81682438');
+  } },
+  { name: 'drama KO subscription button duplicated', mutate: s => {
+    const anchor = '<a class="pick-link pick-link-sub" href="https://www.tving.com/contents/P001710496" target="_blank" rel="noopener noreferrer">TVING에서 보기 (정액제)</a>';
+    s.pages.ko = s.pages.ko.replace(anchor, anchor + anchor);
+  } },
+  { name: 'drama EN subscription button added to a Netflix-only card', mutate: s => {
+    s.pages.en = s.pages.en.replace(/(data-i18n="picks\.drama1\.actions">)/,
+      '$1<a class="pick-link pick-link-sub" href="https://www.viki.com/tv/12699c-heirs" target="_blank" rel="noopener noreferrer">Watch on Viki (subscription)</a>');
+  } },
+  { name: 'drama EN subscription button pushed below the buy button', mutate: s => {
+    s.pages.en = s.pages.en.replace(
+      /(<a class="pick-link pick-link-sub"[^>]*>[^<]*<\/a>)(<a class="pick-link pick-link-featured"[^>]*>[^<]*<\/a>)/,
+      '$2$1');
   } }
 ];
 

@@ -481,6 +481,12 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
 }
 .pick-link:hover { border-color: var(--accent); background: var(--surface-2); }
 .pick-link-featured { color: var(--accent); border-color: var(--accent); font-weight: 700; }
+/* 订阅制渠道（站长 2026-11-22）：按区实查后在租买按钮与 aff 之上单独一行，明确标注「订阅」，
+   不冒充买断、不挤掉 aff 入口 */
+.pick-link-sub {
+  font-size: 12.5px; padding: 10px 14px; border-style: dashed;
+  color: var(--ink-soft); background: var(--surface-2);
+}
 /* 奈飞原按钮文案降级为红字提示（站长 2026-11-22 指令），不再是可点按钮 */
 .pick-netflix-note {
   margin: -2px 0 0; font-size: 12.5px; line-height: 1.65;
