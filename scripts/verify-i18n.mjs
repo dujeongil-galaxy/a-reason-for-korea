@@ -193,6 +193,14 @@ function verify(state) {
     if (zhNodes[key] !== expected) errors.push('zh: picks node wrong -> ' + key);
   }
 
+  /* 1e. 极窄屏：320px 视口曾被语言切换器撑宽 6px，收紧规则不得回退 */
+  if (!state.css.includes('@media (max-width: 360px)')) {
+    errors.push('zh: narrow-viewport guard missing');
+  }
+  if (!/\.lang-switch a\s*\{[^}]*padding:\s*4px 7px/.test(state.css)) {
+    errors.push('zh: narrow-viewport lang switch not tightened');
+  }
+
   /* 1c. mobile switcher labels + accessible full names */
   const sourceShorts = shortLabels(source);
   for (const [code, expected] of Object.entries(SHORT_LABELS)) {
@@ -612,6 +620,9 @@ const faults = [
   } },
   { name: 'Korean music placeholder left in Chinese', mutate: s => {
     s.dict.ko.html['picks.music.soon'] = '此专区正在建设中，请稍安勿躁';
+  } },
+  { name: 'narrow-viewport guard removed', mutate: s => {
+    s.css = s.css.replace(/@media \(max-width: 360px\) \{[\s\S]*?\n\}/, '');
   } }
 ];
 

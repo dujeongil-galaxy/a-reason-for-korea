@@ -603,6 +603,13 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
   .reason-form-row button { padding: 12px 20px; }
 }
 
+/* 极窄屏（<=360px）：收紧头部，避免语言切换器把 320px 视口撑宽 */
+@media (max-width: 360px) {
+  .header-inner { gap: 8px; }
+  .brand { font-size: 14px; }
+  .lang-switch a { min-width: 30px; padding: 4px 7px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
