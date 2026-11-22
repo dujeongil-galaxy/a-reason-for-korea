@@ -79,6 +79,10 @@ const ZH_PRODUCT_COPY = [
   '来自一条抖音分享',
   '那条抖音视频：'
 ];
+/* read4 标签口径（站长 2026-11-22 指令）：中文写「抖音」，en/jp/ko 一律用
+   国际产品名 TikTok —— 不是逐字机翻的 Douyin，也不是含糊的旧标签「近例」。 */
+const READ4_TAG = { zh: '抖音', en: 'TikTok', jp: 'TikTok', ko: 'TikTok' };
+const STALE_READ4_TAGS = ['近例', 'Another', 'もう一本', '또 하나'];
 
 /* ---------- extraction helpers ---------- */
 function extractNodes(html) {
@@ -239,6 +243,27 @@ function verify(state) {
     }
     if (!page.includes(PRODUCT_NAME)) {
       errors.push(lang + ': ' + PRODUCT_NAME + ' missing from generated page');
+    }
+  }
+
+  /* 2c. read4 标签：中文「抖音」，三语统一 TikTok，旧标签不得回退 */
+  if (extractNodes(source)['read4.tag'] !== READ4_TAG.zh) {
+    errors.push('zh: read4.tag must be 抖音 (not the old 近例)');
+  }
+  for (const lang of LANGS) {
+    const d = dict[lang] || {};
+    const dictTag = (d.html || {})['read4.tag'];
+    if (dictTag !== READ4_TAG[lang]) {
+      errors.push(lang + ': read4.tag must be ' + READ4_TAG[lang] + ' (got ' + dictTag + ')');
+    }
+    const pageTag = extractNodes(pages[lang] || '')['read4.tag'];
+    if (pageTag !== READ4_TAG[lang]) {
+      errors.push(lang + ': generated page read4.tag out of sync -> ' + pageTag);
+    }
+    for (const stale of STALE_READ4_TAGS) {
+      if (pageTag && pageTag.includes(stale)) {
+        errors.push(lang + ': stale read4 tag returned -> ' + stale);
+      }
     }
   }
 
@@ -512,6 +537,21 @@ const faults = [
   } },
   { name: 'Chinese source loses the original word 抖音', mutate: s => {
     s.source = s.source.replace(/一条抖音分享/g, '一条短视频分享');
+  } },
+  { name: 'read4 tag reverts to 近例', mutate: s => {
+    s.source = s.source.replace('data-i18n="read4.tag">抖音<', 'data-i18n="read4.tag">近例<');
+  } },
+  { name: 'English read4 tag machine-translates to Douyin', mutate: s => {
+    s.dict.en.html['read4.tag'] = 'Douyin';
+  } },
+  { name: 'Japanese read4 tag reverts to もう一本', mutate: s => {
+    s.dict.jp.html['read4.tag'] = 'もう一本';
+  } },
+  { name: 'Korean read4 tag reverts to 또 하나', mutate: s => {
+    s.dict.ko.html['read4.tag'] = '또 하나';
+  } },
+  { name: 'generated Korean page read4 tag tampered', mutate: s => {
+    s.pages.ko = s.pages.ko.replace('data-i18n="read4.tag">TikTok<', 'data-i18n="read4.tag">또 하나<');
   } }
 ];
 
