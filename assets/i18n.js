@@ -12,7 +12,7 @@
 window.SITE_I18N = {
   zh: {
     attr: {
-      'meta.description': '一条关于猫、善意与韩国的抖音分享，和它背后的四个理由。喜欢一个地方，可以有一个像样的理由，也可以保持清醒。',
+      'meta.description': '一条关于猫、善意与韩国的抖音分享，回答「为什么喜欢韩国」：从街角的猫到韩国电影《哦！文姬》。喜欢一个地方，可以有一个像样的理由，也可以保持清醒。',
       'meta.ogTitle': '哈韩，也要有一个理由',
       'meta.ogDescription': '不是因为舞台有多亮，是因为街角那只猫，有人给它留了一碗水。',
       'aria.brand': '回到顶部',
@@ -36,7 +36,8 @@ window.SITE_I18N = {
 
   en: {
     html: {
-      'meta.title': 'Liking Korea Needs a Reason · The World Needs Cats',
+      'meta.title': 'Why I Like Korea: Cats, Kindness and K-pop | One Good Reason',
+      'meta.jsonld': '{"@context":"https://schema.org","@type":"WebSite","name":"One Good Reason","alternateName":"Why I Like Korea","url":"https://dujeongil-galaxy.github.io/a-reason-for-korea/en/","inLanguage":"en","description":"Why do people like Korea? One TikTok share about cats, kindness and K-pop, answered in four reasons — from the corner cat water bowl to the film Oh! My Gran.","keywords":["why I like Korea","K-pop","cats","kindness","Oh! My Gran"],"author":{"@type":"Organization","name":"One Good Reason"}}',
       'skip': 'Skip to content',
       'brand': 'One Good Reason',
       'nav.origin': 'Origin',
@@ -135,7 +136,7 @@ window.SITE_I18N = {
       'archive.linksNote': 'Checked 2026-11-13: both the People\'s Daily and Shanxi News links have failed and return 404; only Ifeng still opens normally. Link status changes over time; this note records one check only. The two dead links above now point back to this page (a-reason-for-korea) as kept traces.'
     },
     attr: {
-      'meta.description': 'One TikTok share about cats, kindness and Korea, and the four reasons behind it. Liking a place can have a real reason — and still keep its judgment.',
+      'meta.description': 'Why do people like Korea? One TikTok share about cats, kindness and K-pop, answered in four reasons — from the corner cat water bowl to the film Oh! My Gran. Liking a place can have a real reason, and still keep its judgment.',
       'meta.ogTitle': 'Liking Korea Needs a Reason',
       'meta.ogDescription': 'Not because the stages are bright, but because someone left a bowl of water for a cat on the corner.',
       'aria.brand': 'Back to top',
@@ -159,7 +160,8 @@ window.SITE_I18N = {
 
   jp: {
     html: {
-      'meta.title': '韓国が好きなら、理由も欲しい · 世界に猫は欠かせない',
+      'meta.title': '韓国が好きな理由｜猫と善意、K-POPと映画「オ！ムニ」',
+      'meta.jsonld': '{"@context":"https://schema.org","@type":"WebSite","name":"韓国が好きなら、理由も欲しい","alternateName":"韓国が好きな理由","url":"https://dujeongil-galaxy.github.io/a-reason-for-korea/jp/","inLanguage":"ja","description":"なぜ韓国が好きなのか。猫と善意とK-POPについてのTikTok投稿から、街角の猫の水入れや韓国映画「オ！ムニ」まで、四つの理由をやさしく考えました。","keywords":["韓国が好きな理由","K-POP","猫","善意","オ！ムニ"],"author":{"@type":"Organization","name":"韓国が好きなら、理由も欲しい"}}',
       'skip': '本文へスキップ',
       'brand': '好きになる理由',
       'nav.origin': 'きっかけ',
@@ -258,7 +260,7 @@ window.SITE_I18N = {
       'archive.linksNote': '2026-11-13 時点の確認: 人民網と山西新聞網の 2 本のリンクはいずれも切れており、404 を返します。正常に読めるのは鳳凰網だけです。リンクの状態は変わります。この注記は一度の確認結果だけを記録したもので、切れた 2 本のリンクは本ページ（a-reason-for-korea）への同一リンクとして残してあります。'
     },
     attr: {
-      'meta.description': '猫と善意と韓国についての、ある TikTok の投稿と、その裏にある四つの理由。好きな気持ちには、きちんとした理由があっていい。しかも冷静さも手放さない。',
+      'meta.description': 'なぜ韓国が好きなのか。猫と善意とK-POPについてのTikTok投稿から、街角の猫の水入れや韓国映画「オ！ムニ」まで、四つの理由をやさしく考えました。好きな気持ちには、きちんとした理由があっていい。しかも冷静さも手放さない。',
       'meta.ogTitle': '韓国が好きなら、理由も欲しい',
       'meta.ogDescription': 'ステージがまぶしいからじゃない。街角の猫のために、誰かが水を置いていったから。',
       'aria.brand': 'ページの先頭へ戻る',
@@ -282,7 +284,8 @@ window.SITE_I18N = {
 
   ko: {
     html: {
-      'meta.title': '한국을 좋아하는 데도 이유는 필요하다 · 이 세상엔 고양이가 필요해',
+      'meta.title': '한국을 좋아하는 이유｜고양이와 선의, K-POP, 영화 「오 문희」',
+      'meta.jsonld': '{"@context":"https://schema.org","@type":"WebSite","name":"한국을 좋아하는 데도 이유는 필요하다","alternateName":"한국을 좋아하는 이유","url":"https://dujeongil-galaxy.github.io/a-reason-for-korea/ko/","inLanguage":"ko","description":"한국을 좋아하는 이유는 무엇일까. 고양이와 선의와 K-POP에 관한 TikTok 공유 글과 그 뒤의 네 가지 이유. 길모퉁이 고양이의 물 그릇부터 영화 「오 문희」까지.","keywords":["한국을 좋아하는 이유","K-POP","고양이","선의","오 문희"],"author":{"@type":"Organization","name":"한국을 좋아하는 데도 이유는 필요하다"}}',
       'skip': '본문으로 건너뛰기',
       'brand': '좋아할 만한 이유',
       'nav.origin': '시작',
@@ -381,7 +384,7 @@ window.SITE_I18N = {
       'archive.linksNote': '2026-11-13 확인: 인민망과 산시신문망 2개 외부 링크는 모두 끊겨 있으며 404를 반환한다. 정상적으로 읽을 수 있는 곳은 펑황망뿐이다. 링크 상태는 언제든 바뀔 수 있으며 이 기록은 한 번의 확인 결과일 뿐이다. 끊긴 2개 외부 링크는 본 페이지(a-reason-for-korea)를 가리키는 동일 링크로 남겨 두었다.'
     },
     attr: {
-      'meta.description': '고양이와 선의, 한국에 관한 TikTok 공유 글 하나와 그 뒤의 네 가지 이유. 어떤 곳을 좋아하는 데는 이유가 있어도 좋고, 판단력을 유지해도 좋다.',
+      'meta.description': '한국을 좋아하는 이유는 무엇일까. 고양이와 선의와 K-POP에 관한 TikTok 공유 글과 그 뒤의 네 가지 이유. 길모퉁이 고양이의 물 그릇부터 영화 「오 문희」까지. 어떤 곳을 좋아하는 데는 이유가 있어도 좋고, 판단력을 유지해도 좋다.',
       'meta.ogTitle': '한국을 좋아하는 데도 이유는 필요하다',
       'meta.ogDescription': '무대가 밝아서가 아니라, 길모퉁이 고양이를 위해 누군가 물 한 그릇을 놓아두었기 때문이다.',
       'aria.brand': '맨 위로 돌아가기',

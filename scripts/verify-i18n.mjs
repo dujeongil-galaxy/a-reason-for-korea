@@ -136,6 +136,28 @@ const PICKS_CREDIT = {
   jp: '『오! 문희』の劇中写真（報道用素材・Letterboxd 掲載）',
   ko: '『오! 문희』 스틸컷(홍보용 자료, Letterboxd 수록)'
 };
+/* SEO（2026-11-22 站长指令：按推荐执行 A+C+D 长尾）。
+   title / description 关键词前置、金句后置；旧文艺标题不得回退。
+   JSON-LD 逐语一段，inLanguage / url / keywords 必须与对应语言一致。 */
+const SEO_TITLE_KEYWORD = {
+  zh: '为什么喜欢韩国', en: 'Why I Like Korea',
+  jp: '韓国が好きな理由', ko: '한국을 좋아하는 이유'
+};
+const SEO_DESC_KEYWORD = {
+  zh: '为什么喜欢韩国', en: 'Why do people like Korea',
+  jp: 'なぜ韓国が好きなのか', ko: '한국을 좋아하는 이유는 무엇일까'
+};
+const SEO_STALE_TITLE = {
+  zh: '哈韩，也要有一个理由 · 这个世界不能没有小猫',
+  en: 'Liking Korea Needs a Reason · The World Needs Cats',
+  jp: '韓国が好きなら、理由も欲しい · 世界に猫は欠かせない',
+  ko: '한국을 좋아하는 데도 이유는 필요하다 · 이 세상엔 고양이가 필요해'
+};
+const SEO_LD_LANG = { zh: 'zh-CN', en: 'en', jp: 'ja', ko: 'ko' };
+const SEO_SITEMAP_URLS = [
+  SITE, SITE + 'en/', SITE + 'jp/', SITE + 'ko/'
+];
+const SEO_HREFLANG = ['zh', 'en', 'ja', 'ko', 'x-default'];
 
 /* ---------- extraction helpers ---------- */
 function extractNodes(html) {
@@ -159,6 +181,17 @@ function extractAttrs(html) {
     }
   }
   return out;
+}
+
+function extractTitle(html) {
+  const m = html.match(/<title\b[^>]*>([\s\S]*?)<\/title>/);
+  return m ? m[1] : '';
+}
+
+function extractJsonLd(html) {
+  const m = html.match(/<script type="application\/ld\+json" data-i18n="meta\.jsonld">([\s\S]*?)<\/script>/);
+  if (!m) return null;
+  try { return JSON.parse(m[1]); } catch (e) { return { __parseError: true }; }
 }
 
 function assetRefs(html) {
@@ -518,6 +551,58 @@ function verify(state) {
     }
   }
 
+  /* 5. SEO（A+C+D 长尾）：title / description 关键词前置，旧文艺标题不得回退；
+     四语各一段合法 JSON-LD，inLanguage / url / 关键词逐语对应；
+     sitemap.xml 收录四语 + hreflang，robots.txt 指向 sitemap。 */
+  const zhTitle = extractTitle(source);
+  if (!zhTitle.includes(SEO_TITLE_KEYWORD.zh)) errors.push('zh: title missing SEO keyword -> ' + SEO_TITLE_KEYWORD.zh);
+  if (zhTitle.includes(SEO_STALE_TITLE.zh)) errors.push('zh: stale文艺 title returned');
+  if (!(zhAttrs['meta.description'] || '').includes(SEO_DESC_KEYWORD.zh)) {
+    errors.push('zh: description missing SEO keyword');
+  }
+  const zhLd = extractJsonLd(source);
+  if (!zhLd || zhLd.__parseError) errors.push('zh: JSON-LD missing or invalid JSON');
+  else {
+    if (zhLd['@type'] !== 'WebSite') errors.push('zh: JSON-LD @type must be WebSite');
+    if (zhLd.inLanguage !== SEO_LD_LANG.zh) errors.push('zh: JSON-LD inLanguage wrong');
+    if (zhLd.url !== SITE) errors.push('zh: JSON-LD url wrong');
+    if (!JSON.stringify(zhLd).includes(SEO_TITLE_KEYWORD.zh)) errors.push('zh: JSON-LD missing SEO keyword');
+  }
+  if (!source.includes('<link rel="sitemap" type="application/xml"')) errors.push('zh: sitemap link missing');
+
+  for (const lang of LANGS) {
+    const page = pages[lang] || '';
+    const attrs = extractAttrs(page);
+    const title = extractTitle(page);
+    if (!title.includes(SEO_TITLE_KEYWORD[lang])) errors.push(lang + ': title missing SEO keyword -> ' + SEO_TITLE_KEYWORD[lang]);
+    if (title.includes(SEO_STALE_TITLE[lang])) errors.push(lang + ': stale文艺 title returned');
+    if (!(attrs['meta.description'] || '').includes(SEO_DESC_KEYWORD[lang])) {
+      errors.push(lang + ': description missing SEO keyword');
+    }
+    const ld = extractJsonLd(page);
+    if (!ld || ld.__parseError) errors.push(lang + ': JSON-LD missing or invalid JSON');
+    else {
+      if (ld['@type'] !== 'WebSite') errors.push(lang + ': JSON-LD @type must be WebSite');
+      if (ld.inLanguage !== SEO_LD_LANG[lang]) errors.push(lang + ': JSON-LD inLanguage wrong');
+      if (ld.url !== SITE + lang + '/') errors.push(lang + ': JSON-LD url wrong');
+      if (!JSON.stringify(ld).includes(SEO_TITLE_KEYWORD[lang])) errors.push(lang + ': JSON-LD missing SEO keyword');
+    }
+    if (!page.includes('<link rel="sitemap" type="application/xml"')) errors.push(lang + ': sitemap link missing');
+  }
+
+  const sitemap = state.sitemap || '';
+  if ((sitemap.match(/<url>/g) || []).length !== 4) errors.push('sitemap: must contain exactly 4 <url> entries');
+  for (const url of SEO_SITEMAP_URLS) {
+    if (!sitemap.includes('<loc>' + url + '</loc>')) errors.push('sitemap: missing loc -> ' + url);
+  }
+  for (const hreflang of SEO_HREFLANG) {
+    if (!sitemap.includes('hreflang="' + hreflang + '"')) errors.push('sitemap: missing hreflang -> ' + hreflang);
+  }
+  if (!sitemap.includes('<?xml version="1.0" encoding="UTF-8"?>')) errors.push('sitemap: missing XML declaration');
+  const robots = state.robots || '';
+  if (!/User-agent:\s*\*/.test(robots)) errors.push('robots.txt: missing User-agent rule');
+  if (!robots.includes('Sitemap: ' + SITE + 'sitemap.xml')) errors.push('robots.txt: sitemap directive missing or wrong');
+
   return errors;
 }
 
@@ -530,7 +615,9 @@ const state = {
   dict: sandbox.window.SITE_I18N,
   css: fs.readFileSync(path.join(ROOT, 'assets/styles.css'), 'utf8'),
   assetExists: fs.existsSync(path.join(ROOT, 'assets/clipping-hkcd.jpg')),
-  picksImageExists: fs.existsSync(path.join(ROOT, 'assets/oh-my-gran-still.jpg'))
+  picksImageExists: fs.existsSync(path.join(ROOT, 'assets/oh-my-gran-still.jpg')),
+  sitemap: fs.existsSync(path.join(ROOT, 'sitemap.xml')) ? fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8') : '',
+  robots: fs.existsSync(path.join(ROOT, 'robots.txt')) ? fs.readFileSync(path.join(ROOT, 'robots.txt'), 'utf8') : ''
 };
 for (const lang of LANGS) {
   const file = path.join(ROOT, lang, 'index.html');
@@ -762,7 +849,39 @@ const faults = [
   } },
   { name: 'picks image height:auto removed', mutate: s => {
     s.css = s.css.replace('width: 100%; height: auto; aspect-ratio: 16 / 9', 'width: 100%; aspect-ratio: 16 / 9');
-  } }
+  } },
+  { name: 'Chinese title reverted to the old literary wording', mutate: s => {
+    s.source = s.source.replace(SEO_TITLE_KEYWORD.zh, SEO_STALE_TITLE.zh);
+  } },
+  { name: 'English description loses the why-like-Korea keyword', mutate: s => {
+    s.dict.en.attr['meta.description'] = s.dict.en.attr['meta.description']
+      .replace(SEO_DESC_KEYWORD.en, 'A TikTok share');
+  } },
+  { name: 'Japanese SEO keyword stripped from title', mutate: s => {
+    s.dict.jp.html['meta.title'] = '韓国が好きなら、理由も欲しい';
+  } },
+  { name: 'Korean JSON-LD given the wrong language', mutate: s => {
+    s.dict.ko.html['meta.jsonld'] = s.dict.ko.html['meta.jsonld'].replace('"inLanguage":"ko"', '"inLanguage":"ja"');
+  } },
+  { name: 'English JSON-LD url points at the Chinese root', mutate: s => {
+    s.dict.en.html['meta.jsonld'] = s.dict.en.html['meta.jsonld'].replace(SITE + 'en/', SITE);
+  } },
+  { name: 'JSON-LD removed from Chinese source', mutate: s => {
+    s.source = s.source.replace(/<script type="application\/ld\+json"[\s\S]*?<\/script>/, '');
+  } },
+  { name: 'sitemap link dropped from English page', mutate: s => {
+    s.pages.en = s.pages.en.replace(/<link rel="sitemap"[^>]*>/, '');
+  } },
+  { name: 'sitemap loses the Korean URL', mutate: s => {
+    s.sitemap = s.sitemap.replace('<loc>' + SITE + 'ko/</loc>', '');
+  } },
+  { name: 'sitemap loses x-default hreflang', mutate: s => {
+    s.sitemap = s.sitemap.replace(/<xhtml:link rel="alternate" hreflang="x-default"[^>]*>/g, '');
+  } },
+  { name: 'robots.txt loses the sitemap directive', mutate: s => {
+    s.robots = 'User-agent: *\nAllow: /\n';
+  } },
+  { name: 'sitemap.xml deleted', mutate: s => { s.sitemap = ''; } }
 ];
 
 let caught = 0;

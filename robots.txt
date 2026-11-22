@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dujeongil-galaxy.github.io/a-reason-for-korea/sitemap.xml
