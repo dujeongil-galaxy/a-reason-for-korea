@@ -115,7 +115,7 @@ const COMING_NOTE = {
   jp: '準備中です。運営者がデータを入力するのをお待ちください。',
   ko: '준비 중입니다. 운영자가 데이터를 입력할 때까지 기다려 주세요.'
 };
-const NAV_SUB_HREFS = ['#picks', '#picks-kpop', '#picks-games'];
+const NAV_SUB_HREFS = ['#picks', '#picks-kpop', '#picks-pc-games'];
 const escRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 /* 韩国音乐专区已撤（站长 2026-11-22）：四语一律不得再出现占位卡与占位文案。 */
 const MUSIC_FORBIDDEN = [
@@ -176,6 +176,24 @@ const MUSIC_YTNOTE = {
   jp: '中国大陸以外からご覧の方は、<a href="' + YT_MV_LINK_SHORT + '" target="_blank" rel="noopener noreferrer">こちらから YouTube で「문을 여시오」の MV をご覧ください</a>。',
   ko: '중국 본토 외부 시청자는 <a href="' + YT_MV_LINK_SHORT + '" target="_blank" rel="noopener noreferrer">여기를 눌러 YouTube에서 『문을 여시오』 MV를 보세요</a>.'
 };
+
+/* 游戏区（2026-11-23 站长指令）：端游 4 款（Steam 商店页链接）+ 手游 2 款
+   （棕色尘埃 / NIKKE，各挂 App Store + Google Play + QooApp）。
+   端游/手游拆成两个锚点两个子标题；六张卡全部沿用剧集卡标准两栏结构。 */
+const PC_GAME_SLUGS = ['liesofp', 'stellarblade', 'pubg', 'eternalreturn'];
+const MOBILE_GAME_SLUGS = ['browndust', 'nikke'];
+const GAME_SLUGS = [...PC_GAME_SLUGS, ...MOBILE_GAME_SLUGS];
+const GAME_IMAGE = {
+  liesofp: 'assets/liesofp-poster.jpg',
+  stellarblade: 'assets/stellarblade-poster.jpg',
+  pubg: 'assets/pubg-poster.jpg',
+  eternalreturn: 'assets/eternalreturn-poster.jpg',
+  browndust: 'assets/browndust-poster.jpg',
+  nikke: 'assets/nikke-poster.jpg'
+};
+/* 端游唯一商店 = Steam；手游三通道必须齐全（App Store / Google Play / QooApp） */
+const STEAM_LINK = 'store.steampowered.com/app/';
+const MOBILE_LINKS = ['apps.apple.com/', 'play.google.com/store/apps/details', 'qoo-app.com/'];
 
 /* 剧集时间线（2026-11-22 站长规则：新增推荐按年份倒序，越近越靠前）。
    五部剧按年份：2023 车贞淑医生 / 2015 无理的前进 / 2013 来自星星的你 /
@@ -383,20 +401,18 @@ function verify(state) {
     if (source.includes(marker)) errors.push('zh: withdrawn music section returned -> ' + marker);
   }
   /* 二级菜单 / 占位：中文源锚点、四语文案键位与两栏卡片结构
-     （2026-11-22：K-pop 占位升级为音乐卡，占位只剩游戏一处，计数 2→1） */
+     （2026-11-23：游戏区已填充，不再检查占位符） */
   if ((zhNodes['picks.subhead'] || '') !== NAV_SUB.zh.drama) {
     errors.push('zh: picks subhead must match the dropdown item');
   }
   if (!source.includes('id="picks-kpop"')) errors.push('zh: picks-kpop music anchor missing');
-  if (!source.includes('id="picks-games"')) errors.push('zh: picks-games placeholder anchor missing');
+  if (!source.includes('id="picks-pc-games"')) errors.push('zh: picks-pc-games anchor missing');
+  if (!source.includes('id="picks-mobile-games"')) errors.push('zh: picks-mobile-games anchor missing');
   if ((source.match(new RegExp(escRe(NAV_SUB.zh.kpop), 'g')) || []).length !== 2) {
     errors.push('zh: 听K-pop must appear in the dropdown and the music subhead');
   }
-  if ((source.match(new RegExp(escRe(NAV_SUB.zh.game), 'g')) || []).length !== 2) {
-    errors.push('zh: 玩游戏 must appear in the dropdown and its placeholder');
-  }
-  if ((source.match(new RegExp(escRe(COMING_NOTE.zh), 'g')) || []).length !== 1) {
-    errors.push('zh: only the games placeholder may carry the coming-soon note');
+  if ((source.match(new RegExp(escRe(NAV_SUB.zh.game), 'g')) || []).length !== 1) {
+    errors.push('zh: 玩游戏 must appear in the dropdown');
   }
   /* 文姬卡与五部剧集卡同一套标准两栏：竖版海报在左、文字在右，无任何特殊布局 */
   const filmCard = source.match(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.film\.label">([\s\S]*?)<\/article>/);
@@ -463,6 +479,53 @@ function verify(state) {
   for (const marker of ['picks.music1.label', 'picks.music1.title', 'picks.music1.desc', 'picks.music1.actions', 'picks.music1.note', 'picks.music1.ytnote']) {
     if (!(zhNodes[marker] || '').length && marker !== 'picks.music1.ytnote') {
       errors.push('zh: music node missing -> ' + marker);
+    }
+  }
+
+  /* 1d-4. 游戏区（2026-11-23）：端游四款 + 手游两款，两锚点两子标题，
+     六张卡全部标准两栏；端游挂 Steam，手游三通道齐全；图片与来源说明不缺。 */
+  if (!source.includes('id="picks-pc-games"')) errors.push('zh: PC games anchor missing');
+  if (!source.includes('id="picks-mobile-games"')) errors.push('zh: mobile games anchor missing');
+  if (!source.includes('data-i18n="nav.picks.game.pc"')) errors.push('zh: PC games subhead missing');
+  if (!source.includes('data-i18n="nav.picks.game.mobile"')) errors.push('zh: mobile games subhead missing');
+  for (const slug of GAME_SLUGS) {
+    const card = source.match(new RegExp('<article class="pick-card">\\s*<p class="pick-card-label" data-i18n="picks\\.' + slug + '\\.label">([\\s\\S]*?)<\\/article>'));
+    if (!card) {
+      errors.push('zh: game card missing -> ' + slug);
+      continue;
+    }
+    const body = card[1];
+    if (!body.includes('<div class="pick-poster-row">')) {
+      errors.push('zh: ' + slug + ' card must use standard two-column poster row');
+    }
+    if (/pick-poster-row-feature|pick-card-feature|pick-figure-still/.test(body)) {
+      errors.push('zh: ' + slug + ' card must not carry any special layout');
+    }
+    if (!body.includes('class="pick-figure pick-figure-poster"') ||
+        !body.includes('class="pick-image pick-image-poster"')) {
+      errors.push('zh: ' + slug + ' card must reuse standard poster figure/image classes');
+    }
+    if (!assetRefs(source).includes(GAME_IMAGE[slug])) {
+      errors.push('zh: ' + slug + ' poster not referenced -> ' + GAME_IMAGE[slug]);
+    }
+    if (!state.gameImages[slug]) {
+      errors.push('picks: ' + slug + ' poster file missing from assets/');
+    }
+    if (!(zhNodes['picks.' + slug + '.title'] || '').length ||
+        !(zhNodes['picks.' + slug + '.desc'] || '').length ||
+        !(zhNodes['picks.' + slug + '.note'] || '').length) {
+      errors.push('zh: ' + slug + ' title/desc/note node missing');
+    }
+    for (const marker of ['picks.' + slug + '.imageCredit']) {
+      if (!(zhNodes[marker] || '').length) errors.push('zh: ' + slug + ' imageCredit missing');
+    }
+    const actions = zhNodes['picks.' + slug + '.actions'] || '';
+    if (PC_GAME_SLUGS.includes(slug)) {
+      if (!actions.includes(STEAM_LINK)) errors.push('zh: ' + slug + ' Steam link missing');
+    } else {
+      for (const link of MOBILE_LINKS) {
+        if (!actions.includes(link)) errors.push('zh: ' + slug + ' mobile channel missing -> ' + link);
+      }
     }
   }
 
@@ -789,14 +852,14 @@ function verify(state) {
     if ((nodes['picks.subhead'] || '') !== sub.drama) {
       errors.push(lang + ': section subhead must match the first dropdown item');
     }
-    for (const [id, label] of [['picks-kpop', sub.kpop], ['picks-games', sub.game]]) {
-      if (!page.includes('id="' + id + '"')) errors.push(lang + ': ' + id + ' placeholder missing');
-      if ((page.match(new RegExp(escRe(label), 'g')) || []).length !== 2) {
-        errors.push(lang + ': ' + id + ' label must appear in both dropdown and placeholder');
-      }
+    if (!page.includes('id="picks-kpop"')) errors.push(lang + ': ' + 'picks-kpop' + ' placeholder missing');
+    if (!page.includes('id="picks-pc-games"')) errors.push(lang + ': ' + 'picks-pc-games' + ' placeholder missing');
+    if (!page.includes('id="picks-mobile-games"')) errors.push(lang + ': ' + 'picks-mobile-games' + ' placeholder missing');
+    if ((page.match(new RegExp(escRe(sub.kpop), 'g')) || []).length !== 2) {
+      errors.push(lang + ': ' + 'picks-kpop' + ' label must appear in both dropdown and subhead');
     }
-    if (!page.includes(COMING_NOTE[lang])) {
-      errors.push(lang + ': placeholder coming-soon note missing');
+    if ((page.match(new RegExp(escRe(sub.game), 'g')) || []).length !== 1) {
+      errors.push(lang + ': ' + 'picks-games' + ' label must appear in dropdown');
     }
     const actions = nodes['picks.film.actions'] || '';
     const want = PICKS_ACTIONS_EXPECT[lang];
@@ -873,9 +936,36 @@ function verify(state) {
       errors.push(lang + ': music card must not carry any special layout');
     }
     if (!page.includes('id="picks-kpop"')) errors.push(lang + ': music anchor missing');
-    if (!page.includes('id="picks-games"')) errors.push(lang + ': games placeholder missing');
-    if ((page.match(new RegExp(escRe(COMING_NOTE[lang]), 'g')) || []).length !== 1) {
-      errors.push(lang + ': only the games placeholder may carry the coming-soon note');
+    if (!page.includes('id="picks-pc-games"')) errors.push(lang + ': PC games anchor missing');
+    if (!page.includes('id="picks-mobile-games"')) errors.push(lang + ': mobile games anchor missing');
+
+    /* 游戏区四语（2026-11-23）：六张卡节点齐全、alt/来源不缺、
+       端游挂 Steam、手游三通道齐全；卡结构与剧集卡同款。 */
+    for (const slug of GAME_SLUGS) {
+      for (const key of ['label', 'title', 'desc', 'actions', 'note', 'imageCredit']) {
+        if (!(nodes['picks.' + slug + '.' + key] || '').length) {
+          errors.push(lang + ': ' + slug + ' node missing -> ' + key);
+        }
+      }
+      if (!attrs['picks.' + slug + '.imageAlt']) errors.push(lang + ': ' + slug + ' imageAlt missing');
+      if (!assetRefs(page).includes('../' + GAME_IMAGE[slug])) {
+        errors.push(lang + ': ' + slug + ' poster not referenced');
+      }
+      const actions = nodes['picks.' + slug + '.actions'] || '';
+      if (PC_GAME_SLUGS.includes(slug)) {
+        if (!actions.includes(STEAM_LINK)) errors.push(lang + ': ' + slug + ' Steam link missing');
+      } else {
+        for (const link of MOBILE_LINKS) {
+          if (!actions.includes(link)) errors.push(lang + ': ' + slug + ' mobile channel missing -> ' + link);
+        }
+      }
+      const cardHtml = (page.match(new RegExp('<article class="pick-card">\\s*<p class="pick-card-label" data-i18n="picks\\.' + slug + '\\.label">([\\s\\S]*?)<\\/article>')) || [])[1] || '';
+      if (!cardHtml.includes('<div class="pick-poster-row">')) {
+        errors.push(lang + ': ' + slug + ' card must use standard two-column poster row');
+      }
+      if (/pick-poster-row-feature|pick-card-feature|pick-figure-still/.test(cardHtml)) {
+        errors.push(lang + ': ' + slug + ' card must not carry any special layout');
+      }
     }
 
     /* 剧集时间线四语校验：五部齐全、红字本地化、按区按钮与海报 alt/来源不缺 */
@@ -1022,6 +1112,8 @@ const state = {
   musicImageExists: fs.existsSync(path.join(ROOT, MUSIC_IMAGE)),
   dramaImages: Object.fromEntries(DRAMA_SLUGS.map(slug => [slug,
     fs.existsSync(path.join(ROOT, DRAMA_IMAGE[slug]))])),
+  gameImages: Object.fromEntries(GAME_SLUGS.map(slug => [slug,
+    fs.existsSync(path.join(ROOT, GAME_IMAGE[slug]))])),
   sitemap: fs.existsSync(path.join(ROOT, 'sitemap.xml')) ? fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8') : '',
   robots: fs.existsSync(path.join(ROOT, 'robots.txt')) ? fs.readFileSync(path.join(ROOT, 'robots.txt'), 'utf8') : ''
 };
@@ -1274,11 +1366,7 @@ const faults = [
   { name: 'music label year drifted', mutate: s => {
     s.source = s.source.replace('data-i18n="picks.music1.label">韩国音乐 · 2013', 'data-i18n="picks.music1.label">韩国音乐 · 2015');
   } },
-  { name: 'games coming-soon note copied onto the music subhead', mutate: s => {
-    s.source = s.source.replace('picks-subhead picks-subhead-music" data-i18n="nav.picks.kpop">听K-pop<',
-      'picks-subhead picks-subhead-music" data-i18n="nav.picks.kpop">听K-pop<p class="picks-coming-note">正在开发中，请等待站长写入数据</p><');
-  } },
-  { name: 'music card deleted from Chinese source', mutate: s => {
+  { name: 'nav dropdown left open by default in CSS', mutate: s => {
     s.source = s.source.replace(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.music1\.label">[\s\S]*?<\/article>/, '');
   } },
   { name: 'withdrawn music placeholder reintroduced to English page', mutate: s => {
@@ -1406,12 +1494,6 @@ const faults = [
   { name: 'section subhead reverted to Chinese on Japanese page', mutate: s => {
     s.pages.jp = s.pages.jp.replace(/(data-i18n="picks\.subhead">)[^<]*(<\/p>)/, '$1' + NAV_SUB.zh.drama + '$2');
   } },
-  { name: 'Korean placeholder writing-in-progress note stripped', mutate: s => {
-    s.pages.ko = s.pages.ko.split(COMING_NOTE.ko).join('');
-  } },
-  { name: 'Chinese games placeholder anchor removed', mutate: s => {
-    s.source = s.source.replace('id="picks-games"', '');
-  } },
   { name: 'nav dropdown left open by default in CSS', mutate: s => {
     s.css = s.css.replace('display: none; position: absolute;', 'display: block; position: absolute;');
   } },
@@ -1436,6 +1518,43 @@ const faults = [
   } },
   { name: 'card actions no longer stick to the bottom', mutate: s => {
     s.css = s.css.replace('.pick-poster-body .pick-actions { margin-top: auto; }', '');
+  } },
+  /* 游戏区（2026-11-23） */
+  { name: 'PC games anchor removed from nav', mutate: s => {
+    s.pages.en = s.pages.en.replace('href="#picks-pc-games"', 'href="#picks-nowhere"');
+  } },
+  { name: 'mobile games anchor removed from Chinese source', mutate: s => {
+    s.source = s.source.replace('id="picks-mobile-games"', '');
+  } },
+  { name: 'game card missing from Chinese source', mutate: s => {
+    s.source = s.source.replace(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.nikke\.label">[\s\S]*?<\/article>/, '');
+  } },
+  { name: 'game poster asset marked missing', mutate: s => { s.gameImages.liesofp = false; } },
+  { name: 'game poster reference stripped', mutate: s => {
+    s.source = s.source.replace('src="assets/browndust-poster.jpg"', '');
+  } },
+  { name: 'game card forced into special layout', mutate: s => {
+    s.source = s.source.replace(/(data-i18n="picks\.pubg\.label"[^>]*>[\s\S]*?<\/p>\s*)<div class="pick-poster-row">/,
+      '$1<div class="pick-poster-row pick-poster-row-feature">');
+  } },
+  { name: 'PC game Steam link stripped', mutate: s => {
+    s.dict.en.html['picks.stellarblade.actions'] = '<a class="pick-link pick-link-featured" href="https://example.com/">Steam</a>';
+  } },
+  { name: 'mobile game Google Play channel stripped', mutate: s => {
+    s.dict.ko.html['picks.browndust.actions'] = s.dict.ko.html['picks.browndust.actions'].replace(/https:\/\/play\.google\.com\/store\/apps\/details[^"]*/, 'https://example.com/');
+  } },
+  { name: 'mobile game QooApp channel stripped from Chinese source', mutate: s => {
+    s.source = s.source.replace(/data-i18n="picks\.nikke\.actions">[\s\S]*?qoo-app\.com[^"]*"[^>]*>[^<]*<\/a>/,
+      'data-i18n="picks.nikke.actions">');
+  } },
+  { name: 'game imageAlt left untranslated in Japanese', mutate: s => {
+    s.dict.jp.attr['picks.liesofp.imageAlt'] = 'Lies of P 游戏海报';
+  } },
+  { name: 'game imageCredit node deleted from dictionary', mutate: s => {
+    delete s.dict.en.html['picks.eternalreturn.imageCredit'];
+  } },
+  { name: 'game translated page missing mobile games anchor', mutate: s => {
+    s.pages.jp = s.pages.jp.replace('id="picks-mobile-games"', '');
   } }
 ];
 
