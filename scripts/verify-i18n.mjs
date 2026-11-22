@@ -28,7 +28,7 @@ const CHINESE_MARKERS = [
 ];
 const REQUIRED_ASSETS = [
   '../assets/styles.css', '../assets/i18n.js', '../assets/app.js', '../favicon.svg',
-  '../assets/clipping-hkcd.jpg'
+  '../assets/clipping-hkcd.jpg', '../assets/oh-my-gran-still.jpg'
 ];
 const ARCHIVE_LINKS = [
   'https://dujeongil-galaxy.github.io/a-reason-for-korea/',
@@ -100,6 +100,14 @@ const PICKS_ZH_NODES = {
   'picks.head': '站长推荐',
   'picks.film.title': '《哦！文姬》',
   'picks.music.soon': '此专区正在建设中，请稍安勿躁'
+};
+/* 推荐必须带预览图（站长 2026-11-22 规则）：本地图片 + 四语 alt + 来源说明。 */
+const PICKS_IMAGE = 'assets/oh-my-gran-still.jpg';
+const PICKS_CREDIT = {
+  zh: '剧照：《哦！文姬》片方宣传物料（经 Letterboxd 收录）',
+  en: 'Still from Oh! My Gran (promotional material, via Letterboxd)',
+  jp: '『오! 문희』の劇中写真（報道用素材・Letterboxd 掲載）',
+  ko: '『오! 문희』 스틸컷(홍보용 자료, Letterboxd 수록)'
 };
 
 /* ---------- extraction helpers ---------- */
@@ -191,6 +199,12 @@ function verify(state) {
   }
   for (const [key, expected] of Object.entries(PICKS_ZH_NODES)) {
     if (zhNodes[key] !== expected) errors.push('zh: picks node wrong -> ' + key);
+  }
+  if (!assetRefs(source).includes(PICKS_IMAGE)) errors.push('zh: picks preview image not referenced');
+  if (!state.picksImageExists) errors.push('picks: preview image file missing from assets/');
+  /* HTML 的 width/height 属性会压过 aspect-ratio，必须有 height:auto 才是 16:9 */
+  if (!/\.pick-image\s*\{[^}]*height:\s*auto/.test(state.css)) {
+    errors.push('zh: picks image missing height:auto (HTML height attribute wins)');
   }
 
   /* 1e. 极窄屏：320px 视口曾被语言切换器撑宽 6px，收紧规则不得回退 */
@@ -425,6 +439,9 @@ function verify(state) {
     }
     if ((nodes['picks.head'] || '') !== PICKS_HEAD[lang]) errors.push(lang + ': picks heading drift');
     if ((nodes['picks.music.soon'] || '') !== MUSIC_SOON[lang]) errors.push(lang + ': music placeholder drift');
+    if ((nodes['picks.film.imageCredit'] || '') !== PICKS_CREDIT[lang]) {
+      errors.push(lang + ': picks image credit drift');
+    }
 
     /* no Chinese body copy left behind */
     for (const marker of CHINESE_MARKERS) {
@@ -443,7 +460,8 @@ const state = {
   pages: {},
   dict: sandbox.window.SITE_I18N,
   css: fs.readFileSync(path.join(ROOT, 'assets/styles.css'), 'utf8'),
-  assetExists: fs.existsSync(path.join(ROOT, 'assets/clipping-hkcd.jpg'))
+  assetExists: fs.existsSync(path.join(ROOT, 'assets/clipping-hkcd.jpg')),
+  picksImageExists: fs.existsSync(path.join(ROOT, 'assets/oh-my-gran-still.jpg'))
 };
 for (const lang of LANGS) {
   const file = path.join(ROOT, lang, 'index.html');
@@ -623,6 +641,15 @@ const faults = [
   } },
   { name: 'narrow-viewport guard removed', mutate: s => {
     s.css = s.css.replace(/@media \(max-width: 360px\) \{[\s\S]*?\n\}/, '');
+  } },
+  { name: 'picks preview image removed from source', mutate: s => {
+    s.source = s.source.replace('src="assets/oh-my-gran-still.jpg"', '');
+  } },
+  { name: 'picks image credit left in Chinese', mutate: s => {
+    s.dict.en.html['picks.film.imageCredit'] = PICKS_CREDIT.zh;
+  } },
+  { name: 'picks image height:auto removed', mutate: s => {
+    s.css = s.css.replace('width: 100%; height: auto; aspect-ratio: 16 / 9', 'width: 100%; aspect-ratio: 16 / 9');
   } }
 ];
 

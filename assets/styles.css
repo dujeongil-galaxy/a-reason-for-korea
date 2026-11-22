@@ -452,6 +452,12 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
   box-shadow: var(--shadow-sm);
 }
 .pick-card-label { font-family: var(--mono); font-size: 10.5px; letter-spacing: .16em; color: var(--accent); }
+.pick-figure { margin: 14px 0 18px; }
+.pick-image {
+  display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover;
+  border-radius: 12px; border: 1px solid var(--line);
+}
+.pick-image-credit { font-size: 11px; color: var(--ink-faint); margin-top: 8px; line-height: 1.6; }
 .pick-title {
   font-family: var(--serif); font-size: clamp(1.35rem, 2.4vw, 1.8rem);
   line-height: 1.4; margin: 14px 0 12px;

@@ -22,7 +22,8 @@ window.SITE_I18N = {
       'aria.heroArt': '插画：一只猫坐在屋檐下，旁边放着一只水碗',
       'aria.lampArt': '插画：纸箱里蜷着一只猫，上方有一盏尚未点亮的灯',
       'placeholder.reason': '例如：因为有人愿意为一碗水弯腰',
-      'archive.imgAlt': '一张香港商报网的网页截图，可见网站标志、栏目导航与一行繁体中文标题；截图止于标题，未包含正文'
+      'archive.imgAlt': '一张香港商报网的网页截图，可见网站标志、栏目导航与一行繁体中文标题；截图止于标题，未包含正文',
+      'picks.film.imageAlt': '电影《哦！文姬》剧照：文姬奶奶与儿子在废车场奔跑'
     },
     js: {
       'lamp.on': '再留一盏灯',
@@ -106,6 +107,7 @@ window.SITE_I18N = {
       'picks.kicker': 'CURATED BY THE WEBMASTER',
       'picks.head': 'Picks from the webmaster',
       'picks.film.label': 'Film & TV',
+      'picks.film.imageCredit': 'Still from Oh! My Gran (promotional material, via Letterboxd)',
       'picks.film.title': 'Oh! My Gran (2020)',
       'picks.film.desc': 'Moon-hee has Alzheimer’s, yet she is the only witness to the hit-and-run that left her granddaughter in a coma. Fighting her own failing memory, she and her son go after the driver. A Korean film that finds both laughter and tears in an old lady.',
       'picks.film.netflix': 'Find the title on Netflix and watch it there — please support the official release',
@@ -144,7 +146,8 @@ window.SITE_I18N = {
       'aria.heroArt': 'Illustration: a cat sitting under the eaves, with a bowl of water',
       'aria.lampArt': 'Illustration: a cat curled up in a cardboard box, with a lamp above that is not yet lit',
       'placeholder.reason': 'For example: because someone bent down to leave a bowl of water',
-      'archive.imgAlt': 'A screenshot of a Hong Kong Commercial Daily web page showing the site logo, section navigation and one headline in traditional Chinese. The image stops at the headline and contains no article text.'
+      'archive.imgAlt': 'A screenshot of a Hong Kong Commercial Daily web page showing the site logo, section navigation and one headline in traditional Chinese. The image stops at the headline and contains no article text.',
+      'picks.film.imageAlt': 'Still from Oh! My Gran: Moon-hee and her son running through a scrapyard'
     },
     js: {
       'lamp.on': 'Leave one more light',
@@ -228,6 +231,7 @@ window.SITE_I18N = {
       'picks.kicker': '運営が選ぶ',
       'picks.head': '運営のおすすめ',
       'picks.film.label': '映画・ドラマ',
+      'picks.film.imageCredit': '『오! 문희』の劇中写真（報道用素材・Letterboxd 掲載）',
       'picks.film.title': '『오! 문희』（Oh! My Gran）',
       'picks.film.desc': 'アルツハイマーを患ったムンヒおばあちゃんは、孫娘が巻き込まれたひき逃げ事故の唯一の目撃者。衰えていく記憶と戦いながら、息子とともに犯人を追います。2020年の韓国映画。笑いと涙が、ひとりの老人に宿ります。',
       'picks.film.netflix': 'Netflix で作品名を検索してご覧ください。正版で応援しましょう',
@@ -266,7 +270,8 @@ window.SITE_I18N = {
       'aria.heroArt': 'イラスト：軒先に座る猫と、水の入った器',
       'aria.lampArt': 'イラスト：段ボールの中で丸まる猫と、まだ点いていない上の灯り',
       'placeholder.reason': '例：誰かが水を置くために腰をかがめてくれたから',
-      'archive.imgAlt': '香港商報網のページを写したスクリーンショット。サイトのロゴ、欄目ナビゲーション、繁体字の見出し一行が見える。画像は見出しで途切れており、本文は含まれていない。'
+      'archive.imgAlt': '香港商報網のページを写したスクリーンショット。サイトのロゴ、欄目ナビゲーション、繁体字の見出し一行が見える。画像は見出しで途切れており、本文は含まれていない。',
+      'picks.film.imageAlt': '映画『오! 문희』の劇中写真：ムンヒおばあちゃんと息子が解体工場を走る'
     },
     js: {
       'lamp.on': 'もう一度ともす',
@@ -350,6 +355,7 @@ window.SITE_I18N = {
       'picks.kicker': '운영자가 고른',
       'picks.head': '운영자 추천',
       'picks.film.label': '영화·드라마',
+      'picks.film.imageCredit': '『오! 문희』 스틸컷(홍보용 자료, Letterboxd 수록)',
       'picks.film.title': '『오! 문희』(Oh! My Gran)',
       'picks.film.desc': '알츠하이머를 앓고 있는 문희 할머니는 손녀가 당한 뺑소니 사고의 유일한 목격자입니다. 흐려지는 기억과 싸우며 아들과 함께 범인을 찾아나서죠. 2020년 한국 영화, 웃음과 눈물이 한 노인에게 모입니다.',
       'picks.film.netflix': 'Netflix에서 제목을 검색해 보세요. 정식 서비스로 응원해 주세요',
@@ -388,7 +394,8 @@ window.SITE_I18N = {
       'aria.heroArt': '삽화: 처마 아래 앉은 고양이와 물그릇',
       'aria.lampArt': '삽화: 상자 안에 웅크린 고양이와, 아직 켜지지 않은 위쪽 전등',
       'placeholder.reason': '예: 누군가 물 한 그릇을 놓으려고 허리를 굽혔기 때문에',
-      'archive.imgAlt': '홍콩상보망(hkcd.com) 웹페이지 스크린샷. 사이트 로고, 섹션 메뉴와 번체 중국어 제목 한 줄이 보인다. 화면은 제목에서 끊겨 있으며 본문은 포함되지 않았다.'
+      'archive.imgAlt': '홍콩상보망(hkcd.com) 웹페이지 스크린샷. 사이트 로고, 섹션 메뉴와 번체 중국어 제목 한 줄이 보인다. 화면은 제목에서 끊겨 있으며 본문은 포함되지 않았다.',
+      'picks.film.imageAlt': '영화 『오! 문희』 스틸컷: 문희 할머니와 아들이 고철장에서 달리는 장면'
     },
     js: {
       'lamp.on': '한 번 더 켜기',
