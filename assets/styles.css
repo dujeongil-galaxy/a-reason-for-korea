@@ -458,6 +458,16 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
   border-radius: 12px; border: 1px solid var(--line);
 }
 .pick-image-credit { font-size: 11px; color: var(--ink-faint); margin-top: 8px; line-height: 1.6; }
+/* 剧集卡片：竖版海报 + 文字并排（海报 2:3 / 3:4，不能被 16:9 裁掉） */
+.pick-poster-row { display: grid; grid-template-columns: minmax(0, 132px) minmax(0, 1fr); gap: 18px; }
+.pick-figure-poster { margin: 0; }
+.pick-image-poster { width: 100%; height: auto; aspect-ratio: auto; object-fit: contain; }
+.pick-poster-body { min-width: 0; }
+.pick-poster-body .pick-title { margin-top: 0; }
+@media (max-width: 420px) {
+  .pick-poster-row { grid-template-columns: 1fr; }
+  .pick-figure-poster { max-width: 150px; }
+}
 .pick-title {
   font-family: var(--serif); font-size: clamp(1.35rem, 2.4vw, 1.8rem);
   line-height: 1.4; margin: 14px 0 12px;

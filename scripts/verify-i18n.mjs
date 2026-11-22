@@ -136,6 +136,38 @@ const PICKS_CREDIT = {
   jp: '『오! 문희』の劇中写真（報道用素材・Letterboxd 掲載）',
   ko: '『오! 문희』 스틸컷(홍보용 자료, Letterboxd 수록)'
 };
+
+/* 剧集时间线（2026-11-22 站长规则：新增推荐按年份倒序，越近越靠前）。
+   五部剧按年份：2023 车贞淑医生 / 2015 无理的前进 / 2013 来自星星的你 /
+   2013 继承者们 / 2003 大长今。每部本地竖版海报 + 四语 alt/来源说明。 */
+const DRAMA_SLUGS = ['drama1', 'drama2', 'drama3', 'drama4', 'drama5'];
+const DRAMA_IMAGE = {
+  drama1: 'assets/doctor-cha-poster.jpg',
+  drama2: 'assets/sassy-go-go-poster.jpg',
+  drama3: 'assets/my-love-from-star-poster.jpg',
+  drama4: 'assets/the-heirs-poster.jpg',
+  drama5: 'assets/dae-jang-geum-poster.jpg'
+};
+const DRAMA_YEAR = { drama1: '2023', drama2: '2015', drama3: '2013', drama4: '2013', drama5: '2003' };
+/* 按区实查后的主按钮（2026-11-22）：无租买渠道的区只有红字，不挂购买按钮。
+   en/drama4 美区 Amazon 买断；jp/drama3 与 jp/drama4 日区 Amazon 租买；其余无。
+   中文五部统一 aff 港区口径；韩区五部均无租买 → 只有红字。 */
+const DRAMA_AMAZON_US = 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.48bbb40c-29e6-73ba-eafe-e8d48570412f';
+const DRAMA_AMAZON_JP_STAR = 'https://watch.amazon.co.jp/detail?gti=amzn1.dv.gti.70ae1894-d080-80dc-72e9-3739218bb8a0';
+const DRAMA_AMAZON_JP_HEIRS = 'https://watch.amazon.co.jp/detail?gti=amzn1.dv.gti.a37f89de-a7ea-4c5f-9188-2ba82f552e4a';
+/* 期望的 featured 按钮链接：键为 lang/slug，缺省为 null（只允许红字，不许主按钮） */
+const DRAMA_PRIMARY = {
+  'zh/drama1': AFF_LINK, 'zh/drama2': AFF_LINK, 'zh/drama3': AFF_LINK,
+  'zh/drama4': AFF_LINK, 'zh/drama5': AFF_LINK,
+  'en/drama4': DRAMA_AMAZON_US,
+  'jp/drama3': DRAMA_AMAZON_JP_STAR, 'jp/drama4': DRAMA_AMAZON_JP_HEIRS
+};
+const DRAMA_NOTE = {
+  zh: '到 Netflix 搜索片名观看 · 请支持正版',
+  en: 'Viewers in mainland China: <a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">click here</a> to access Netflix.',
+  jp: '中国大陸からご覧になる場合は、<a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">こちら</a>から Netflix にアクセスできます。',
+  ko: '중국 본토 시청자는 <a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">여기</a>를 눌러 Netflix에 접속하세요.'
+};
 /* SEO（2026-11-22 站长指令：按推荐执行 A+C+D 长尾）。
    title / description 关键词前置、金句后置；旧文艺标题不得回退。
    JSON-LD 逐语一段，inLanguage / url / keywords 必须与对应语言一致。 */
@@ -278,6 +310,47 @@ function verify(state) {
   /* HTML 的 width/height 属性会压过 aspect-ratio，必须有 height:auto 才是 16:9 */
   if (!/\.pick-image\s*\{[^}]*height:\s*auto/.test(state.css)) {
     errors.push('zh: picks image missing height:auto (HTML height attribute wins)');
+  }
+
+  /* 1d-2. 剧集时间线：五部剧按年份倒序，竖版海报 + 四语本地化 + 按区按钮 */
+  const sourceLabels = [...source.matchAll(/data-i18n="(picks\.drama[1-5]\.label)"[^>]*>([^<]*)</g)]
+    .map(m => ({ key: m[1], text: m[2] }));
+  if (sourceLabels.length !== 5) {
+    errors.push('zh: drama timeline must have 5 cards, found ' + sourceLabels.length);
+  }
+  for (let i = 0; i < DRAMA_SLUGS.length; i++) {
+    const slug = DRAMA_SLUGS[i];
+    if (!source.includes('data-i18n="picks.' + slug + '.title"')) {
+      errors.push('zh: ' + slug + ' title node missing');
+    }
+    if (!source.includes('data-i18n="picks.' + slug + '.actions"')) {
+      errors.push('zh: ' + slug + ' actions node missing');
+    }
+    if (!assetRefs(source).includes(DRAMA_IMAGE[slug])) {
+      errors.push('zh: ' + slug + ' poster not referenced -> ' + DRAMA_IMAGE[slug]);
+    }
+    if (!state.dramaImages[slug]) {
+      errors.push('picks: ' + slug + ' poster file missing from assets/');
+    }
+    const label = sourceLabels.find(x => x.key === 'picks.' + slug + '.label');
+    if (!label || !label.text.includes(DRAMA_YEAR[slug])) {
+      errors.push('zh: ' + slug + ' label year drift (want ' + DRAMA_YEAR[slug] + ')');
+    }
+  }
+  /* 时间线顺序：DOM 中 drama1..drama5 依次出现，年份由新到旧 */
+  let cursor = -1;
+  for (const slug of DRAMA_SLUGS) {
+    const at = source.indexOf('data-i18n="picks.' + slug + '.label"');
+    if (at <= cursor) {
+      errors.push('zh: drama timeline out of order at ' + slug);
+    }
+    cursor = at;
+  }
+  if (!/\.pick-image-poster\s*\{[^}]*aspect-ratio:\s*auto/.test(state.css)) {
+    errors.push('zh: poster images must keep native aspect-ratio');
+  }
+  if (!state.css.includes('@media (max-width: 420px)')) {
+    errors.push('zh: poster row narrow-viewport guard missing');
   }
 
   /* 1e. 极窄屏：320px 视口曾被语言切换器撑宽 6px，收紧规则不得回退 */
@@ -545,6 +618,43 @@ function verify(state) {
       errors.push(lang + ': picks image credit drift');
     }
 
+    /* 剧集时间线四语校验：五部齐全、红字本地化、按区按钮与海报 alt/来源不缺 */
+    const note = DRAMA_NOTE[lang];
+    for (const slug of DRAMA_SLUGS) {
+      if (!nodes['picks.' + slug + '.title']) errors.push(lang + ': ' + slug + ' title node missing');
+      if (!attrs['picks.' + slug + '.imageAlt']) errors.push(lang + ': ' + slug + ' imageAlt missing');
+      if (!nodes['picks.' + slug + '.imageCredit']) errors.push(lang + ': ' + slug + ' imageCredit missing');
+      if (!nodes['picks.' + slug + '.label'] || !nodes['picks.' + slug + '.label'].includes(DRAMA_YEAR[slug])) {
+        errors.push(lang + ': ' + slug + ' label year drift');
+      }
+      const actions = nodes['picks.' + slug + '.actions'] || '';
+      if (!actions.includes(note)) errors.push(lang + ': ' + slug + ' Netflix note drift');
+      if (!actions.includes(AFF_LINK)) errors.push(lang + ': ' + slug + ' aff entry missing in note');
+      if (actions.includes(FORBIDDEN_NETFLIX_LINK)) errors.push(lang + ': ' + slug + ' Netflix link forbidden');
+      for (const dom of FORBIDDEN_PIRATE_DOMAINS) {
+        if (actions.includes(dom)) errors.push(lang + ': ' + slug + ' pirate domain forbidden');
+      }
+      const featured = (actions.match(/class="pick-link pick-link-featured"\s+href="([^"]+)"/) || [])[1] || '';
+      const wantPrimary = DRAMA_PRIMARY[lang + '/' + slug] || null;
+      if (wantPrimary) {
+        if (!featured.includes(wantPrimary)) {
+          errors.push(lang + ': ' + slug + ' featured buy link missing -> ' + wantPrimary);
+        }
+        /* 有按钮的卡片禁止出现别区购买渠道，aff 只能出现在红字里 */
+        for (const [k, link] of Object.entries({
+          amazon: AMAZON_LINK, us: DRAMA_AMAZON_US,
+          jpStar: DRAMA_AMAZON_JP_STAR, jpHeirs: DRAMA_AMAZON_JP_HEIRS,
+          apple: APPLE_TV_LINK
+        })) {
+          if (k !== (wantPrimary === DRAMA_AMAZON_US ? 'us' : wantPrimary === DRAMA_AMAZON_JP_STAR ? 'jpStar' : wantPrimary === DRAMA_AMAZON_JP_HEIRS ? 'jpHeirs' : wantPrimary) && featured.includes(link)) {
+            errors.push(lang + ': ' + slug + ' wrong-region buy link -> ' + k);
+          }
+        }
+      } else if (featured) {
+        errors.push(lang + ': ' + slug + ' buy button forbidden where no rent/buy channel exists');
+      }
+    }
+
     /* no Chinese body copy left behind */
     for (const marker of CHINESE_MARKERS) {
       if (page.includes(marker)) errors.push(lang + ': untranslated Chinese left in page -> ' + marker);
@@ -616,6 +726,8 @@ const state = {
   css: fs.readFileSync(path.join(ROOT, 'assets/styles.css'), 'utf8'),
   assetExists: fs.existsSync(path.join(ROOT, 'assets/clipping-hkcd.jpg')),
   picksImageExists: fs.existsSync(path.join(ROOT, 'assets/oh-my-gran-still.jpg')),
+  dramaImages: Object.fromEntries(DRAMA_SLUGS.map(slug => [slug,
+    fs.existsSync(path.join(ROOT, DRAMA_IMAGE[slug]))])),
   sitemap: fs.existsSync(path.join(ROOT, 'sitemap.xml')) ? fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8') : '',
   robots: fs.existsSync(path.join(ROOT, 'robots.txt')) ? fs.readFileSync(path.join(ROOT, 'robots.txt'), 'utf8') : ''
 };
@@ -789,8 +901,9 @@ const faults = [
   { name: 'Netflix red bold note styling stripped', mutate: s => {
     s.css = s.css.replace('color: #C5221F; font-weight: 700;', 'color: var(--ink-soft); font-weight: 400;');
   } },
-  { name: 'Netflix note line removed from source', mutate: s => {
-    s.source = s.source.replace('<p class="pick-netflix-note">到 Netflix 搜索片名观看 · 请支持正版</p>', '');
+  { name: 'Netflix note line removed from film actions', mutate: s => {
+    s.source = s.source.replace(/<div class="pick-actions" data-i18n="picks\.film\.actions">[\s\S]*?<\/div>/,
+      '<div class="pick-actions" data-i18n="picks.film.actions"></div>');
   } },
   { name: 'Prime Video link stripped from English page', mutate: s => {
     s.pages.en = s.pages.en.replace(AMAZON_LINK, 'https://nfshare.cn/');
@@ -881,7 +994,52 @@ const faults = [
   { name: 'robots.txt loses the sitemap directive', mutate: s => {
     s.robots = 'User-agent: *\nAllow: /\n';
   } },
-  { name: 'sitemap.xml deleted', mutate: s => { s.sitemap = ''; } }
+  { name: 'sitemap.xml deleted', mutate: s => { s.sitemap = ''; } },
+  { name: 'drama timeline card removed from Chinese source', mutate: s => {
+    s.source = s.source.replace(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.drama1\.label">[\s\S]*?<\/article>/, '');
+  } },
+  { name: 'drama timeline reversed (oldest first)', mutate: s => {
+    const block = s.source.match(/data-i18n="picks\.drama1\.label"[\s\S]*?data-i18n="picks\.drama5\.label"/);
+    if (block) {
+      const labels = [...block[0].matchAll(/data-i18n="picks\.drama[1-5]\.label"/g)].map(m => m[0]);
+      let i = 0;
+      s.source = s.source.replace(block[0], block[0].replace(/data-i18n="picks\.drama[1-5]\.label"/g, () => labels[labels.length - 1 - i++]));
+    }
+  } },
+  { name: 'drama poster reference stripped', mutate: s => {
+    s.source = s.source.replace('src="assets/doctor-cha-poster.jpg"', '');
+  } },
+  { name: 'drama poster asset marked missing', mutate: s => { s.dramaImages.drama3 = false; } },
+  { name: 'drama label year drifted', mutate: s => {
+    s.source = s.source.replace('data-i18n="picks.drama1.label">剧集 · 2023', 'data-i18n="picks.drama1.label">剧集 · 2022');
+  } },
+  { name: 'drama buy button added where no channel exists (KO)', mutate: s => {
+    s.dict.ko.html['picks.drama1.actions'] = '<a class="pick-link pick-link-featured" href="' + AFF_LINK + '" target="_blank">buy</a>' + s.dict.ko.html['picks.drama1.actions'];
+  } },
+  { name: 'drama localized Netflix note reverted to Chinese', mutate: s => {
+    s.dict.en.html['picks.drama2.actions'] = s.dict.en.html['picks.drama2.actions'].replace(DRAMA_NOTE.en, DRAMA_NOTE.zh);
+  } },
+  { name: 'drama EN US buy link stripped', mutate: s => {
+    s.dict.en.html['picks.drama4.actions'] = s.dict.en.html['picks.drama4.actions'].replace(DRAMA_AMAZON_US, 'https://nfshare.cn/');
+  } },
+  { name: 'drama JP star buy link pointed at US', mutate: s => {
+    s.dict.jp.html['picks.drama3.actions'] = s.dict.jp.html['picks.drama3.actions'].replace(DRAMA_AMAZON_JP_STAR, DRAMA_AMAZON_US);
+  } },
+  { name: 'drama JP heirs buy link swapped to star gti', mutate: s => {
+    s.dict.jp.html['picks.drama4.actions'] = s.dict.jp.html['picks.drama4.actions'].replace(DRAMA_AMAZON_JP_HEIRS, DRAMA_AMAZON_JP_STAR);
+  } },
+  { name: 'drama Chinese source given a Netflix link', mutate: s => {
+    s.source = s.source.replace('data-i18n="picks.drama1.actions"><p class="pick-netflix-note">', 'data-i18n="picks.drama1.actions"><a href="https://www.netflix.com/title/x">netflix</a><p class="pick-netflix-note">');
+  } },
+  { name: 'drama aff entry removed from Japanese note', mutate: s => {
+    s.dict.jp.html['picks.drama5.actions'] = s.dict.jp.html['picks.drama5.actions'].replace(AFF_LINK, 'https://nfshare.cn/');
+  } },
+  { name: 'drama imageAlt left untranslated in English', mutate: s => {
+    s.dict.en.attr['picks.drama1.imageAlt'] = '《车贞淑医生》海报：严正花饰演的车贞淑';
+  } },
+  { name: 'poster native aspect-ratio guard removed', mutate: s => {
+    s.css = s.css.replace('.pick-image-poster { width: 100%; height: auto; aspect-ratio: auto; object-fit: contain; }', '');
+  } }
 ];
 
 let caught = 0;
