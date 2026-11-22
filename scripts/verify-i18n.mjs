@@ -336,6 +336,14 @@ function verify(state) {
     if (!label || !label.text.includes(DRAMA_YEAR[slug])) {
       errors.push('zh: ' + slug + ' label year drift (want ' + DRAMA_YEAR[slug] + ')');
     }
+    /* 中文五部统一挂港区 aff 邀请码按钮 + 红字原文 */
+    const actionsBlock = (source.match(new RegExp('data-i18n="picks\\.' + slug + '\\.actions">([\\s\\S]*?)<\\/div>')) || [])[1] || '';
+    if (!actionsBlock.includes(DRAMA_PRIMARY['zh/' + slug])) {
+      errors.push('zh: ' + slug + ' HK-region aff button missing');
+    }
+    if (!actionsBlock.includes(DRAMA_NOTE.zh)) {
+      errors.push('zh: ' + slug + ' Netflix note missing');
+    }
   }
   /* 时间线顺序：DOM 中 drama1..drama5 依次出现，年份由新到旧 */
   let cursor = -1;
@@ -1029,10 +1037,15 @@ const faults = [
     s.dict.jp.html['picks.drama4.actions'] = s.dict.jp.html['picks.drama4.actions'].replace(DRAMA_AMAZON_JP_HEIRS, DRAMA_AMAZON_JP_STAR);
   } },
   { name: 'drama Chinese source given a Netflix link', mutate: s => {
-    s.source = s.source.replace('data-i18n="picks.drama1.actions"><p class="pick-netflix-note">', 'data-i18n="picks.drama1.actions"><a href="https://www.netflix.com/title/x">netflix</a><p class="pick-netflix-note">');
+    s.source = s.source.replace(/data-i18n="picks\.drama1\.actions"><a class="pick-link pick-link-featured" href="[^"]*nfshare[^"]*"/,
+      'data-i18n="picks.drama1.actions"><a class="pick-link pick-link-featured" href="https://www.netflix.com/title/x"');
   } },
   { name: 'drama aff entry removed from Japanese note', mutate: s => {
     s.dict.jp.html['picks.drama5.actions'] = s.dict.jp.html['picks.drama5.actions'].replace(AFF_LINK, 'https://nfshare.cn/');
+  } },
+  { name: 'drama HK-region aff button stripped from Chinese source', mutate: s => {
+    s.source = s.source.replace(/data-i18n="picks\.drama3\.actions"><a class="pick-link pick-link-featured"[\s\S]*?<\/a>/,
+      'data-i18n="picks.drama3.actions">');
   } },
   { name: 'drama imageAlt left untranslated in English', mutate: s => {
     s.dict.en.attr['picks.drama1.imageAlt'] = '《车贞淑医生》海报：严正花饰演的车贞淑';

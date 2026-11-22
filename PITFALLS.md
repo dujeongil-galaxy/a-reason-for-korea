@@ -185,4 +185,5 @@
 - **imageAlt 分段坑（踩了很久）**：本站 `data-i18n-alt` 的值存在字典的 `attr` 段、**不是** `html` 段（`picks.film.imageAlt` 就是先例）。我一开始把五部剧的 imageAlt 加进 html 段，build 报 `MISSING KEYS`，随后一连串脚本修复又把 zh 的 attr 段删空、ko 的 html 段留重复、甚至把 `archive.imgAlt` 和新键**粘成一行**。教训：① 属性翻译键一律进 `attr`；② 用 `node -e` 内联脚本改字典时，bash 会吃掉单引号/正则斜杠导致误删，**必须写成独立 .cjs 文件执行**；③ 改完先看每个键的 grep 计数（每种语言应恰好 1 条），再跑 build/verify。
 - **海报纸质比例**：TMDB/MBC 海报都是竖版（2:3 / 3:4），沿用 `.pick-image` 的 `aspect-ratio: 16/9; object-fit: cover` 会把人像裁成横条。新增 `.pick-image-poster` 用 `aspect-ratio: auto; object-fit: contain`，≤420px 时海报与文字上下堆叠。verify 对 `aspect-ratio: auto` 与 `@media (max-width: 420px)` 都有断言。
 - **故障注入脆弱项**：旧注入「Netflix note line removed from source」删的是 index.html 里的红字，但中文源校验读的是 `zhNodes`（从 data-i18n 节点提取），删 source 不判红；改成替换 `picks.film.actions` 节点内容才生效。新增卡片时务必让每条注入都对应真实的校验路径。
-- **校验计数**：79 → **93/93**（新增 15 组剧集注入，修好 1 组旧注入）。真实文件把英文继承者们购买链接改回 aff → 判红 2 条，恢复全绿。
+- **文档与实现不一致的遗漏**：README/CHANGELOG 写「中文五部挂港区 aff」，但实际中文页五部剧最初只有红字——因为 `DRAMA_PRIMARY` 里的 zh 期望只在外文循环里被检查，中文源校验段没读它。教训：新增卡片时，**中文源和外文页两套校验路径都要覆盖同一条规则**，不能因为常量表里写了就以为生效。补上中文源 aff 按钮断言 + 故障注入后，真实文件删掉第二部剧的 aff 按钮 → 判红 1 条。
+- **校验计数**：79 → **94/94**（新增 16 组剧集注入，修好 1 组旧注入）。真实文件把英文继承者们购买链接改回 aff → 判红 2 条；删中文 aff 按钮 → 判红 1 条；恢复全绿。
