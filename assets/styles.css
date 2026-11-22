@@ -493,11 +493,6 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
   color: #C5221F; font-weight: 700;
 }
 .pick-note { font-size: 12px; color: var(--ink-faint); margin-top: 16px; line-height: 1.7; }
-.pick-card-soon { display: flex; flex-direction: column; justify-content: center; min-height: 260px; }
-.pick-placeholder {
-  font-family: var(--serif); font-size: clamp(1.05rem, 2vw, 1.35rem);
-  line-height: 1.8; color: var(--ink-soft); margin-top: 18px;
-}
 
 /* ---------- archive / keepsake ---------- */
 .archive { background: var(--bg-soft); }

@@ -101,12 +101,12 @@ const FORBIDDEN_REGION_CALQUES = ['Hong Kong, China', '중국 홍콩', '香港�
 const PICKS_HEAD = {
   zh: '站长推荐', en: 'Picks from the webmaster', jp: '運営のおすすめ', ko: '운영자 추천'
 };
-const MUSIC_SOON = {
-  zh: '此专区正在建设中，请稍安勿躁',
-  en: 'This section is under construction. Please stay tuned.',
-  jp: 'このコーナーは準備中です。しばらくお待ちください。',
-  ko: '이 코너는 준비 중입니다. 조금만 기다려 주세요.'
-};
+/* 韩国音乐专区已撤（站长 2026-11-22）：四语一律不得再出现占位卡与占位文案。 */
+const MUSIC_FORBIDDEN = [
+  'picks.music.label', 'picks.music.soon', 'pick-card-soon', 'pick-placeholder',
+  '此专区正在建设中，请稍安勿躁', 'This section is under construction. Please stay tuned.',
+  'このコーナーは準備中です。しばらくお待ちください。', '이 코너는 준비 중입니다. 조금만 기다려 주세요.'
+];
 /* 整块 actions：zh=aff（港区）、en=Prime Video（美区）、jp=Apple TV（日区）、ko=YouTube（韩区）；
    primary 逐语锁定。红字 note：中文保留原文；en/jp/ko 逐语本地化为「中国大陆用户点这里访问 Netflix」，
    「这里」必须指向 aff 入口（AFF_LINK），不得回退成旧版机翻的「搜索片名观看」。 */
@@ -125,8 +125,7 @@ const PICKS_PRIMARY_LABEL = {
 };
 const PICKS_ZH_NODES = {
   'picks.head': '站长推荐',
-  'picks.film.title': '《哦！文姬》',
-  'picks.music.soon': '此专区正在建设中，请稍安勿躁'
+  'picks.film.title': '《哦！文姬》'
 };
 /* 推荐必须带预览图（站长 2026-11-22 规则）：本地图片 + 四语 alt + 来源说明。 */
 const PICKS_IMAGE = 'assets/oh-my-gran-still.jpg';
@@ -338,6 +337,9 @@ function verify(state) {
   }
   for (const [key, expected] of Object.entries(PICKS_ZH_NODES)) {
     if (zhNodes[key] !== expected) errors.push('zh: picks node wrong -> ' + key);
+  }
+  for (const marker of MUSIC_FORBIDDEN) {
+    if (source.includes(marker)) errors.push('zh: withdrawn music section returned -> ' + marker);
   }
   if (!assetRefs(source).includes(PICKS_IMAGE)) errors.push('zh: picks preview image not referenced');
   if (!state.picksImageExists) errors.push('picks: preview image file missing from assets/');
@@ -659,7 +661,9 @@ function verify(state) {
       if (page.includes(dom)) errors.push(lang + ': 盗版站域名不得出现 -> ' + dom);
     }
     if ((nodes['picks.head'] || '') !== PICKS_HEAD[lang]) errors.push(lang + ': picks heading drift');
-    if ((nodes['picks.music.soon'] || '') !== MUSIC_SOON[lang]) errors.push(lang + ': music placeholder drift');
+    for (const marker of MUSIC_FORBIDDEN) {
+      if (page.includes(marker)) errors.push(lang + ': withdrawn music section returned -> ' + marker);
+    }
     if ((nodes['picks.film.imageCredit'] || '') !== PICKS_CREDIT[lang]) {
       errors.push(lang + ': picks image credit drift');
     }
@@ -1021,14 +1025,17 @@ const faults = [
   { name: 'invitation code stripped from Chinese page', mutate: s => {
     s.source = s.source.replace('5rfpUarUEd', '');
   } },
-  { name: 'Chinese music placeholder removed', mutate: s => {
-    s.source = s.source.replace('此专区正在建设中，请稍安勿躁', '');
+  { name: 'picks section removed from Chinese source', mutate: s => {
+    s.source = s.source.replace(/<section class="section picks" id="picks">[\s\S]*?<\/section>/, '');
   } },
   { name: 'English picks heading machine-translated', mutate: s => {
     s.dict.en.html['picks.head'] = 'Webmaster recommend';
   } },
-  { name: 'Korean music placeholder left in Chinese', mutate: s => {
-    s.dict.ko.html['picks.music.soon'] = '此专区正在建设中，请稍安勿躁';
+  { name: 'withdrawn Korean music card reintroduced to Chinese source', mutate: s => {
+    s.source += '<article class="pick-card pick-card-soon"><p data-i18n="picks.music.soon">此专区正在建设中，请稍安勿躁</p></article>';
+  } },
+  { name: 'withdrawn music placeholder reintroduced to English page', mutate: s => {
+    s.pages.en = s.pages.en.replace('id="picks"', 'id="picks" data-marker="picks.music.soon"');
   } },
   { name: 'narrow-viewport guard removed', mutate: s => {
     s.css = s.css.replace(/@media \(max-width: 360px\) \{[\s\S]*?\n\}/, '');
