@@ -28,7 +28,7 @@ const CHINESE_MARKERS = [
 ];
 const REQUIRED_ASSETS = [
   '../assets/styles.css', '../assets/i18n.js', '../assets/app.js', '../favicon.svg',
-  '../assets/clipping-hkcd.jpg', '../assets/oh-my-gran-still.jpg'
+  '../assets/clipping-hkcd.jpg', '../assets/oh-my-gran-poster.jpg'
 ];
 const ARCHIVE_LINKS = [
   'https://dujeongil-galaxy.github.io/a-reason-for-korea/',
@@ -144,12 +144,12 @@ const PICKS_ZH_NODES = {
   'picks.film.title': '《哦！文姬》'
 };
 /* 推荐必须带预览图（站长 2026-11-22 规则）：本地图片 + 四语 alt + 来源说明。 */
-const PICKS_IMAGE = 'assets/oh-my-gran-still.jpg';
+const PICKS_IMAGE = 'assets/oh-my-gran-poster.jpg';
 const PICKS_CREDIT = {
-  zh: '剧照：《哦！文姬》片方宣传物料（经 Letterboxd 收录）',
-  en: 'Still from Oh! My Gran (promotional material, via Letterboxd)',
-  jp: '『오! 문희』の劇中写真（報道用素材・Letterboxd 掲載）',
-  ko: '『오! 문희』 스틸컷(홍보용 자료, Letterboxd 수록)'
+  zh: '海报：《哦！文姬》官方宣传物料（经 GoldPoster 收录）',
+  en: 'Poster for Oh! My Gran (official promotional material, via GoldPoster)',
+  jp: '『오! 문희』のポスター（公式宣伝素材・GoldPoster 掲載）',
+  ko: '『오! 문희』 포스터(공식 홍보 자료, GoldPoster 수록)'
 };
 
 /* 剧集时间线（2026-11-22 站长规则：新增推荐按年份倒序，越近越靠前）。
@@ -370,19 +370,31 @@ function verify(state) {
   if ((source.match(new RegExp(escRe(COMING_NOTE.zh), 'g')) || []).length !== 2) {
     errors.push('zh: both placeholders must carry the coming-soon note');
   }
-  if (!source.includes('class="pick-poster-row pick-poster-row-feature"')) {
-    errors.push('zh: film card must use the full-width stacked layout');
-  }
-  const filmRow = source.match(/<div class="pick-poster-row pick-poster-row-feature">([\s\S]*?)<\/div>\s*<\/article>/);
-  if (!filmRow || filmRow[1].indexOf('</figure>') === -1 ||
-      filmRow[1].indexOf('</figure>') > filmRow[1].indexOf('pick-poster-body')) {
-    errors.push('zh: film card text must sit below the full-width still');
+  /* 文姬卡与五部剧集卡同一套标准两栏：竖版海报在左、文字在右，无任何特殊布局 */
+  const filmCard = source.match(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.film\.label">([\s\S]*?)<\/article>/);
+  if (!filmCard) {
+    errors.push('zh: film card missing');
+  } else {
+    const body = filmCard[1];
+    if (!body.includes('<div class="pick-poster-row">')) {
+      errors.push('zh: film card must use the same standard two-column row as drama cards');
+    }
+    if (/pick-poster-row-feature|pick-card-feature|pick-figure-still/.test(body)) {
+      errors.push('zh: film card must not carry any special stacked/feature layout');
+    }
+    if (!body.includes('class="pick-figure pick-figure-poster"') ||
+        !body.includes('class="pick-image pick-image-poster"')) {
+      errors.push('zh: film card must use the poster figure/image classes like drama cards');
+    }
+    const figEnd = body.indexOf('</figure>');
+    if (figEnd === -1 || figEnd > body.indexOf('pick-poster-body')) {
+      errors.push('zh: film poster must sit before the text body (left column)');
+    }
   }
   if (!assetRefs(source).includes(PICKS_IMAGE)) errors.push('zh: picks preview image not referenced');
   if (!state.picksImageExists) errors.push('picks: preview image file missing from assets/');
-  /* HTML 的 width/height 属性会压过 aspect-ratio，必须有 height:auto 才是 16:9 */
-  if (!/\.pick-image\s*\{[^}]*height:\s*auto/.test(state.css)) {
-    errors.push('zh: picks image missing height:auto (HTML height attribute wins)');
+  if (/\.pick-poster-row-feature|pick-figure-still|pick-card-feature/.test(state.css)) {
+    errors.push('zh: special film-card layout CSS must be removed');
   }
 
   /* 1d-2. 剧集时间线：五部剧按年份倒序，竖版海报 + 四语本地化 + 按区按钮 */
@@ -453,14 +465,8 @@ function verify(state) {
   if (!state.css.includes('@media (max-width: 420px)')) {
     errors.push('zh: poster row narrow-viewport guard missing');
   }
-  if (!/\.pick-figure-still \.pick-image\s*\{[^}]*aspect-ratio:\s*16\s*\/\s*9/.test(state.css)) {
-    errors.push('zh: film still must keep 16:9 in the full-width layout');
-  }
-  if (!/\.pick-poster-row-feature\s*\{[^}]*display:\s*flex;[^}]*flex-direction:\s*column/.test(state.css)) {
-    errors.push('zh: film card missing full-width stacked CSS rule');
-  }
-  if (/\.pick-card-feature\s*\{[^}]*grid-column:\s*1\s*\/\s*-1/.test(state.css)) {
-    errors.push('zh: film card must not break out of the two-column grid');
+  if (/\.pick-poster-row-feature|pick-figure-still|pick-card-feature/.test(state.css)) {
+    errors.push('zh: special film-card layout CSS must be removed (no stacked/feature/still rules)');
   }
   if (!/\.nav-dropdown-menu\s*\{[^}]*display:\s*none/.test(state.css)) {
     errors.push('css: nav dropdown must be closed by default');
@@ -905,7 +911,7 @@ const state = {
   dict: sandbox.window.SITE_I18N,
   css: fs.readFileSync(path.join(ROOT, 'assets/styles.css'), 'utf8'),
   assetExists: fs.existsSync(path.join(ROOT, 'assets/clipping-hkcd.jpg')),
-  picksImageExists: fs.existsSync(path.join(ROOT, 'assets/oh-my-gran-still.jpg')),
+  picksImageExists: fs.existsSync(path.join(ROOT, 'assets/oh-my-gran-poster.jpg')),
   dramaImages: Object.fromEntries(DRAMA_SLUGS.map(slug => [slug,
     fs.existsSync(path.join(ROOT, DRAMA_IMAGE[slug]))])),
   sitemap: fs.existsSync(path.join(ROOT, 'sitemap.xml')) ? fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8') : '',
@@ -1138,13 +1144,14 @@ const faults = [
     s.css = s.css.replace(/@media \(max-width: 360px\) \{[\s\S]*?\n\}/, '');
   } },
   { name: 'picks preview image removed from source', mutate: s => {
-    s.source = s.source.replace('src="assets/oh-my-gran-still.jpg"', '');
+    s.source = s.source.replace('src="assets/oh-my-gran-poster.jpg"', '');
   } },
   { name: 'picks image credit left in Chinese', mutate: s => {
     s.dict.en.html['picks.film.imageCredit'] = PICKS_CREDIT.zh;
   } },
-  { name: 'picks image height:auto removed', mutate: s => {
-    s.css = s.css.replace('width: 100%; height: auto; aspect-ratio: 16 / 9', 'width: 100%; aspect-ratio: 16 / 9');
+  { name: 'picks poster reverted to 16:9 still aspect-ratio', mutate: s => {
+    s.css = s.css.replace('aspect-ratio: auto; object-fit: cover; object-position: top center;',
+      'aspect-ratio: 16 / 9; object-fit: cover; object-position: top center;');
   } },
   { name: 'Chinese title reverted to the old literary wording', mutate: s => {
     s.source = s.source.replace(SEO_TITLE_KEYWORD.zh, SEO_STALE_TITLE.zh);
@@ -1264,15 +1271,17 @@ const faults = [
   { name: 'nav dropdown left open by default in CSS', mutate: s => {
     s.css = s.css.replace('display: none; position: absolute;', 'display: block; position: absolute;');
   } },
-  { name: 'film card reverted to the two-column layout', mutate: s => {
-    s.source = s.source.replace('class="pick-poster-row pick-poster-row-feature"', 'class="pick-poster-row"');
+  { name: 'film card forced back into special stacked layout', mutate: s => {
+    s.source = s.source.replace(/(data-i18n="picks\.film\.label"[^>]*>[\s\S]*?<\/p>\s*)<div class="pick-poster-row">/,
+      '$1<div class="pick-poster-row pick-poster-row-feature">');
   } },
-  { name: 'film card stacked CSS rule removed', mutate: s => {
-    s.css = s.css.replace('.pick-poster-row-feature { display: flex; flex-direction: column; gap: 0; }', '');
+  { name: 'film card image reverted to plain still class', mutate: s => {
+    s.source = s.source.replace('class="pick-image pick-image-poster" src="assets/oh-my-gran-poster.jpg"',
+      'class="pick-image" src="assets/oh-my-gran-poster.jpg"');
   } },
-  { name: 'film card forced out of the two-column grid', mutate: s => {
-    s.css = s.css.replace('.pick-figure-still { margin: 0; }',
-      '.pick-figure-still { margin: 0; }\n.pick-card-feature { grid-column: 1 / -1; order: -1; }');
+  { name: 'special film-card layout CSS reintroduced', mutate: s => {
+    s.css = s.css.replace('.pick-poster-body .pick-title { margin-top: 0; }',
+      '.pick-poster-body .pick-title { margin-top: 0; }\n.pick-card-feature { grid-column: 1 / -1; order: -1; }');
   } },
   { name: 'picks grid reverted to per-card height (blank gap returns)', mutate: s => {
     s.css = s.css.replace('.picks-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }',

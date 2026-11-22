@@ -28,7 +28,7 @@ window.SITE_I18N = {
       'picks.drama3.imageAlt': '《来自星星的你》海报：金秀贤与全智贤',
       'picks.drama4.imageAlt': '《继承者们》海报：李敏镐与朴信惠',
       'picks.drama5.imageAlt': '《大长今》海报：李英爱饰演的长今',
-      'picks.film.imageAlt': '电影《哦！文姬》剧照：文姬奶奶与儿子在废车场奔跑'
+      'picks.film.imageAlt': '电影《哦！文姬》海报：罗文熙饰演的文姬与李熙俊饰演的儿子'
     },
     js: {
       'lamp.on': '再留一盏灯',
@@ -118,7 +118,7 @@ window.SITE_I18N = {
       'picks.subhead': 'Watch K-dramas',
       'picks.coming': 'Under construction. The webmaster is preparing the content.',
       'picks.film.label': 'Film & TV',
-      'picks.film.imageCredit': 'Still from Oh! My Gran (promotional material, via Letterboxd)',
+      'picks.film.imageCredit': 'Poster for Oh! My Gran (official promotional material, via GoldPoster)',
       'picks.film.title': 'Oh! My Gran (2020)',
       'picks.film.desc': 'Moon-hee has Alzheimer’s, yet she is the only witness to the hit-and-run that left her granddaughter in a coma. Fighting her own failing memory, she and her son go after the driver. A Korean film that finds both laughter and tears in an old lady.',
       'picks.film.actions': '<a class="pick-link pick-link-featured" href="https://watch.amazon.com/detail?gti=amzn1.dv.gti.3a505a12-509d-4f34-af76-47f0ea441f72" target="_blank" rel="noopener noreferrer">Rent or buy on Prime Video</a><p class="pick-netflix-note">Viewers in mainland China: <a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">click here</a> to access Netflix.</p>',
@@ -190,7 +190,7 @@ window.SITE_I18N = {
       'picks.drama3.imageAlt': 'My Love from the Star poster: Kim Soo-hyun and Jun Ji-hyun',
       'picks.drama4.imageAlt': 'The Heirs poster: Lee Min-ho and Park Shin-hye',
       'picks.drama5.imageAlt': 'Jewel in the Palace poster: Lee Young-ae as Jang-geum',
-      'picks.film.imageAlt': 'Still from Oh! My Gran: Moon-hee and her son running through a scrapyard'
+      'picks.film.imageAlt': 'Oh! My Gran poster: Na Moon-hee as Moon-hee and Lee Hee-jun as her son'
     },
     js: {
       'lamp.on': 'Leave one more light',
@@ -280,7 +280,7 @@ window.SITE_I18N = {
       'picks.subhead': '韓国ドラマを見る',
       'picks.coming': '準備中です。運営者がデータを入力するのをお待ちください。',
       'picks.film.label': '映画・ドラマ',
-      'picks.film.imageCredit': '『오! 문희』の劇中写真（報道用素材・Letterboxd 掲載）',
+      'picks.film.imageCredit': '『오! 문희』のポスター（公式宣伝素材・GoldPoster 掲載）',
       'picks.film.title': '『오! 문희』（Oh! My Gran）',
       'picks.film.desc': 'アルツハイマーを患ったムンヒおばあちゃんは、孫娘が巻き込まれたひき逃げ事故の唯一の目撃者。衰えていく記憶と戦いながら、息子とともに犯人を追います。2020年の韓国映画。笑いと涙が、ひとりの老人に宿ります。',
       'picks.film.actions': '<a class="pick-link pick-link-featured" href="https://itunes.apple.com/jp/movie/%E3%82%AA-%E3%83%A0%E3%83%8B-%E5%AD%97%E5%B9%95%E7%89%88/id1691528206?uo=4" target="_blank" rel="noopener noreferrer">Apple TV でレンタル・購入する · 正版で応援しましょう</a><p class="pick-netflix-note">中国大陸からご覧になる場合は、<a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">こちら</a>から Netflix にアクセスできます。</p>',
@@ -352,7 +352,7 @@ window.SITE_I18N = {
       'picks.drama3.imageAlt': '『星から来たあなた』ポスター：キム・スヒョンとチョン・ジヒョン',
       'picks.drama4.imageAlt': '『相続者たち』ポスター：イ・ミンホとパク・シネ',
       'picks.drama5.imageAlt': '『宮廷女官チャングムの誓い』ポスター：イ・ヨンエ演じるチャングム',
-      'picks.film.imageAlt': '映画『오! 문희』の劇中写真：ムンヒおばあちゃんと息子が解体工場を走る'
+      'picks.film.imageAlt': '映画『오! 문희』のポスター：ナ・ムニ演じるムンヒとイ・ヒジュン演じる息子'
     },
     js: {
       'lamp.on': 'もう一度ともす',
@@ -442,7 +442,7 @@ window.SITE_I18N = {
       'picks.subhead': '한국 드라마 보기',
       'picks.coming': '준비 중입니다. 운영자가 데이터를 입력할 때까지 기다려 주세요.',
       'picks.film.label': '영화·드라마',
-      'picks.film.imageCredit': '『오! 문희』 스틸컷(홍보용 자료, Letterboxd 수록)',
+      'picks.film.imageCredit': '『오! 문희』 포스터(공식 홍보 자료, GoldPoster 수록)',
       'picks.film.title': '『오! 문희』(Oh! My Gran)',
       'picks.film.desc': '알츠하이머를 앓고 있는 문희 할머니는 손녀가 당한 뺑소니 사고의 유일한 목격자입니다. 흐려지는 기억과 싸우며 아들과 함께 범인을 찾아나서죠. 2020년 한국 영화, 웃음과 눈물이 한 노인에게 모입니다.',
       'picks.film.actions': '<a class="pick-link pick-link-featured" href="https://youtu.be/cflWf3XKeFI?si=pZ-WkU6w5wYkh4Wq" target="_blank" rel="noopener noreferrer">YouTube에서 대여하거나 구매하기 · 정식 서비스로 응원해 주세요</a><p class="pick-netflix-note">중국 본토 시청자는 <a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">여기</a>를 눌러 Netflix에 접속하세요.</p>',
@@ -514,7 +514,7 @@ window.SITE_I18N = {
       'picks.drama3.imageAlt': '『별에서 온 그대』 포스터: 김수현과 전지현',
       'picks.drama4.imageAlt': '『상속자들』 포스터: 이민호와 박신혜',
       'picks.drama5.imageAlt': '『대장금』 포스터: 이영애가 연기한 장금',
-      'picks.film.imageAlt': '영화 『오! 문희』 스틸컷: 문희 할머니와 아들이 고철장에서 달리는 장면'
+      'picks.film.imageAlt': '영화 『오! 문희』 포스터: 나문희가 연기한 문희와 이희준이 연기한 아들'
     },
     js: {
       'lamp.on': '한 번 더 켜기',

@@ -237,3 +237,10 @@
 - **正解**：网格恢复等高拉伸，卡片改 flex column，`.pick-poster-row { flex:1 }`，海报列加宽（132→210px）并 `height:100%; object-fit:cover` 撑满，`.pick-poster-body .pick-actions { margin-top:auto }` 把按钮/红字/注记贴底。卡底空白 311→35px。
 - **两个调参细节**：① 海报列只有 132px 时撑到 500px 高会裁得只剩中间一条，必须加宽到 ~210px 才不毁图；② 文字区用 `justify-content:space-between` 会把标题和简介拆得太开，改成标题简介留在顶部、只给 `.pick-actions` 加 `margin-top:auto`，视觉自然得多。
 - **旧断言会失配**：海报改成 `object-fit:cover` 后，原「海报保持 native aspect-ratio」的断言文字与注入字符串都要跟着改，否则自测报 `self-test missed`。计数 109 → **111/111**。
+
+## 33. 用户反复纠结卡片布局时，回到「和别的卡一样」这个最简单解
+
+- **起因**：站长连续给截图挑战了电影卡布局四次（图上文下 → 不要独占 → 占满 → 657px 填满），最后给两张标准剧集卡截图说「文姬那张卡片做成这种大小不行吗，大不了图片缩小」。
+- **教训**：当用户在两张「参考卡」和一张「问题卡」之间反复来回时，最稳的做法是**直接把问题卡改成和参考卡一模一样的结构**，而不是继续在问题卡上叠加新的特殊 CSS。此前每一轮都为电影卡加一条专属规则（`pick-poster-row-feature`、`pick-figure-still`、`pick-card-feature`），越改越偏离。
+- **正解**：撤掉全部专属类与 CSS，文姬卡复用剧集卡的 `.pick-poster-row` / `.pick-figure-poster` / `.pick-image-poster`，横剧照换成竖版海报（1010×1440，GoldPoster），海报栏宽与其他卡同为 210px。桌面六卡高度 446-447px 完全一致，卡底空白 35px。
+- **机器强制**：源码断言六卡统一标准两栏、禁用 feature/still/stacked 回退；CSS 断言特殊布局规则不得存在；故障注入把文姬卡塞回 feature 布局判红 2 条（之前短字符串 replace 命中了别的卡，需锚定 `picks.film.label`）。图片常量、文件存在检查、四语 alt/credit 全改成海报版。
