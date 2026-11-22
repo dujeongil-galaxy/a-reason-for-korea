@@ -2,6 +2,14 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-22 · 外文页 aff 按钮去掉「港区」直译
+
+- `ea093ee` — 站长截图指出英文页 aff 按钮写着 `Hong Kong, China: get access through this link`，是把中文的「中国香港地区」直译过去的。站长：英语直接链奈飞没错、挂 aff 也没错，只是不该直译港区。
+  - **改了什么**：`assets/i18n.js` 的 en / ko `picks.film.actions` 文案去掉地区前缀——英文改为 `Get access through this link (invitation code 5rfpUarUEd)`，韩文改为 `이 링크로 이용권 구매 (초대 코드 5rfpUarUEd)`；aff 链接、邀请码、红字 Netflix 提示、按钮 class 全部不变。中文源「中国香港地区」是上轮拍板的原始口径、保留；日文页无 aff 按钮，不受影响。`en/index.html` / `ko/index.html` 由 `build-i18n.mjs` 重建。
+  - **机器强制**：`scripts/verify-i18n.mjs` 新增 `FORBIDDEN_REGION_CALQUES`（`Hong Kong, China` / `중국 홍콩`），en/ko aff 分支逐页断言不得出现；新增 1 组故障注入，`SELF-TEST 62 → 63/63`。真实文件把 `Hong Kong, China` 塞回英文页 → 精准判红，恢复后全绿。
+  - **验证**：`build-i18n.mjs` 重建三语页（每语 97 节点）；四页 actions 文案核对正确、en/ko/i18n 里禁词计数 0；CDP 截图 `picks-en-final.png` / `picks-en-final-mobile.png` 肉眼确认按钮文案与红字 Netflix 完整。
+  - **诊断记录**：截图里英文页中英逐句对照是浏览器翻译插件叠加，不是页面 bug——`en/index.html` 的 CJK 仅导航「中文 / 日本語」与署名「新浪」三处。
+
 ## 2026-11-22 · 站长推荐链接改港区 aff 口径，日区不挂购买链接
 
 - `86266b0` — 站长指令：韩国 YouTube 租买页只有韩国 IP 可用；中国大陆以后一律按港区算，港区 YouTube 搜不到也不能租买，所以 aff 邀请码链接继续保留。日区不挂链接，直接推荐奈飞。

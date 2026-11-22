@@ -138,3 +138,10 @@
 - **诊断坑**：用 `&gl=US|JP|HK` 参数抓 YouTube 页面并不能真的切换地区，四个地区都返回同一个韩区页面 + `UNPLAYABLE "Video unavailable"`（出口 IP 不变）。地区可用性不能靠 `gl` 参数实测，要查 JustWatch 等地区化流媒体数据库。
 - **最终口径（站长 2026-11-22 指令）**：中国大陆以后都按**港区**算；港区 YouTube 搜不到也不能租买，所以 **aff 邀请码链接不能删，继续保留**——zh/en/ko 三页 featured 按钮指向 `https://nfshare.cn/?sid=5rfpUarUEd`，文案写「中国香港地区」，邀请码 `5rfpUarUEd` 逐字保留；按钮下方红字保留奈飞原文案「到 Netflix 搜索片名观看 · 请支持正版」；**日区（jp）不挂任何购买链接**，只留 Netflix 文字推荐。四页一律禁 `youtu.be` / `youtube.com/watch` / `www.netflix.com` 链接与盗版域名。
 - **实现**：三条按钮 key（youtube / netflix / cn）合并为一条整块 `picks.film.actions`（字典值是完整 HTML 片段，`translateNodes` 直接替换 innerHTML），这样日区能单独去掉 `<a>` 而不影响其他三语。`verify-i18n.mjs` 用 `PICKS_ACTIONS_EXPECT` 逐语校验 aff 有无 / 邀请码 / Netflix 文案，`FORBIDDEN_PURCHASE_LINKS` 四页禁链接；`SELF-TEST 56 → 62/62`。真实文件给日区塞回 aff 链接 → 精准判红两条，恢复后全绿。
+
+## 21. 「港区」是中文口径，不要直译进外文按钮文案
+
+- **现象**：站长看英文页截图指出——aff 按钮的英文文案被写成 `Hong Kong, China: get access through this link`，是把中文源的「中国香港地区」逐字翻译过去的。站长原话「英语的直接链奈飞没错，挂 aff 也没错，但是为什么要直接翻译港区？」：链 Netflix、挂 aff 都认可，唯独不该把港区划分这种**中文语境专属口径**译进外文。
+- **原因**：上一轮「中国大陆一律按港区算」是站长给中文站的地区分类决定（用于解释 aff 链接为何写香港），不是必须逐语复制的文案。做法应是「决策口径中文保留、外文本地化重写」：中文源写「中国香港地区：通过此链接开通」，英/韩只写「Get access through this link / 이 링크로 이용권 구매」+ 邀请码，让国际读者看得懂；日文页本就没有 aff 按钮，不受影响。
+- **诊断坑**：用户截图里英文页每句下面都跟一行中文，看着像「页面混了中文」。实测 `en/index.html` 的 CJK 只有导航的「中文 / 日本語」和署名「新浪」三处——中英逐句对照是**浏览器翻译插件叠加**的效果，不是页面 bug。遇到这类截图先 grep 生成页确认有无真中文残留，别急着改页面。
+- **强制层**：`verify-i18n.mjs` 新增 `FORBIDDEN_REGION_CALQUES = ['Hong Kong, China', '중국 홍콩']`，在 en/ko 的 aff 分支逐页断言不得出现（中文源不受限），+ 1 组故障注入，`SELF-TEST 62 → 63/63`。真实文件把 `Hong Kong, China` 塞回英文页 → 只报新增断言 + 节点不同步两条，恢复后全绿。
