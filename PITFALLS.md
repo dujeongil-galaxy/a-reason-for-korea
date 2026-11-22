@@ -187,3 +187,15 @@
 - **故障注入脆弱项**：旧注入「Netflix note line removed from source」删的是 index.html 里的红字，但中文源校验读的是 `zhNodes`（从 data-i18n 节点提取），删 source 不判红；改成替换 `picks.film.actions` 节点内容才生效。新增卡片时务必让每条注入都对应真实的校验路径。
 - **文档与实现不一致的遗漏**：README/CHANGELOG 写「中文五部挂港区 aff」，但实际中文页五部剧最初只有红字——因为 `DRAMA_PRIMARY` 里的 zh 期望只在外文循环里被检查，中文源校验段没读它。教训：新增卡片时，**中文源和外文页两套校验路径都要覆盖同一条规则**，不能因为常量表里写了就以为生效。补上中文源 aff 按钮断言 + 故障注入后，真实文件删掉第二部剧的 aff 按钮 → 判红 1 条。
 - **校验计数**：79 → **94/94**（新增 16 组剧集注入，修好 1 组旧注入）。真实文件把英文继承者们购买链接改回 aff → 判红 2 条；删中文 aff 按钮 → 判红 1 条；恢复全绿。
+
+## 27. 订阅制：能挂，但不能当主按钮，也不能凭 US 条目推别区
+
+- **起因**：站长问「其余外文区只有订阅制（Netflix / TVING / Viki / Kocowa），既然能买正版，为什么不挂？」。上一轮把订阅制整体排除在外，用的是我自己定的「只挂单片可租买」口径——**口径来源要说清楚**，不能把自己的取舍当成站长的规则引用。
+- **定案**：订阅是正版渠道，该挂；但**不能做主按钮**（主按钮承诺「点进去就能看这一部」，订阅平台给不出买断承诺）→ 虚线次级按钮 `.pick-link-sub`，文案写明 `subscription` / `定額制` / `정액제`，位置**固定在租买按钮与红字 AFF 之上**，AFF 不删不挪。
+- **Netflix 不挂直链**：订阅按钮一律不许出现 `netflix.com`——那个入口就是红字 AFF，挂直链既破「四页禁 netflix.com」的站规，又跟 AFF 抢点击。该区**只有** Netflix 时（美/日《车贞淑医生》）干脆不加按钮。
+- **JustWatch GraphQL 的字段坑**：`content { releaseYear }` 不存在，正确字段是 `originalReleaseYear`；报错只给 `HTTP 422`，**必须把响应体打出来看**才看到 `GRAPHQL_VALIDATION_FAILED`。搜索用 `popularTitles(filter: { searchQuery })`，取渠道用 `node(id) { ... on MovieOrShow { offers(country, platform: WEB) } }`。
+- **同名误匹配**：日区搜 `Sassy Go Go` 命中《Go! プリンセスプリキュア》(2015, SHOW)——同年份同类型，光靠标题像就挂了就错片。匹配必须叠 **objectType + 年份 ±1**，并且用**原名**（韩文 `발칙하게 고고`）再搜一遍核对。
+- **别拿一个区推三个区**：`오! 문희` 在 JP / KR 的 JustWatch 都搜不到条目（KR 连条目都没有），日区真渠道是 Apple TV（JustWatch 不收录）。按区实查的意思就是**每区单独查、查不到就空着**。
+- **Viki 的 offer URL 是「第 3 集」**：`/videos/1027036v-...-episode-3` 直接当卡内链接会让读者从第三集开始看。要从 episode 页 HTML 里反查剧集主页（`https://www.viki.com/tv/NNNNc-slug`）再挂。
+- **状态码不能只看 200**：`watcha.com/contents/*` 从非韩区访问是 **451**（地域封锁），`watch.amazon.com` 是 **302** 跳 `amazon.com/gp/video/detail/*` 后 200。判死链要 `curl -L` 看落地页，别把地域封锁当成链接坏了。
+- **机器强制**：`DRAMA_SUB` 锁链接与逐语文案、`SUB_DOMAINS` 锁域名前缀；断言「有渠道必须有且仅一条」「订阅按钮必须排在 featured 与红字之前」「无渠道区禁挂」「中文页禁挂外区订阅」。注入验证：真实文件把 jp 的 U-NEXT 换成 netflix 直链 → 判红 5 条，恢复全绿；总计 **99/99**。
