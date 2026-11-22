@@ -2,6 +2,15 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-22 · SEO 长尾改造（A+C+D）
+
+- `25a1330` — 站长：「有记载，但是很差，看看 seo 怎么做，你先给我一些关键词，我来决定吧」→ 给出 A 品牌 / B 主题 / C 猫与善意 / D 影视四组，站长选「按你的推荐执行」（A+C+D），并提到双休购进了 AI、此站若也能进更好（AI 摘要不稳定，本站在站内只把结构化数据做扎实，不承诺必进）。
+  - **title / description**：中文「哈韩的一个理由｜为什么喜欢韩国：猫、善意与《哦！文姬》」；en `Why I Like Korea: Cats, Kindness and K-pop | One Good Reason`；jp「韓国が好きな理由｜猫と善意、K-POPと映画「オ！ムニ」」；ko「한국을 좋아하는 이유｜고양이와 선의, K-POP, 영화 「오 문희」」。四语 description 关键词前置、各自本地化，旧文艺 title 一律禁回退。
+  - **JSON-LD**：每语一段 `WebSite`，`inLanguage` = `zh-CN/en/ja/ko`，`url` 指向各自页面，`keywords` 用当地语言；`sitemap.xml`（四语 + hreflang + x-default）、`robots.txt`（指向 sitemap）、四页 head 的 `<link rel="sitemap">` 新增。
+  - **机器强制**：`verify-i18n.mjs` 新增 `SEO_TITLE_KEYWORD / SEO_DESC_KEYWORD / SEO_STALE_TITLE / SEO_LD_LANG / SEO_SITEMAP_URLS / SEO_HREFLANG`；`extractTitle / extractJsonLd` 解析；state 纳入 sitemap/robots 文本；新增 11 组故障注入（title 回退、描述去词、日文 title 去词、韩文 JSON-LD 语言错、英文 JSON-LD url 错、中文 JSON-LD 删除、英文 sitemap link 删、sitemap 缺 ko / 缺 x-default、robots 丢 sitemap、sitemap 删除），68 → **79/79**。真实文件删掉 sitemap 的 ko loc → 判红 1 条，恢复后全绿。
+  - **验证**：build 98 节点 / 12 属性；CDP 四语 × 320/360/390/414 共 16 项 `overflow=0`。
+  - **记账依据**：PITFALLS 新增第 25 条（金句型 title 不利于检索 + 四语 JSON-LD 语言/地址必须逐语对应 + AI 摘要不可承诺）。
+
 ## 2026-11-22 · 三语红字提示改为本地化 AFF 入口
 
 - `a13b74d` — 站长指出其他语言按钮下方那条红字「还在机翻」，要求统一替换为「中国大陆用户请点击这里访问 Netflix」，每个语言单独翻译，替掉原来的红色加粗提示语。

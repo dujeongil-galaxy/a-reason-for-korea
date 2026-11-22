@@ -17,6 +17,15 @@
 
 每页右上角可切换语言，当前语言高亮；窄屏自动改为短标签（`CN / EN / JP / KR`）——四个一律是两字母大写拉丁地区缩写，不用「中」「日」「韓」这类单字汉字，也不混简繁。短标签带 `aria-hidden`，语言全名以视觉隐藏方式保留给读屏软件。四个页面各有自己的 `hreflang`、`canonical` 与 `og:url`，都是**完整翻译后的静态 HTML**——关掉 JavaScript 也能正常阅读，方便单独分享与收录。
 
+## SEO（2026-11-22 站长指令：按推荐执行 A+C+D 长尾）
+
+搜索引擎目前只收录到 GitHub 仓库页、站点本身的标题是金句没有可检索词。做法：
+
+- **title / description 关键词前置、金句后置**，四语各自本地化、不机翻。核心长尾按语言定：中文「为什么喜欢韩国」、英文 `Why I Like Korea`、日文「韓国が好きな理由」、韩文「한국을 좋아하는 이유」；再各自带上品牌「哈韩的一个理由」/ `K-pop` / 猫与善意 / 片名《哦！文姬》。
+- **每语一段 JSON-LD**（`WebSite`）：`inLanguage` 分别 `zh-CN / en / ja / ko`，`url` 指向各自页面，`keywords` 用当地语言，不得混用别的语言。
+- **`sitemap.xml`** 收录四语地址 + `hreflang`（含 `x-default`），**`robots.txt`** 指向它；四页 head 都有 `<link rel="sitemap">`。
+- **AI 摘要（如双休购那种）无法保证必进**：站内只负责把结构化数据、关键词和入口做扎实，是否展示由搜索引擎/AI 决定。
+
 **中文原文没有删除、也没有复制成第二份**：`index.html` 是唯一的中文源文案，中文页仍是默认首页。
 
 ## 这一页在说什么
@@ -65,8 +74,10 @@ assets/i18n.js                en/jp/ko 译文 + 四语属性 / 运行时文案
 assets/app.js                 滚动淡入 / 点灯计数 / 理由卡片 / 复制
 assets/clipping-hkcd.jpg      附页剪报（站长发给 AI，原样未修改）
 favicon.svg                   猫爪图标
+sitemap.xml                   四语地址 + hreflang（x-default 指中文）
+robots.txt                    允许抓取并指向 sitemap.xml
 scripts/build-i18n.mjs        由 index.html + 字典生成三张语言页
-scripts/verify-i18n.mjs       四语一致性 + 附页 + 切换器 + 链接状态 + 归属措辞 + 产品名/read4 标签 + 站长推荐按区主按钮（zh=aff、en=Prime Video、jp=Apple TV、ko=YouTube）/三语本地化红字 AFF 入口/港区只中文/预览图 + 极窄屏防溢出校验 + 68 项故障注入自检
+scripts/verify-i18n.mjs       四语一致性 + 附页 + 切换器 + 链接状态 + 归属措辞 + 产品名/read4 标签 + 站长推荐按区主按钮（zh=aff、en=Prime Video、jp=Apple TV、ko=YouTube）/三语本地化红字 AFF 入口/港区只中文/预览图 + SEO title/description 关键词 + 四语 JSON-LD + sitemap/robots + 极窄屏防溢出校验 + 79 项故障注入自检
 .nojekyll                     让 GitHub Pages 跳过 Jekyll
 CHANGELOG.md / PITFALLS.md    改动记账与踩坑记录
 ```
@@ -77,10 +88,10 @@ CHANGELOG.md / PITFALLS.md    改动记账与踩坑记录
 
 ```bash
 node scripts/build-i18n.mjs     # 重新生成三张语言页
-node scripts/verify-i18n.mjs    # 校验；内含故意造错的自检，必须 68/68 判红
+node scripts/verify-i18n.mjs    # 校验；内含故意造错的自检，必须 79/79 判红
 ```
 
-校验会检查四语 key 是否齐全（84 个节点 / 11 个属性）、中文是否被删、生成页是否与字典逐字一致、资源路径 / 语言切换链接 / canonical 是否正确，以及附页章节、边界声明、剪报图片归属措辞、三条存档链接及其状态标记在四语里是否都在。
+校验会检查四语 key 是否齐全（98 个节点 / 12 个属性）、中文是否被删、生成页是否与字典逐字一致、资源路径 / 语言切换链接 / canonical 是否正确，附页章节、边界声明、剪报图片归属措辞、三条存档链接及其状态标记在四语里是否都在，以及 SEO 关键词、四语 JSON-LD 的语言/地址、sitemap 四语入口与 robots 指向。
 
 ## 本地预览
 

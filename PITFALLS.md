@@ -168,3 +168,12 @@
 - **落地**：en `Viewers in mainland China: click here to access Netflix.`；jp `中国大陸からご覧になる場合は、こちらから Netflix にアクセスできます。`；ko `중국 본토 시청자는 여기를 눌러 Netflix에 접속하세요.`。三语的「这里 / click here / こちら / 여기」都指向 AFF 入口 `nfshare.cn/?sid=5rfpUarUEd`，这是站长额外加的推广 / 邀请码链接，**不是 Netflix 官网**；`netflix.com` 依旧禁成链接，中文页红字原文不动。
 - **校验坑**：旧断言「非中文页不得出现 aff / 邀请码」会被新红字误伤。改成只用正则取 `class="pick-link pick-link-featured"` 的 href 比对主按钮——aff 允许出现在 note 里但禁止当主按钮；note 整段逐语锁定防机翻回退。故障注入 66 → **68/68**：真实文件把英文红字链接的邀请码去掉 → 判红 2 条，恢复后全绿。
 - **验收**：Pages 第 2 次轮询生效，线上 en/jp/ko 新红字各 1、旧机翻文案 0、`netflix.com` 链接 0；CDP 四页 × 320/360/390/414 共 16 项 `overflow=0`。
+
+## 25. SEO：金句型 title 检索不到，JSON-LD 必须逐语对应
+
+- **现象**：截图里搜站名只出 GitHub 仓库页 `哈韩，也要有一个理由 - GitHub`，站点本身没被有效收录。原因是 `<title>` 与 description 都是金句（「哈韩，也要有一个理由 · 这个世界不能没有小猫」），不含任何可检索的核心词；且没有 sitemap / robots / 结构化数据。
+- **做法（站长选 A+C+D 长尾）**：title / description 关键词前置、金句后置，四语各自本地化——核心词 zh「为什么喜欢韩国」/ en `Why I Like Korea` / jp「韓国が好きな理由」/ ko「한국을 좋아하는 이유」。**不要机翻**：日文写 K-POP 而非直译，韩文写 `오 문희` 用当地片名。
+- **JSON-LD 坑**：`<script type="application/ld+json" data-i18n="meta.jsonld">` 走构建脚本的 data-i18n 翻译，三语字典都要有 `meta.jsonld` 且必须是合法 JSON 字符串（单引号包、内部双引号）。`inLanguage` 必须按**页面语言层**写 `ja`（不是目录 `jp`）、`zh-CN`（不是 `zh`）；`url` 指向各自页面。混用会判红。
+- **sitemap 坑**：hreflang 用 ISO 语言码 `ja`，路径仍是 `jp/`；`x-default` 指中文根页。robots 的 Sitemap 行写绝对地址。四页 head 都要有 `<link rel="sitemap">`（构建时绝对路径不相对化）。
+- **AI 摘要**：站长提到双休购进了 AI 但「偶尔会推、偶尔又不会」。站内只能把 title / 结构化数据 / sitemap 做扎实，**不能承诺 AI 一定会展示**，是否展示是搜索引擎侧的决定。
+- **校验**：新增 11 组故障注入（title 回退、描述去词、JSON-LD 语言/url 错、sitemap 缺项等），68 → **79/79**。真实文件删掉 sitemap 的 ko loc → 判红 1 条，恢复后全绿；CDP 四语 × 320/360/390/414 共 16 项 `overflow=0`。
