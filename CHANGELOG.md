@@ -11,6 +11,7 @@
   - **同步坑**：动手前本地落后远端 4 个提交（`69afbb7..00c724f`，含新增 `read4` 那条链接），先 `git fetch origin && git merge --ff-only origin/main` 快进再改，否则会在旧结构上动手。
   - **校验**：`build` 重建（每语 86 节点）；`verify` → `VERIFY OK` + `SELF-TEST 47/47`（原 42 + 5）；按项目硬性要求又用真实文件注入一次故障（把 `read4.tag` 改回「近例」），确认**仅新增断言判红**且退出码 1，恢复后复跑全绿；四页标签扫描 `抖音 / TikTok / TikTok / TikTok`，三语页 `Douyin|더우인|抖音` 计数均为 0。
   - **文档同步**：README 故障注入计数 35 → 47（此前漏同步），并补记 read4 标签口径。
+  - **推送状态（未上线）**：`c231dc5` + `9e4295b` 已在本地提交，但推送被 403 拦下——本地凭据是 `x-access-token`（GitHub App 安装令牌），`git push` 报 `Permission to dujeongil-galaxy/a-reason-for-korea.git denied`；改用已连接的 GitHub 连接器写入，同样返回 `403 Resource not accessible by integration`（连空 tree 都建不了，探测未产生提交）。与 `9c2738a` 那次是同一个坑：该 App 的仓库授权范围不含本站，或缺 Contents 写权限。**待站长在 GitHub App 安装页把 `a-reason-for-korea` 加入授权并给 Contents: Read & Write 后重推**，或由站长用有 `repo` 权限的凭据本地推送。已导出 `git format-patch` 补丁备用。
 
 ## 2026-11-21 18:05 · 延伸阅读新增一条同频视频链接（`9c2738a`）
 
