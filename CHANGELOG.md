@@ -2,6 +2,14 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-22 · 三语红字提示改为本地化 AFF 入口
+
+- `a13b74d` — 站长指出其他语言按钮下方那条红字「还在机翻」，要求统一替换为「中国大陆用户请点击这里访问 Netflix」，每个语言单独翻译，替掉原来的红色加粗提示语。
+  - **改了什么**：en `Viewers in mainland China: click here to access Netflix.`；jp `中国大陸からご覧になる場合は、こちらから Netflix にアクセスできます。`；ko `중국 본토 시청자는 여기를 눌러 Netflix에 접속하세요.`。三语的「这里 / click here / こちら / 여기」都指向 `https://nfshare.cn/?sid=5rfpUarUEd`（站长额外增加的 AFF 入口），**不是 Netflix 官网链接**；中文源红字原文不动，四语主按钮不动，四页仍禁 `netflix.com` 链接。
+  - **机器强制**：`PICKS_ACTIONS_EXPECT[lang].note` 改为逐语整段锁定（含 aff 链接）；主按钮校验从「整段 actions 不得含 aff」改成**只取 featured 按钮的 href** 比对，aff 允许出现在外文红字、但禁止当主按钮；新增 2 组故障注入（英文红字链接去掉邀请码 / 日文红字回退旧机翻），66 → **68/68**。真实文件把英文红字链接的邀请码去掉 → 判红 2 条（`node out of sync` + `note wording drift`），恢复后全绿。
+  - **验证**：Pages 第 2 次轮询生效；线上 en/jp/ko 新红字各 1、旧机翻文案 0、`netflix.com` 链接 0，三语主按钮按区不变；CDP 四页 × 320/360/390/414 共 16 项 `overflow=0`。
+  - **记账依据**：PITFALLS 新增第 24 条（机翻提示语逐语重写 + AFF 入口与 Netflix 官网链接区分 + featured href 校验范围）。
+
 ## 2026-11-22 · README 固化「按区实查」长期规则
 
 - `eb8a5ea` — 站长确认上一轮做法：「以后都要这样去检查一次，这个规则写进 README，但备注，这只是站长额外增加的 AFF」。README「站长推荐」段新增长期规则：每新增或改动推荐片的正版引导，必须重新按**当地**实查租买渠道，先用原名 + 导演 + 主演确认同一部片（避免 `Oh! Baby` 同名撞片），再查 JustWatch 国家页 / Moviefone / iTunes API 等地区化来源，`YouTube Free` 不算租买，当地有渠道就挂当地官方页、中文港区 aff 单独保留、Netflix 只留红字不成链接；并按站长原话备注「这只是站长额外增加的 AFF」，非本站原有通用规则，但挂了就要挂对。

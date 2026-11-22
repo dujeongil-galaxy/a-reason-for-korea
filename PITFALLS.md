@@ -159,5 +159,12 @@
 - **现象**：站长要求「美区看看亚马逊，日本还是不行吗？奈飞也搜不到？」复核发现上一轮的结论建立在错误片名上——检索 `Oh! Baby` 命中的是 2019 年印度泰卢固语电影（Samantha主演），而本站推荐的是 2020 年韩国片《哦！文姬》，正确英文名 **Oh! My Gran**（原名 `오! 문희`，罗文姬主演）。同名/近名电影会给出完全错误的「某区没有渠道」结论。
 - **正确片名后的查证**：美区 JustWatch + Moviefone 均列出 Prime Video 租 $2.99 / 买 $9.99，商品页 `watch.amazon.com/detail?gti=amzn1.dv.gti.3a505a12-509d-4f34-af76-47f0ea441f72`；日区 JustWatch 搜索页（`/jp/search?q=Oh! My Gran`）显示日文名「オ！ムニ (字幕版)」，Apple TV 租 ¥550 / 买 ¥2,100、FOD 租 ¥550，**Netflix 与 Amazon Japan 均无此片**；韩区 YouTube 租买页维持不变。
 - **地区 404 的坑**：`tv.apple.com/jp/movie/...` 与 iTunes API 返回的 `trackViewUrl` 在本机都跳到 tv.apple.com 并回 404，因为出口 IP 不在日本；**不能据此判定商品不存在**。权威做法是用 `https://itunes.apple.com/lookup?id=1691528206&country=jp` 看 `trackId` / `trackPrice` / `trackRentalPrice` / `country: JPN`，页面链接直接用 API 的 `trackViewUrl`。同理 Amazon 在非美区出口会跳 `getTheApp` splash，也不代表链接失效。
-- **落地**：zh=aff、en=Prime Video、jp=Apple TV、ko=YouTube；邀请码只剩中文页。`verify-i18n.mjs` 用 `PRIMARY_LINK` 四渠道总表逐区锁主链接，跨区渠道 / YouTube 域 / aff 邀请码按区禁入，新增 1 组故障注入（`65 → 66/66`）。真实文件把英文页 Prime Video 链改回 aff → 判红 4 条，恢复后全绿。
+- **落地**：zh=aff、en=Prime Video、jp=Apple TV、ko=YouTube；**aff 邀请码不出现在任何外文主按钮**（2026-11-22 晚些时候起，它作为红字 AFF 入口出现在外文页，见第 24 条）。`verify-i18n.mjs` 用 `PRIMARY_LINK` 四渠道总表逐区锁主链接，跨区渠道 / YouTube 域 / aff 邀请码按区禁入，新增 1 组故障注入（`65 → 66/66`）。真实文件把英文页 Prime Video 链改回 aff → 判红 4 条，恢复后全绿。
 - **通用规则**：查「某区能不能租买」时，先拿**原名 + 导演 + 主演**确认是同一部片，再分别查 JustWatch 对应国家页、Moviefone where-to-watch、iTunes API；YouTube Free（免费带广告）永远不等于 YouTube 商店租买。
+
+## 24. 红字提示别机翻：逐语重写，别把 AFF 入口当成 Netflix 官网链接
+
+- **现象**：站长看截图指出 en/jp/ko 主按钮下方那条红字仍是从中文「到 Netflix 搜索片名观看 · 请支持正版」逐字翻过去的（`Find the title on Netflix...` / `Netflix で作品名を検索して...` / `Netflix에서 제목을 검색해...`），要求统一换成「中国大陆用户请点击这里访问 Netflix」，每个语言单独翻译。
+- **落地**：en `Viewers in mainland China: click here to access Netflix.`；jp `中国大陸からご覧になる場合は、こちらから Netflix にアクセスできます。`；ko `중국 본토 시청자는 여기를 눌러 Netflix에 접속하세요.`。三语的「这里 / click here / こちら / 여기」都指向 AFF 入口 `nfshare.cn/?sid=5rfpUarUEd`，这是站长额外加的推广 / 邀请码链接，**不是 Netflix 官网**；`netflix.com` 依旧禁成链接，中文页红字原文不动。
+- **校验坑**：旧断言「非中文页不得出现 aff / 邀请码」会被新红字误伤。改成只用正则取 `class="pick-link pick-link-featured"` 的 href 比对主按钮——aff 允许出现在 note 里但禁止当主按钮；note 整段逐语锁定防机翻回退。故障注入 66 → **68/68**：真实文件把英文红字链接的邀请码去掉 → 判红 2 条，恢复后全绿。
+- **验收**：Pages 第 2 次轮询生效，线上 en/jp/ko 新红字各 1、旧机翻文案 0、`netflix.com` 链接 0；CDP 四页 × 320/360/390/414 共 16 项 `overflow=0`。

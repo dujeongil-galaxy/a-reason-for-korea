@@ -44,9 +44,9 @@
   - **中文（港区）**：aff 邀请码链接 `https://nfshare.cn/?sid=5rfpUarUEd`，文案「中国香港地区：通过此链接开通（邀请码 5rfpUarUEd）」——**港区口径只有中文能写**。
   - **英文（美区）**：YouTube 美区只有免费带广告，Prime Video 可租可买 → 主按钮挂 `https://watch.amazon.com/detail?gti=amzn1.dv.gti.3a505a12-509d-4f34-af76-47f0ea441f72`，文案「Rent or buy on Prime Video」。
   - **日文（日区）**：Netflix / Amazon Japan / YouTube 均无此片，Apple TV 日区可租 ¥550、可买 ¥2,100 → 主按钮挂 `https://itunes.apple.com/jp/movie/%E3%82%AA-%E3%83%A0%E3%83%8B-%E5%AD%97%E5%B9%95%E7%89%88/id1691528206?uo=4`，文案「Apple TV でレンタル・購入する · 正版で応援しましょう」。
-  - **韩文（韩区）**：YouTube 可租借买断 → 主按钮挂 `https://youtu.be/cflWf3XKeFI?si=pZ-WkU6w5wYkh4Wq`，不挂 aff / 邀请码。**邀请码只出现在中文页**。
-  - 四页按钮下方都有**红色加粗 Netflix 正版提示**；四页一律禁 Netflix 链接、盗版链接。港区口径不得直译进外文（`Hong Kong, China` / `중국 홍콩` / `香港地区` 一律禁）。音乐区暂为占位句「此专区正在建设中，请稍安勿躁」。
-- **购买引导以后都要按区实查一次**（站长 2026-11-22 追加的长期规则）：每新增或改动一条推荐片的正版引导，都必须**重新查一遍当地真实的租买渠道**，不沿用旧结论、不给所有语言套同一口径。顺序：① 先用**原名 + 导演 + 主演**确认是同一部片（避免像 `Oh! Baby` 那种同名撞片，本片真名是 `Oh! My Gran` / `오! 문희`）；② 再查 JustWatch 对应国家页、Moviefone where-to-watch、iTunes Search API（日区）等**地区化**来源；③ `YouTube Free`（免费带广告）**不算**租买；④ 当地有可租买渠道就挂当地官方商品页，中文港区 aff 单独保留，Netflix 只留红字提示、不许成链接。
+  - **韩文（韩区）**：YouTube 可租借买断 → 主按钮挂 `https://youtu.be/cflWf3XKeFI?si=pZ-WkU6w5wYkh4Wq`。**三个外文主按钮都不挂 aff / 邀请码**。
+  - **按钮下方的红色加粗提示**（2026-11-22 站长指令）：中文页保留原文「到 Netflix 搜索片名观看 · 请支持正版」；**英 / 日 / 韩三语各自本地化**为「中国大陆用户请点击**这里**访问 Netflix」——en `Viewers in mainland China: click here to access Netflix.`、jp `中国大陸からご覧になる場合は、こちらから Netflix にアクセスできます。`、ko `중국 본토 시청자는 여기를 눌러 Netflix에 접속하세요.`。其中「这里 / click here / こちら / 여기」都是指向 `https://nfshare.cn/?sid=5rfpUarUEd` 的链接（站长额外增加的 AFF 入口），**不是 Netflix 官网链接**。四页仍一律禁 `netflix.com` 链接与盗版链接；港区口径不得直译进外文（`Hong Kong, China` / `중국 홍콩` / `香港地区` 一律禁）。音乐区暂为占位句「此专区正在建设中，请稍安勿躁」。
+- **购买引导以后都要按区实查一次**（站长 2026-11-22 追加的长期规则）：每新增或改动一条推荐片的正版引导，都必须**重新查一遍当地真实的租买渠道**，不沿用旧结论、不给所有语言套同一口径。顺序：① 先用**原名 + 导演 + 主演**确认是同一部片（避免像 `Oh! Baby` 那种同名撞片，本片真名是 `Oh! My Gran` / `오! 문희`）；② 再查 JustWatch 对应国家页、Moviefone where-to-watch、iTunes Search API（日区）等**地区化**来源；③ `YouTube Free`（免费带广告）**不算**租买；④ 当地有可租买渠道就挂当地官方商品页，中文港区 aff 单独保留，Netflix 只留红字提示、不许把 `netflix.com` 做成链接（外文的红字里「这里」是 AFF 入口）。
   - **备注：这只是站长额外增加的 AFF**（推广 / 邀请码引导），不是本站原有栏目的通用规则；但既然挂了，就必须按实查结果挂对、挂到当地，不能想当然。
 - **推荐必须带预览图**（站长 2026-11-22 定下的长期规则）：每条推荐都要有一张来自正版资料站的剧照 / 海报，下载到 `assets/` 本地引用，四语 alt + 来源说明齐全；不用盗版站素材，不挂外链图片。首部影片用的是 `assets/oh-my-gran-still.jpg`（1200×675，174 KB，Letterboxd 收录的片方宣传剧照）。`verify-i18n.mjs` 对盗版域名、两条链接、四语占位句、图片引用/alt/来源说明、16:9 修正均有断言 + 8 组故障注入。
 - **附页的剪报是记忆存档，不是论据**：图片原样保留并标注来源，页面不复述其内容、不评价、不核查，也不把它算作任何一条理由；外部存档链接同样不核查、不背书。四语都写着「记得一件事，不等于替它下结论」。
@@ -66,7 +66,7 @@ assets/app.js                 滚动淡入 / 点灯计数 / 理由卡片 / 复�
 assets/clipping-hkcd.jpg      附页剪报（站长发给 AI，原样未修改）
 favicon.svg                   猫爪图标
 scripts/build-i18n.mjs        由 index.html + 字典生成三张语言页
-scripts/verify-i18n.mjs       四语一致性 + 附页 + 切换器 + 链接状态 + 归属措辞 + 产品名/read4 标签 + 站长推荐按区主按钮（zh=aff、en=Prime Video、jp=Apple TV、ko=YouTube）/港区只中文/预览图 + 极窄屏防溢出校验 + 66 项故障注入自检
+scripts/verify-i18n.mjs       四语一致性 + 附页 + 切换器 + 链接状态 + 归属措辞 + 产品名/read4 标签 + 站长推荐按区主按钮（zh=aff、en=Prime Video、jp=Apple TV、ko=YouTube）/三语本地化红字 AFF 入口/港区只中文/预览图 + 极窄屏防溢出校验 + 68 项故障注入自检
 .nojekyll                     让 GitHub Pages 跳过 Jekyll
 CHANGELOG.md / PITFALLS.md    改动记账与踩坑记录
 ```
@@ -77,7 +77,7 @@ CHANGELOG.md / PITFALLS.md    改动记账与踩坑记录
 
 ```bash
 node scripts/build-i18n.mjs     # 重新生成三张语言页
-node scripts/verify-i18n.mjs    # 校验；内含故意造错的自检，必须 66/66 判红
+node scripts/verify-i18n.mjs    # 校验；内含故意造错的自检，必须 68/68 判红
 ```
 
 校验会检查四语 key 是否齐全（84 个节点 / 11 个属性）、中文是否被删、生成页是否与字典逐字一致、资源路径 / 语言切换链接 / canonical 是否正确，以及附页章节、边界声明、剪报图片归属措辞、三条存档链接及其状态标记在四语里是否都在。
