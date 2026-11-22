@@ -2,6 +2,16 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-22 · 音乐区加入任昌丁《请开门》MV 卡（大陆 QQ / 外文 YouTube）
+
+- `62a7c29` — 站长说「音乐区域先加一下这个吧」，给了 QQ 音乐 MV 链接（大陆）和 YouTube MV 链接（其他区域）。
+  - 中文源新增音乐卡，**标准两栏结构**（与剧集卡完全一致，锁死排版规则）：左竖版 MV 缩略图（`assets/door-mv-thumb.jpg`，1280×720，任昌丁白西装领舞，CSS `object-fit: cover` 自动裁成竖版）、右文字区（标题/简介/按钮/红字/注记）。
+  - **按区挂链接**：中文页 actions 按钮挂 QQ 音乐 MV（`https://y.qq.com/n/m/detail/mv/index.html?vid=f0015hf64je`），外文三页 actions 按钮挂 YouTube MV（`https://youtu.be/GQ53MTOVS04`）。中文页 ytnote 改为纯文字提示（无链接，遵守「中文源禁 YouTube 直链」红线），外文页 ytnote 保留 YouTube 链接。
+  - 四语字典新增 `picks.music1.*` 键（label/title/desc/actions/note/ytnote/imageAlt/imageCredit），年份锁定 2013（MV 发行年）。
+  - CSS 调整：`.picks-grid` 单卡时居中收窄（`max-width: 720px; margin: 0 auto`），避免右侧空洞。
+  - 校验新增音乐卡断言（标准两栏结构、按区通道、年份 2013、图片资源存在）+ 11 组故障注入（MV 缩略图漂移、通道错区、结构回退、年份漂移等），修复 zh 字典无 html 段的故障注入（改操作 `s.source` 而非 `s.dict.zh.html`），**122/122**。
+  - 踩坑见 PITFALLS 34（zh 字典没有 html 段，故障注入不能写 `s.dict.zh.html[...]`）。
+
 ## 2026-11-22 · 文姬卡改回标准两栏竖版海报（与剧集卡同款）
 
 - 站长给两张标准卡截图：「文姬那张卡片做成这种大小不行吗，大不了图片缩小」。确认要的是与剧集卡完全一致的尺寸与结构，不是特殊布局。

@@ -244,3 +244,11 @@
 - **教训**：当用户在两张「参考卡」和一张「问题卡」之间反复来回时，最稳的做法是**直接把问题卡改成和参考卡一模一样的结构**，而不是继续在问题卡上叠加新的特殊 CSS。此前每一轮都为电影卡加一条专属规则（`pick-poster-row-feature`、`pick-figure-still`、`pick-card-feature`），越改越偏离。
 - **正解**：撤掉全部专属类与 CSS，文姬卡复用剧集卡的 `.pick-poster-row` / `.pick-figure-poster` / `.pick-image-poster`，横剧照换成竖版海报（1010×1440，GoldPoster），海报栏宽与其他卡同为 210px。桌面六卡高度 446-447px 完全一致，卡底空白 35px。
 - **机器强制**：源码断言六卡统一标准两栏、禁用 feature/still/stacked 回退；CSS 断言特殊布局规则不得存在；故障注入把文姬卡塞回 feature 布局判红 2 条（之前短字符串 replace 命中了别的卡，需锚定 `picks.film.label`）。图片常量、文件存在检查、四语 alt/credit 全改成海报版。
+
+## 34. zh 字典没有 html 段，故障注入不能写 `s.dict.zh.html[...]`
+
+- **现象**：加音乐卡故障注入时写 `s.dict.zh.html['picks.music1.actions'] = '...'`，跑校验主流程过（VERIFY OK）但故障注入阶段崩：`TypeError: Cannot set properties of undefined (setting 'picks.music1.actions')`。
+- **原因**：中文源页面内容直接写在 `index.html` 里，不走字典翻译；`assets/i18n.js` 的 `zh` 段只有 `attr` 和 `js`，**没有 `html`**。en/jp/ko 三语才有 `html` 段（由 build 脚本从字典注入生成页）。
+- **规则**：凡是改中文源内容的故障注入，必须操作 `s.source`（即 `index.html` 的字符串），不能操作 `s.dict.zh.html`。例如「中文页 MV 按钮换成 YouTube」应写 `s.source = s.source.replace(QQ_MV_LINK, YT_MV_LINK_WATCH)`。
+- **为什么主流程能过**：`verify()` function 里对 zh 的检查都是读 `s.source` 和 `zhNodes`（从 source 提取的节点），不碰 `s.dict.zh.html`；只有故障注入的 `mutate` 函数会写它，所以主流程 VERIFY OK、注入阶段才崩。
+- **计数**：111 → **122/122**（新增 11 组音乐卡专属注入）。
