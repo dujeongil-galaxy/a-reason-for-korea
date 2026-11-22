@@ -108,3 +108,10 @@
 - **真因**：`/repos/...` 的 `permissions` 字段反映的是**发起请求的账号在该仓库的权限**，不是**这把令牌被授予的权限**。fine-grained PAT 的权限是独立的一层，必须单独看。此外 GitHub App 安装令牌（`x-access-token`，前缀 `ghs_`）与连接器走的 integration 令牌是另外两套身份，都可能没有本站 Contents 写权限。
 - **规则**：诊断顺序应为 ① `curl -X POST /repos/<o>/<r>/git/blobs` 做最小写探测 → ② 看响应是 `Resource not accessible by personal access token`（PAT 权限不足）还是 `by integration`（App/连接器授权范围不足）→ ③ 再决定去 PAT 页改 Contents 还是去 App 安装页勾仓库。**不要拿 `/repos` 的 `push: true` 当令牌可写的证据**；认证失败用 reconnect，权限不足别去 reconnect。
 - **解决**：让站长新建 fine-grained PAT（Resource owner 选组织、Only select repositories 勾本站、Repository permissions → Contents: Read and write），用 `git -c credential.helper= push "https://x-access-token:<PAT>@github.com/<o>/<r>.git" main` 直推；令牌只走 shell 变量，不写文件、不进日志、不改 `origin`。本次 `c231dc5` 三笔据此推送成功（`00c724f..1f9ca34`）。
+
+## 17. 链接线索来自盗版站时，只取片名，不取链接
+
+- **现象**：站长给了一条盗版站链接作为推荐片的线索，并明确「不要挂这个链接，这是盗版，请引导用户去 Netflix 支持正版，中国大陆请访问 ... 购买（带邀请码，别删）」。直接把链接放上去最省事，但等于给盗版站导流。
+- **规则**：盗版 URL 只用于**离线确认片名**（本次为 2020 年韩国电影《哦！文姬》，原名 `오! 문희`、国际名 `Oh! My Gran`）。页面只写片名与一句剧情，不放该域名、不引用其海报、不写「资源」字样；引导语落到 Netflix 官方站，中国大陆购买链接逐字保留邀请码 `sid=5rfpUarUEd`。
+- **片名不机翻**：en 用国际发行名 `Oh! My Gran`，jp/ko 用原名 `『오! 문희』` 并附国际名；不要译成 `Oh! Moon-hee` 之外的自造名，也不要把中文「哦！文姬」直译成拼音。
+- **强制层**：`verify-i18n.mjs` 新增 `FORBIDDEN_PIRATE_DOMAINS`（四页 + 中文源禁 `ncat30.com`）、`PICKS_LINKS`（Netflix 与带邀请码的 nfshare 必须逐字在四页出现）、`PICKS_HEAD` / `MUSIC_SOON` 四语逐字断言 + 5 组故障注入，`SELF-TEST 52/52`。
