@@ -370,8 +370,16 @@ function verify(state) {
   if ((source.match(new RegExp(escRe(COMING_NOTE.zh), 'g')) || []).length !== 2) {
     errors.push('zh: both placeholders must carry the coming-soon note');
   }
-  if (!source.includes('class="pick-figure pick-figure-still"')) {
-    errors.push('zh: film card must use the same two-column layout as the drama cards');
+  if (!source.includes('class="pick-card pick-card-feature"')) {
+    errors.push('zh: film card must be marked as the full-width featured card');
+  }
+  if (!source.includes('class="pick-poster-row pick-poster-row-feature"')) {
+    errors.push('zh: film card must use the full-width stacked layout');
+  }
+  const filmRow = source.match(/<div class="pick-poster-row pick-poster-row-feature">([\s\S]*?)<\/div>\s*<\/article>/);
+  if (!filmRow || filmRow[1].indexOf('</figure>') === -1 ||
+      filmRow[1].indexOf('</figure>') > filmRow[1].indexOf('pick-poster-body')) {
+    errors.push('zh: film card text must sit below the full-width still');
   }
   if (!assetRefs(source).includes(PICKS_IMAGE)) errors.push('zh: picks preview image not referenced');
   if (!state.picksImageExists) errors.push('picks: preview image file missing from assets/');
@@ -433,7 +441,13 @@ function verify(state) {
     errors.push('zh: poster row narrow-viewport guard missing');
   }
   if (!/\.pick-figure-still \.pick-image\s*\{[^}]*aspect-ratio:\s*16\s*\/\s*9/.test(state.css)) {
-    errors.push('zh: film still must keep 16:9 in the shared two-column layout');
+    errors.push('zh: film still must keep 16:9 in the full-width layout');
+  }
+  if (!/\.pick-poster-row-feature\s*\{[^}]*display:\s*flex;[^}]*flex-direction:\s*column/.test(state.css)) {
+    errors.push('zh: film card missing full-width stacked CSS rule');
+  }
+  if (!/\.pick-card-feature\s*\{[^}]*grid-column:\s*1\s*\/\s*-1;[^}]*order:\s*-1/.test(state.css)) {
+    errors.push('zh: featured film card must span the full grid and lead the row');
   }
   if (!/\.nav-dropdown-menu\s*\{[^}]*display:\s*none/.test(state.css)) {
     errors.push('css: nav dropdown must be closed by default');
@@ -1237,8 +1251,17 @@ const faults = [
   { name: 'nav dropdown left open by default in CSS', mutate: s => {
     s.css = s.css.replace('display: none; position: absolute;', 'display: block; position: absolute;');
   } },
-  { name: 'film card reverted to full-width layout', mutate: s => {
-    s.source = s.source.replace('class="pick-figure pick-figure-still"', 'class="pick-figure"');
+  { name: 'film card reverted to the two-column layout', mutate: s => {
+    s.source = s.source.replace('class="pick-poster-row pick-poster-row-feature"', 'class="pick-poster-row"');
+  } },
+  { name: 'film card stacked CSS rule removed', mutate: s => {
+    s.css = s.css.replace('.pick-poster-row-feature { display: flex; flex-direction: column; gap: 0; }', '');
+  } },
+  { name: 'featured film card lost its full-width CSS', mutate: s => {
+    s.css = s.css.replace('.pick-card-feature { grid-column: 1 / -1; order: -1; }', '');
+  } },
+  { name: 'featured film card class removed from source', mutate: s => {
+    s.source = s.source.replace('class="pick-card pick-card-feature"', 'class="pick-card"');
   } }
 ];
 

@@ -492,9 +492,13 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
 .pick-poster-row { display: grid; grid-template-columns: minmax(0, 132px) minmax(0, 1fr); gap: 18px; }
 .pick-figure-poster { margin: 0; }
 .pick-image-poster { width: 100%; height: auto; aspect-ratio: auto; object-fit: contain; }
-/* 电影卡也走「图 + 文」并排：六张卡高度一致，首卡不再留出大块空白 */
+/* 电影卡：剧照横向铺满整卡，标题/简介/按钮/注记全部落到图下方 */
 .pick-figure-still { margin: 0; }
 .pick-figure-still .pick-image { aspect-ratio: 16 / 9; }
+.pick-card-feature { grid-column: 1 / -1; order: -1; }
+.pick-poster-row-feature { display: flex; flex-direction: column; gap: 0; }
+.pick-poster-row-feature .pick-figure-still { width: 100%; }
+.pick-poster-row-feature .pick-poster-body { margin-top: 18px; }
 .pick-poster-body { min-width: 0; }
 .pick-poster-body .pick-title { margin-top: 0; }
 @media (max-width: 420px) {
