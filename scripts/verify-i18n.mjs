@@ -434,6 +434,9 @@ function verify(state) {
   if (!/\.pick-image-poster\s*\{[^}]*aspect-ratio:\s*auto/.test(state.css)) {
     errors.push('zh: poster images must keep native aspect-ratio');
   }
+  if (!/\.picks-grid\s*\{[^}]*align-items:\s*start/.test(state.css)) {
+    errors.push('zh: picks grid must let cards keep their own height (no stretch gap)');
+  }
   if (!state.css.includes('@media (max-width: 420px)')) {
     errors.push('zh: poster row narrow-viewport guard missing');
   }
@@ -1257,6 +1260,10 @@ const faults = [
   { name: 'film card forced out of the two-column grid', mutate: s => {
     s.css = s.css.replace('.pick-figure-still { margin: 0; }',
       '.pick-figure-still { margin: 0; }\n.pick-card-feature { grid-column: 1 / -1; order: -1; }');
+  } },
+  { name: 'picks grid stretched to equal card heights again', mutate: s => {
+    s.css = s.css.replace('.picks-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: start; }',
+      '.picks-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }');
   } }
 ];
 
