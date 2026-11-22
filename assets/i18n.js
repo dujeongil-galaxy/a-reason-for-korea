@@ -29,7 +29,8 @@ window.SITE_I18N = {
       'picks.drama4.imageAlt': '《继承者们》海报：李敏镐与朴信惠',
       'picks.drama5.imageAlt': '《大长今》海报：李英爱饰演的长今',
       'picks.film.imageAlt': '电影《哦！文姬》海报：罗文熙饰演的文姬与李熙俊饰演的儿子',
-      'picks.music1.imageAlt': '《请开门》MV 官方缩略图：任昌丁穿白色西装在街头领舞'
+      'picks.music1.imageAlt': '《请开门》MV 官方缩略图：任昌丁穿白色西装在街头领舞',
+      'picks.1thek.imageAlt': '1theK 平台上的 NCT DREAM 表演画面'
     },
     js: {
       'lamp.on': '再留一盏灯',
@@ -161,6 +162,12 @@ window.SITE_I18N = {
       'picks.music1.actions': '<a class="pick-link pick-link-featured" href="https://www.youtube.com/watch?v=GQ53MTOVS04" target="_blank" rel="noopener noreferrer">Watch the MV on YouTube</a>',
       'picks.music1.note': 'The webmaster’s QQ Music link (mainland China only): <a href="https://y.qq.com/n/m/detail/mv/index.html?vid=f0015hf64je" target="_blank" rel="noopener noreferrer">y.qq.com</a>.',
       'picks.music1.ytnote': 'Viewers outside mainland China: <a href="https://youtu.be/GQ53MTOVS04" target="_blank" rel="noopener noreferrer">watch the "Open the Door" MV on YouTube</a>.',
+      'picks.1thek.label': 'K-POP Platform',
+      'picks.1thek.imageCredit': 'Image: 1theK official website',
+      'picks.1thek.title': '1theK (원더케이)',
+      'picks.1thek.desc': 'South Korean K-POP media platform with 35 million subscribers across YouTube, X, Instagram, Facebook and other platforms. Features K-POP artists\' live performances, dance videos, variety shows and interviews. Available in Chinese, Japanese, English and Korean.',
+      'picks.1thek.actions': '<a class="pick-link pick-link-featured" href="https://www.1thek.com/china/" target="_blank" rel="noopener noreferrer">Visit 1theK Chinese Site</a><a class="pick-link pick-link-secondary" href="https://www.1thek.com/japan/" target="_blank" rel="noopener noreferrer">Japanese Site</a><a class="pick-link pick-link-secondary" href="https://www.1thek.com/english/" target="_blank" rel="noopener noreferrer">English Site</a>',
+      'picks.1thek.note': '1theK is a South Korean platform accessible without VPN, with interface available in four languages.',
       'footer.quote': 'The world needs cats.<br><span>And may every liking have a reason it can say out loud.</span>',
       'footer.meta.design': 'Design & code · WorkBuddy',
       'footer.meta.host': 'Hosted · GitHub Pages',
@@ -199,7 +206,8 @@ window.SITE_I18N = {
       'picks.drama4.imageAlt': 'The Heirs poster: Lee Min-ho and Park Shin-hye',
       'picks.drama5.imageAlt': 'Jewel in the Palace poster: Lee Young-ae as Jang-geum',
       'picks.film.imageAlt': 'Oh! My Gran poster: Na Moon-hee as Moon-hee and Lee Hee-jun as her son',
-      'picks.music1.imageAlt': 'Official Open the Door MV thumbnail: Lim Chang-jung dancing at the head of the crowd in a white suit'
+      'picks.music1.imageAlt': 'Official Open the Door MV thumbnail: Lim Chang-jung dancing at the head of the crowd in a white suit',
+      'picks.1thek.imageAlt': 'NCT DREAM performance on 1theK platform'
     },
     js: {
       'lamp.on': 'Leave one more light',
@@ -331,6 +339,12 @@ window.SITE_I18N = {
       'picks.music1.actions': '<a class="pick-link pick-link-featured" href="https://www.youtube.com/watch?v=GQ53MTOVS04" target="_blank" rel="noopener noreferrer">YouTube で MV を見る</a>',
       'picks.music1.note': '運営者の QQ音楽リンク（中国大陸のみ視聴可）：<a href="https://y.qq.com/n/m/detail/mv/index.html?vid=f0015hf64je" target="_blank" rel="noopener noreferrer">y.qq.com</a>。',
       'picks.music1.ytnote': '中国大陸以外からご覧の方は、<a href="https://youtu.be/GQ53MTOVS04" target="_blank" rel="noopener noreferrer">こちらから YouTube で「문을 여시오」の MV をご覧ください</a>。',
+      'picks.1thek.label': 'K-POP プラットフォーム',
+      'picks.1thek.imageCredit': '画像：1theK 公式ウェブサイト',
+      'picks.1thek.title': '1theK（원더케이）',
+      'picks.1thek.desc': '韓国の K-POP メディアプラットフォームで、YouTube、X、Instagram、Facebook などで 3500 万人の登録者を擁します。K-POP アーティストのライブパフォーマンス、ダンスビデオ、バラエティ番組、インタビューを提供。中国語、日本語、英語、韓国語の 4 言語に対応。',
+      'picks.1thek.actions': '<a class="pick-link pick-link-featured" href="https://www.1thek.com/china/" target="_blank" rel="noopener noreferrer">1theK 中国語サイトへ</a><a class="pick-link pick-link-secondary" href="https://www.1thek.com/japan/" target="_blank" rel="noopener noreferrer">日本語サイト</a><a class="pick-link pick-link-secondary" href="https://www.1thek.com/english/" target="_blank" rel="noopener noreferrer">英語サイト</a>',
+      'picks.1thek.note': '1theK は韓国本土のプラットフォームで、VPN なしでアクセス可能、4 言語インターフェースに対応。',
       'footer.quote': '世界に猫は欠かせない。<br><span>そして、どんな「好き」にも、口にできる理由がありますように。</span>',
       'footer.meta.design': 'デザインとコード · WorkBuddy',
       'footer.meta.host': 'ホスティング · GitHub Pages',
@@ -369,7 +383,8 @@ window.SITE_I18N = {
       'picks.drama4.imageAlt': '『相続者たち』ポスター：イ・ミンホとパク・シネ',
       'picks.drama5.imageAlt': '『宮廷女官チャングムの誓い』ポスター：イ・ヨンエ演じるチャングム',
       'picks.film.imageAlt': '映画『오! 문희』のポスター：ナ・ムニ演じるムンヒとイ・ヒジュン演じる息子',
-      'picks.music1.imageAlt': '「문을 여시오」公式 MV サムネイル：白いスーツ姿で先頭に立って踊るイム・チャンジョン'
+      'picks.music1.imageAlt': '「문을 여시오」公式 MV サムネイル：白いスーツ姿で先頭に立って踊るイム・チャンジョン',
+      'picks.1thek.imageAlt': '1theK プラットフォームでの NCT DREAM のパフォーマンス'
     },
     js: {
       'lamp.on': 'もう一度ともす',
@@ -501,6 +516,12 @@ window.SITE_I18N = {
       'picks.music1.actions': '<a class="pick-link pick-link-featured" href="https://www.youtube.com/watch?v=GQ53MTOVS04" target="_blank" rel="noopener noreferrer">YouTube에서 MV 보기</a>',
       'picks.music1.note': '운영자의 QQ음악 링크(중국 대륙에서만 시청 가능): <a href="https://y.qq.com/n/m/detail/mv/index.html?vid=f0015hf64je" target="_blank" rel="noopener noreferrer">y.qq.com</a>.',
       'picks.music1.ytnote': '중국 본토 외부 시청자는 <a href="https://youtu.be/GQ53MTOVS04" target="_blank" rel="noopener noreferrer">여기를 눌러 YouTube에서 『문을 여시오』 MV를 보세요</a>.',
+      'picks.1thek.label': 'K-POP 플랫폼',
+      'picks.1thek.imageCredit': '이미지: 1theK 공식 웹사이트',
+      'picks.1thek.title': '1theK（원더케이）',
+      'picks.1thek.desc': '한국 K-POP 미디어 플랫폼으로, YouTube, X, Instagram, Facebook 등 전 플랫폼 3500만 구독자를 보유하고 있습니다. K-POP 스타의 LIVE 공연, 댄스 비디오, 예능 프로그램, 인터뷰 콘텐츠를 제공하며, 중국어·일본어·영어·한국어 4개 언어를 지원합니다.',
+      'picks.1thek.actions': '<a class="pick-link pick-link-featured" href="https://www.1thek.com/china/" target="_blank" rel="noopener noreferrer">1theK 중국어 사이트 방문</a><a class="pick-link pick-link-secondary" href="https://www.1thek.com/japan/" target="_blank" rel="noopener noreferrer">일본어 사이트</a><a class="pick-link pick-link-secondary" href="https://www.1thek.com/english/" target="_blank" rel="noopener noreferrer">영어 사이트</a>',
+      'picks.1thek.note': '1theK는 한국 본토 플랫폼으로, VPN 없이 접속 가능하며 4개 언어 인터페이스를 제공합니다.',
       'footer.quote': '이 세상엔 고양이가 필요하다.<br><span>그리고 모든 좋아함에는, 입으로 꺼낼 수 있는 이유가 있기를.</span>',
       'footer.meta.design': '디자인과 코드 · WorkBuddy',
       'footer.meta.host': '호스팅 · GitHub Pages',
@@ -539,7 +560,8 @@ window.SITE_I18N = {
       'picks.drama4.imageAlt': '『상속자들』 포스터: 이민호와 박신혜',
       'picks.drama5.imageAlt': '『대장금』 포스터: 이영애가 연기한 장금',
       'picks.film.imageAlt': '영화 『오! 문희』 포스터: 나문희가 연기한 문희와 이희준이 연기한 아들',
-      'picks.music1.imageAlt': '『문을 여시오』 MV 장면: 흰 정장을 입고 춤을 추는 임창정'
+      'picks.music1.imageAlt': '『문을 여시오』 MV 장면: 흰 정장을 입고 춤을 추는 임창정',
+      'picks.1thek.imageAlt': '1theK 플랫폼의 NCT DREAM 공연 장면'
     },
     js: {
       'lamp.on': '한 번 더 켜기',
