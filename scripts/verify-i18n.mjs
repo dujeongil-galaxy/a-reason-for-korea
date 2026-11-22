@@ -152,6 +152,31 @@ const PICKS_CREDIT = {
   ko: '『오! 문희』 포스터(공식 홍보 자료, GoldPoster 수록)'
 };
 
+/* 音乐区（2026-11-22 站长指令）：第一首《请开门》(문을 여시오, 2013)。
+   MV 通道按区：中文页 = QQ 音乐（大陆），外文页 = YouTube（其他地区）。
+   QQ 音乐 MV 链接仅中文页可见；YouTube 链接仅外文页可见，中文源整页禁 YouTube。
+   音乐卡与剧集卡同一套标准两栏结构（排版规则锁死）。 */
+const MUSIC_SLUGS = ['music1'];
+const MUSIC_YEAR = { music1: '2013' };
+const MUSIC_IMAGE = 'assets/door-mv-thumb.jpg';
+const QQ_MV_LINK = 'https://y.qq.com/n/m/detail/mv/index.html?vid=f0015hf64je';
+const YT_MV_LINK_SHORT = 'https://youtu.be/GQ53MTOVS04';
+const YT_MV_LINK_WATCH = 'https://www.youtube.com/watch?v=GQ53MTOVS04';
+/* 注：verify 既有断言「中文页禁 YouTube 域」继续生效——中文页 MV 主按钮只挂 QQ 音乐，
+   YouTube 通道只在外文页出现（ytnote 行），中文页该行由构建时替换为纯文字说明。 */
+const MUSIC_CREDIT = {
+  zh: 'MV 官方缩略图：任昌丁、金昌烈《请开门》（NH EMG 官方频道）',
+  en: 'Official MV thumbnail: Lim Chang-jung & Kim Chang-ryeol "Open the Door" (문을 여시오, NH EMG official channel)',
+  jp: '公式 MV サムネイル：イム・チャンジョン＆キム・チャンリョル「문을 여시오」（NH EMG 公式チャンネル）',
+  ko: '공식 MV 썸네일: 임창정 & 김창렬 『문을 여시오』 (NH EMG 공식 채널)'
+};
+/* 外文页 ytnote 行（逐语锁定，防机翻回退） */
+const MUSIC_YTNOTE = {
+  en: 'Viewers outside mainland China: <a href="' + YT_MV_LINK_SHORT + '" target="_blank" rel="noopener noreferrer">watch the "Open the Door" MV on YouTube</a>.',
+  jp: '中国大陸以外からご覧の方は、<a href="' + YT_MV_LINK_SHORT + '" target="_blank" rel="noopener noreferrer">こちらから YouTube で「문을 여시오」の MV をご覧ください</a>。',
+  ko: '중국 본토 외부 시청자는 <a href="' + YT_MV_LINK_SHORT + '" target="_blank" rel="noopener noreferrer">여기를 눌러 YouTube에서 『문을 여시오』 MV를 보세요</a>.'
+};
+
 /* 剧集时间线（2026-11-22 站长规则：新增推荐按年份倒序，越近越靠前）。
    五部剧按年份：2023 车贞淑医生 / 2015 无理的前进 / 2013 来自星星的你 /
    2013 继承者们 / 2003 大长今。每部本地竖版海报 + 四语 alt/来源说明。 */
@@ -357,18 +382,21 @@ function verify(state) {
   for (const marker of MUSIC_FORBIDDEN) {
     if (source.includes(marker)) errors.push('zh: withdrawn music section returned -> ' + marker);
   }
-  /* 二级菜单 / 占位：中文源锚点、四语文案键位与两栏卡片结构 */
+  /* 二级菜单 / 占位：中文源锚点、四语文案键位与两栏卡片结构
+     （2026-11-22：K-pop 占位升级为音乐卡，占位只剩游戏一处，计数 2→1） */
   if ((zhNodes['picks.subhead'] || '') !== NAV_SUB.zh.drama) {
     errors.push('zh: picks subhead must match the dropdown item');
   }
-  for (const [id, label] of [['picks-kpop', NAV_SUB.zh.kpop], ['picks-games', NAV_SUB.zh.game]]) {
-    if (!source.includes('id="' + id + '"')) errors.push('zh: ' + id + ' placeholder anchor missing');
-    if ((source.match(new RegExp(escRe(label), 'g')) || []).length !== 2) {
-      errors.push('zh: ' + label + ' must appear in the dropdown and its placeholder');
-    }
+  if (!source.includes('id="picks-kpop"')) errors.push('zh: picks-kpop music anchor missing');
+  if (!source.includes('id="picks-games"')) errors.push('zh: picks-games placeholder anchor missing');
+  if ((source.match(new RegExp(escRe(NAV_SUB.zh.kpop), 'g')) || []).length !== 2) {
+    errors.push('zh: 听K-pop must appear in the dropdown and the music subhead');
   }
-  if ((source.match(new RegExp(escRe(COMING_NOTE.zh), 'g')) || []).length !== 2) {
-    errors.push('zh: both placeholders must carry the coming-soon note');
+  if ((source.match(new RegExp(escRe(NAV_SUB.zh.game), 'g')) || []).length !== 2) {
+    errors.push('zh: 玩游戏 must appear in the dropdown and its placeholder');
+  }
+  if ((source.match(new RegExp(escRe(COMING_NOTE.zh), 'g')) || []).length !== 1) {
+    errors.push('zh: only the games placeholder may carry the coming-soon note');
   }
   /* 文姬卡与五部剧集卡同一套标准两栏：竖版海报在左、文字在右，无任何特殊布局 */
   const filmCard = source.match(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.film\.label">([\s\S]*?)<\/article>/);
@@ -395,6 +423,47 @@ function verify(state) {
   if (!state.picksImageExists) errors.push('picks: preview image file missing from assets/');
   if (/\.pick-poster-row-feature|pick-figure-still|pick-card-feature/.test(state.css)) {
     errors.push('zh: special film-card layout CSS must be removed');
+  }
+
+  /* 1d-3. 音乐卡（2026-11-22 站长指令）：中文页 MV 主按钮 = QQ 音乐，
+     结构与剧集卡完全同款（排版规则锁死）；QQ 链接只在中文页，YouTube 链接只在英文页。 */
+  const musicCard = source.match(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.music1\.label">([\s\S]*?)<\/article>/);
+  if (!musicCard) {
+    errors.push('zh: music card missing');
+  } else {
+    const body = musicCard[1];
+    if (!body.includes('<div class="pick-poster-row">')) {
+      errors.push('zh: music card must use the standard two-column poster row');
+    }
+    if (/pick-poster-row-feature|pick-card-feature|pick-figure-still/.test(body)) {
+      errors.push('zh: music card must not carry any special layout');
+    }
+    if (!body.includes('class="pick-figure pick-figure-poster"') ||
+        !body.includes('class="pick-image pick-image-poster"')) {
+      errors.push('zh: music card must reuse the standard poster figure/image classes');
+    }
+    const figEnd = body.indexOf('</figure>');
+    if (figEnd === -1 || figEnd > body.indexOf('pick-poster-body')) {
+      errors.push('zh: music poster must sit before the text body (left column)');
+    }
+  }
+  if (!assetRefs(source).includes(MUSIC_IMAGE)) errors.push('zh: music MV thumbnail not referenced');
+  if (!state.musicImageExists) errors.push('picks: music MV thumbnail file missing from assets/');
+  if ((source.match(new RegExp(escRe('data-i18n="picks.music1.label"'), 'g')) || []).length !== 1) {
+    errors.push('zh: music card must appear exactly once');
+  }
+  if (!source.includes('data-i18n="picks.music1.label">韩国音乐 · 2013<')) {
+    errors.push('zh: music card label must carry the year 2013 (the MV release year)');
+  }
+  const zhMusicActions = zhNodes['picks.music1.actions'] || '';
+  if (!zhMusicActions.includes(QQ_MV_LINK)) errors.push('zh: QQ Music MV link missing as the mainland channel');
+  if (!zhMusicActions.includes('pick-link-featured')) errors.push('zh: QQ Music MV button must be the featured link');
+  if (zhMusicActions.includes('youtu')) errors.push('zh: YouTube link forbidden on the Chinese page (mainland uses QQ Music)');
+  if ((zhNodes['picks.music1.title'] || '').length < 2) errors.push('zh: music title missing');
+  for (const marker of ['picks.music1.label', 'picks.music1.title', 'picks.music1.desc', 'picks.music1.actions', 'picks.music1.note', 'picks.music1.ytnote']) {
+    if (!(zhNodes[marker] || '').length && marker !== 'picks.music1.ytnote') {
+      errors.push('zh: music node missing -> ' + marker);
+    }
   }
 
   /* 1d-2. 剧集时间线：五部剧按年份倒序，竖版海报 + 四语本地化 + 按区按钮 */
@@ -771,6 +840,44 @@ function verify(state) {
       errors.push(lang + ': picks image credit drift');
     }
 
+    /* 音乐区四语（2026-11-22）：外文页 MV 主按钮 = YouTube，附 QQ 音乐注记；
+       ytnote 行逐语锁定；卡结构与剧集卡同款；QQ 链接不得当主按钮。 */
+    const musicActions = nodes['picks.music1.actions'] || '';
+    if (!musicActions.includes(YT_MV_LINK_WATCH)) {
+      errors.push(lang + ': YouTube MV link missing as the featured music button');
+    }
+    if (!musicActions.includes('pick-link-featured')) {
+      errors.push(lang + ': music featured button class missing');
+    }
+    if (musicActions.includes(QQ_MV_LINK)) {
+      errors.push(lang + ': QQ Music link must not be the featured MV button outside mainland China');
+    }
+    if (!(nodes['picks.music1.note'] || '').includes(QQ_MV_LINK)) {
+      errors.push(lang + ': music note must mention the webmaster QQ Music link');
+    }
+    if ((nodes['picks.music1.ytnote'] || '') !== MUSIC_YTNOTE[lang]) {
+      errors.push(lang + ': music ytnote wording drift');
+    }
+    if ((nodes['picks.music1.imageCredit'] || '') !== MUSIC_CREDIT[lang]) {
+      errors.push(lang + ': music image credit drift');
+    }
+    if (!attrs['picks.music1.imageAlt']) errors.push(lang + ': music imageAlt missing');
+    if (!nodes['picks.music1.label'] || !nodes['picks.music1.label'].includes(MUSIC_YEAR.music1)) {
+      errors.push(lang + ': music label year drift (want ' + MUSIC_YEAR.music1 + ')');
+    }
+    const musicCardHtml = (page.match(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.music1\.label">([\s\S]*?)<\/article>/) || [])[1] || '';
+    if (!musicCardHtml.includes('<div class="pick-poster-row">')) {
+      errors.push(lang + ': music card must use the standard two-column poster row');
+    }
+    if (/pick-poster-row-feature|pick-card-feature|pick-figure-still/.test(musicCardHtml)) {
+      errors.push(lang + ': music card must not carry any special layout');
+    }
+    if (!page.includes('id="picks-kpop"')) errors.push(lang + ': music anchor missing');
+    if (!page.includes('id="picks-games"')) errors.push(lang + ': games placeholder missing');
+    if ((page.match(new RegExp(escRe(COMING_NOTE[lang]), 'g')) || []).length !== 1) {
+      errors.push(lang + ': only the games placeholder may carry the coming-soon note');
+    }
+
     /* 剧集时间线四语校验：五部齐全、红字本地化、按区按钮与海报 alt/来源不缺 */
     const note = DRAMA_NOTE[lang];
     for (const slug of DRAMA_SLUGS) {
@@ -912,6 +1019,7 @@ const state = {
   css: fs.readFileSync(path.join(ROOT, 'assets/styles.css'), 'utf8'),
   assetExists: fs.existsSync(path.join(ROOT, 'assets/clipping-hkcd.jpg')),
   picksImageExists: fs.existsSync(path.join(ROOT, 'assets/oh-my-gran-poster.jpg')),
+  musicImageExists: fs.existsSync(path.join(ROOT, MUSIC_IMAGE)),
   dramaImages: Object.fromEntries(DRAMA_SLUGS.map(slug => [slug,
     fs.existsSync(path.join(ROOT, DRAMA_IMAGE[slug]))])),
   sitemap: fs.existsSync(path.join(ROOT, 'sitemap.xml')) ? fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8') : '',
@@ -1136,6 +1244,42 @@ const faults = [
   } },
   { name: 'withdrawn Korean music card reintroduced to Chinese source', mutate: s => {
     s.source += '<article class="pick-card pick-card-soon"><p data-i18n="picks.music.soon">此专区正在建设中，请稍安勿躁</p></article>';
+  } },
+  /* 音乐区（2026-11-22）：《请开门》卡漂移 / 通道错区 / 结构回退 */
+  { name: 'music MV thumbnail reference stripped', mutate: s => {
+    s.source = s.source.replace('src="assets/door-mv-thumb.jpg"', '');
+  } },
+  { name: 'music MV thumbnail file marked missing', mutate: s => { s.musicImageExists = false; } },
+  { name: 'music card reverted to special stacked layout', mutate: s => {
+    s.source = s.source.replace(/(data-i18n="picks\.music1\.label"[^>]*>[\s\S]*?<\/p>\s*)<div class="pick-poster-row">/,
+      '$1<div class="pick-poster-row pick-poster-row-feature">');
+  } },
+  { name: 'Chinese page MV button swapped to YouTube (region violation)', mutate: s => {
+    s.source = s.source.replace(QQ_MV_LINK, YT_MV_LINK_WATCH);
+  } },
+  { name: 'English page MV button swapped to QQ Music (region violation)', mutate: s => {
+    s.dict.en.html['picks.music1.actions'] =
+      '<a class="pick-link pick-link-featured" href="' + QQ_MV_LINK + '" target="_blank" rel="noopener noreferrer">Watch the MV on QQ Music</a>';
+  } },
+  { name: 'English ytnote link stripped (aff-style drift)', mutate: s => {
+    s.dict.en.html['picks.music1.ytnote'] =
+      'Viewers outside mainland China: <a href="https://youtu.be/dQw4w9WgXcQ" target="_blank" rel="noopener noreferrer">watch the MV</a>.';
+  } },
+  { name: 'Japanese music image credit left in Chinese', mutate: s => {
+    s.dict.jp.html['picks.music1.imageCredit'] = MUSIC_CREDIT.zh;
+  } },
+  { name: 'Korean music imageAlt removed', mutate: s => {
+    delete s.dict.ko.attr['picks.music1.imageAlt'];
+  } },
+  { name: 'music label year drifted', mutate: s => {
+    s.source = s.source.replace('data-i18n="picks.music1.label">韩国音乐 · 2013', 'data-i18n="picks.music1.label">韩国音乐 · 2015');
+  } },
+  { name: 'games coming-soon note copied onto the music subhead', mutate: s => {
+    s.source = s.source.replace('picks-subhead picks-subhead-music" data-i18n="nav.picks.kpop">听K-pop<',
+      'picks-subhead picks-subhead-music" data-i18n="nav.picks.kpop">听K-pop<p class="picks-coming-note">正在开发中，请等待站长写入数据</p><');
+  } },
+  { name: 'music card deleted from Chinese source', mutate: s => {
+    s.source = s.source.replace(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.music1\.label">[\s\S]*?<\/article>/, '');
   } },
   { name: 'withdrawn music placeholder reintroduced to English page', mutate: s => {
     s.pages.en = s.pages.en.replace('id="picks"', 'id="picks" data-marker="picks.music.soon"');

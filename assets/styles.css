@@ -461,6 +461,13 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
 
 /* ---------- webmaster picks ---------- */
 .picks-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+/* 音乐区单卡：沿用同一套卡片结构，网格列宽与剧集区一致，只把这一列收到与剧集卡同宽 */
+.picks-grid-music { grid-template-columns: minmax(0, 1fr); max-width: calc(50% - 10px); }
+.picks-subhead-music { margin-top: 26px; }
+.picks-yt-note { margin: 14px 0 0; }
+@media (max-width: 960px) {
+  .picks-grid-music { max-width: none; }
+}
 /* 二级菜单当前分类：与导航下拉的三项一一对应 */
 .picks-subhead {
   display: inline-block; margin: -2px 0 18px; padding-bottom: 6px;

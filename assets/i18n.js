@@ -28,7 +28,8 @@ window.SITE_I18N = {
       'picks.drama3.imageAlt': '《来自星星的你》海报：金秀贤与全智贤',
       'picks.drama4.imageAlt': '《继承者们》海报：李敏镐与朴信惠',
       'picks.drama5.imageAlt': '《大长今》海报：李英爱饰演的长今',
-      'picks.film.imageAlt': '电影《哦！文姬》海报：罗文熙饰演的文姬与李熙俊饰演的儿子'
+      'picks.film.imageAlt': '电影《哦！文姬》海报：罗文熙饰演的文姬与李熙俊饰演的儿子',
+      'picks.music1.imageAlt': '《请开门》MV 官方缩略图：任昌丁穿白色西装在街头领舞'
     },
     js: {
       'lamp.on': '再留一盏灯',
@@ -153,6 +154,13 @@ window.SITE_I18N = {
       'picks.drama5.desc': 'A palace lady rises past the prejudices of rank through cooking and medicine, becoming the king’s first female physician. A 2003 MBC historical drama starring Lee Young-ae and Ji Jin-hee.',
       'picks.drama5.actions': '<a class="pick-link pick-link-sub" href="https://www.viki.com/tv/614c-jewel-in-the-palace" target="_blank" rel="noopener noreferrer">Watch on Viki (subscription)</a><p class="pick-netflix-note">Viewers in mainland China: <a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">click here</a> to access Netflix.</p>',
       'picks.drama5.note': 'This site neither hosts nor links to pirated copies.',
+      'picks.music1.label': 'K-pop · 2013',
+      'picks.music1.imageCredit': 'Official MV thumbnail: Lim Chang-jung & Kim Chang-ryeol "Open the Door" (문을 여시오, NH EMG official channel)',
+      'picks.music1.title': 'Open the Door (문을 여시오, 2013)',
+      'picks.music1.desc': 'A brainworm dance track by Ssang-dong Tiger, sung by Lim Chang-jung with Kim Chang-ryeol, cameo-studded with dozens of stars from Heechul of Super Junior to U-KISS and Kim Su-ro — and simple moves you cannot help swaying to. Released in 2013, it was called the song that topped even "Gangnam Style".',
+      'picks.music1.actions': '<a class="pick-link pick-link-featured" href="https://www.youtube.com/watch?v=GQ53MTOVS04" target="_blank" rel="noopener noreferrer">Watch the MV on YouTube</a>',
+      'picks.music1.note': 'The webmaster’s QQ Music link (mainland China only): <a href="https://y.qq.com/n/m/detail/mv/index.html?vid=f0015hf64je" target="_blank" rel="noopener noreferrer">y.qq.com</a>.',
+      'picks.music1.ytnote': 'Viewers outside mainland China: <a href="https://youtu.be/GQ53MTOVS04" target="_blank" rel="noopener noreferrer">watch the "Open the Door" MV on YouTube</a>.',
       'footer.quote': 'The world needs cats.<br><span>And may every liking have a reason it can say out loud.</span>',
       'footer.meta.design': 'Design & code · WorkBuddy',
       'footer.meta.host': 'Hosted · GitHub Pages',
@@ -190,7 +198,8 @@ window.SITE_I18N = {
       'picks.drama3.imageAlt': 'My Love from the Star poster: Kim Soo-hyun and Jun Ji-hyun',
       'picks.drama4.imageAlt': 'The Heirs poster: Lee Min-ho and Park Shin-hye',
       'picks.drama5.imageAlt': 'Jewel in the Palace poster: Lee Young-ae as Jang-geum',
-      'picks.film.imageAlt': 'Oh! My Gran poster: Na Moon-hee as Moon-hee and Lee Hee-jun as her son'
+      'picks.film.imageAlt': 'Oh! My Gran poster: Na Moon-hee as Moon-hee and Lee Hee-jun as her son',
+      'picks.music1.imageAlt': 'Official Open the Door MV thumbnail: Lim Chang-jung dancing at the head of the crowd in a white suit'
     },
     js: {
       'lamp.on': 'Leave one more light',
@@ -315,6 +324,13 @@ window.SITE_I18N = {
       'picks.drama5.desc': '宮女チャングムが料理と医術で身分の偏見を乗り越え、王の初の女性主治医になる。2003年のMBC時代劇。イ・ヨンエ、チ・ジニ主演。',
       'picks.drama5.actions': '<a class="pick-link pick-link-sub" href="https://video.unext.jp/episode/SID0020374/ED00094308" target="_blank" rel="noopener noreferrer">U-NEXT で見る（定額制）</a><p class="pick-netflix-note">中国大陸からご覧になる場合は、<a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">こちら</a>から Netflix にアクセスできます。</p>',
       'picks.drama5.note': '当サイトは海賊版を提供したり、リンクしたりしません。',
+      'picks.music1.label': '韓国音楽 · 2013',
+      'picks.music1.imageCredit': '公式 MV サムネイル：イム・チャンジョン＆キム・チャンリョル「문을 여시오」（NH EMG 公式チャンネル）',
+      'picks.music1.title': '문을 여시오（2013）',
+      'picks.music1.desc': 'シンサドンホリャンイが手がけた、イム・チャンジョンとキム・チャンリョルが歌う洗脳系ダンスナンバー。SUPER JUNIOR のヒチョルをはじめ U-KISS、キム・スロなど数十組のスターがカメオ出演し、簡単な振り付けについつい体が揺れます。2013年リリース、「江南スタイルを超えた神曲」と呼ばれた一曲。',
+      'picks.music1.actions': '<a class="pick-link pick-link-featured" href="https://www.youtube.com/watch?v=GQ53MTOVS04" target="_blank" rel="noopener noreferrer">YouTube で MV を見る</a>',
+      'picks.music1.note': '運営者の QQ音楽リンク（中国大陸のみ視聴可）：<a href="https://y.qq.com/n/m/detail/mv/index.html?vid=f0015hf64je" target="_blank" rel="noopener noreferrer">y.qq.com</a>。',
+      'picks.music1.ytnote': '中国大陸以外からご覧の方は、<a href="https://youtu.be/GQ53MTOVS04" target="_blank" rel="noopener noreferrer">こちらから YouTube で「문을 여시오」の MV をご覧ください</a>。',
       'footer.quote': '世界に猫は欠かせない。<br><span>そして、どんな「好き」にも、口にできる理由がありますように。</span>',
       'footer.meta.design': 'デザインとコード · WorkBuddy',
       'footer.meta.host': 'ホスティング · GitHub Pages',
@@ -352,7 +368,8 @@ window.SITE_I18N = {
       'picks.drama3.imageAlt': '『星から来たあなた』ポスター：キム・スヒョンとチョン・ジヒョン',
       'picks.drama4.imageAlt': '『相続者たち』ポスター：イ・ミンホとパク・シネ',
       'picks.drama5.imageAlt': '『宮廷女官チャングムの誓い』ポスター：イ・ヨンエ演じるチャングム',
-      'picks.film.imageAlt': '映画『오! 문희』のポスター：ナ・ムニ演じるムンヒとイ・ヒジュン演じる息子'
+      'picks.film.imageAlt': '映画『오! 문희』のポスター：ナ・ムニ演じるムンヒとイ・ヒジュン演じる息子',
+      'picks.music1.imageAlt': '「문을 여시오」公式 MV サムネイル：白いスーツ姿で先頭に立って踊るイム・チャンジョン'
     },
     js: {
       'lamp.on': 'もう一度ともす',
@@ -477,6 +494,13 @@ window.SITE_I18N = {
       'picks.drama5.desc': '궁녀 장금이 요리와 의술로 신분의 편견을 뛰어넘어 임금의 첫 여성 주치의가 된다. 2003년 MBC 사극, 이영애·지진희 주연.',
       'picks.drama5.actions': '<a class="pick-link pick-link-sub" href="https://www.tving.com/contents/P001790390" target="_blank" rel="noopener noreferrer">TVING에서 보기 (정액제)</a><p class="pick-netflix-note">중국 본토 시청자는 <a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">여기</a>를 눌러 Netflix에 접속하세요.</p>',
       'picks.drama5.note': '이 사이트는 불법 복제본을 제공하거나 연결하지 않습니다.',
+      'picks.music1.label': '한국 음악 · 2013',
+      'picks.music1.imageCredit': '공식 MV 썸네일: 임창정 & 김창렬 『문을 여시오』 (NH EMG 공식 채널)',
+      'picks.music1.title': '문을 여시오 (2013)',
+      'picks.music1.desc': '신사동 호랭이가 만들고 임창정과 김창렬이 부른 중독성 강한 댄스 곡. 슈퍼주니어 희철을 비롯해 U-KISS, 김수로 등 수십 명의 스타가 카메오로 출연했고, 쉬운 안무를 따라 하다 보면 어느새 몸이 흔들립니다. 2013년 발매, 『강남 스타일을 넘어선 신곡』이라 불렸습니다.',
+      'picks.music1.actions': '<a class="pick-link pick-link-featured" href="https://www.youtube.com/watch?v=GQ53MTOVS04" target="_blank" rel="noopener noreferrer">YouTube에서 MV 보기</a>',
+      'picks.music1.note': '운영자의 QQ음악 링크(중국 대륙에서만 시청 가능): <a href="https://y.qq.com/n/m/detail/mv/index.html?vid=f0015hf64je" target="_blank" rel="noopener noreferrer">y.qq.com</a>.',
+      'picks.music1.ytnote': '중국 본토 외부 시청자는 <a href="https://youtu.be/GQ53MTOVS04" target="_blank" rel="noopener noreferrer">여기를 눌러 YouTube에서 『문을 여시오』 MV를 보세요</a>.',
       'footer.quote': '이 세상엔 고양이가 필요하다.<br><span>그리고 모든 좋아함에는, 입으로 꺼낼 수 있는 이유가 있기를.</span>',
       'footer.meta.design': '디자인과 코드 · WorkBuddy',
       'footer.meta.host': '호스팅 · GitHub Pages',
@@ -514,7 +538,8 @@ window.SITE_I18N = {
       'picks.drama3.imageAlt': '『별에서 온 그대』 포스터: 김수현과 전지현',
       'picks.drama4.imageAlt': '『상속자들』 포스터: 이민호와 박신혜',
       'picks.drama5.imageAlt': '『대장금』 포스터: 이영애가 연기한 장금',
-      'picks.film.imageAlt': '영화 『오! 문희』 포스터: 나문희가 연기한 문희와 이희준이 연기한 아들'
+      'picks.film.imageAlt': '영화 『오! 문희』 포스터: 나문희가 연기한 문희와 이희준이 연기한 아들',
+      'picks.music1.imageAlt': '『문을 여시오』 MV 장면: 흰 정장을 입고 춤을 추는 임창정'
     },
     js: {
       'lamp.on': '한 번 더 켜기',
