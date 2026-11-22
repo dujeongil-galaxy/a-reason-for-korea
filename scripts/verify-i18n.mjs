@@ -432,10 +432,23 @@ function verify(state) {
     cursor = at;
   }
   if (!/\.pick-image-poster\s*\{[^}]*aspect-ratio:\s*auto/.test(state.css)) {
-    errors.push('zh: poster images must keep native aspect-ratio');
+    errors.push('zh: poster images must not be forced into 16:9');
   }
-  if (!/\.picks-grid\s*\{[^}]*align-items:\s*start/.test(state.css)) {
-    errors.push('zh: picks grid must let cards keep their own height (no stretch gap)');
+  /* 等高网格：卡片被同行最高的卡拉齐后，内容要撑满，不留底部空白 */
+  if (/\.picks-grid\s*\{[^}]*align-items:\s*start/.test(state.css)) {
+    errors.push('zh: picks grid must stretch cards to equal height');
+  }
+  if (!/\.pick-card\s*\{[^}]*display:\s*flex;[^}]*flex-direction:\s*column/.test(state.css)) {
+    errors.push('zh: pick card must be a flex column so content can fill its height');
+  }
+  if (!/\.pick-poster-row\s*\{[^}]*flex:\s*1/.test(state.css)) {
+    errors.push('zh: poster row must flex to fill the card height');
+  }
+  if (!/\.pick-image-poster\s*\{[^}]*height:\s*100%[^}]*object-fit:\s*cover/.test(state.css)) {
+    errors.push('zh: drama poster must fill the stretched card height');
+  }
+  if (!/\.pick-poster-body \.pick-actions\s*\{[^}]*margin-top:\s*auto/.test(state.css)) {
+    errors.push('zh: card actions must stick to the bottom of the stretched card');
   }
   if (!state.css.includes('@media (max-width: 420px)')) {
     errors.push('zh: poster row narrow-viewport guard missing');
@@ -1212,8 +1225,8 @@ const faults = [
   { name: 'drama imageAlt left untranslated in English', mutate: s => {
     s.dict.en.attr['picks.drama1.imageAlt'] = '《车贞淑医生》海报：严正花饰演的车贞淑';
   } },
-  { name: 'poster native aspect-ratio guard removed', mutate: s => {
-    s.css = s.css.replace('.pick-image-poster { width: 100%; height: auto; aspect-ratio: auto; object-fit: contain; }', '');
+  { name: 'poster aspect-ratio guard removed', mutate: s => {
+    s.css = s.css.replace('aspect-ratio: auto; object-fit: cover;', 'aspect-ratio: 16 / 9; object-fit: cover;');
   } },
   /* 订阅制渠道（2026-11-22）：漂移 / 指向 Netflix / 重复 / 挂到无渠道区 / 被挤到购买按钮下面 */
   { name: 'drama EN subscription link drifted off Viki', mutate: s => {
@@ -1261,9 +1274,15 @@ const faults = [
     s.css = s.css.replace('.pick-figure-still { margin: 0; }',
       '.pick-figure-still { margin: 0; }\n.pick-card-feature { grid-column: 1 / -1; order: -1; }');
   } },
-  { name: 'picks grid stretched to equal card heights again', mutate: s => {
-    s.css = s.css.replace('.picks-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: start; }',
-      '.picks-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }');
+  { name: 'picks grid reverted to per-card height (blank gap returns)', mutate: s => {
+    s.css = s.css.replace('.picks-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }',
+      '.picks-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: start; }');
+  } },
+  { name: 'poster row no longer fills card height', mutate: s => {
+    s.css = s.css.replace('gap: 18px; flex: 1; }', 'gap: 18px; }');
+  } },
+  { name: 'card actions no longer stick to the bottom', mutate: s => {
+    s.css = s.css.replace('.pick-poster-body .pick-actions { margin-top: auto; }', '');
   } }
 ];
 

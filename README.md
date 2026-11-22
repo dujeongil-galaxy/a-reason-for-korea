@@ -85,7 +85,7 @@ favicon.svg                   猫爪图标
 sitemap.xml                   四语地址 + hreflang（x-default 指中文）
 robots.txt                    允许抓取并指向 sitemap.xml
 scripts/build-i18n.mjs        由 index.html + 字典生成三张语言页
-scripts/verify-i18n.mjs       四语一致性 + 附页 + 切换器 + 链接状态 + 归属措辞 + 产品名/read4 标签 + 站长推荐按区主按钮（zh=aff、en=Prime Video、jp=Apple TV、ko=YouTube）/三语本地化红字 AFF 入口/港区只中文/预览图/五部剧集时间线（年份倒序、按区购买、竖版海报、按区订阅渠道）/订阅按钮位置与域名白名单/已撤销音乐专区不得回退/二级菜单三项锚点与标题分类对应/K-pop 游戏占位/电影卡图上文下且不得跨列/网格卡片按内容高度不拉伸/五部剧集两栏卡片 + SEO title/description 关键词 + 四语 JSON-LD + sitemap/robots + 极窄屏防溢出校验 + 109 项故障注入自检
+scripts/verify-i18n.mjs       四语一致性 + 附页 + 切换器 + 链接状态 + 归属措辞 + 产品名/read4 标签 + 站长推荐按区主按钮（zh=aff、en=Prime Video、jp=Apple TV、ko=YouTube）/三语本地化红字 AFF 入口/港区只中文/预览图/五部剧集时间线（年份倒序、按区购买、竖版海报、按区订阅渠道）/订阅按钮位置与域名白名单/已撤销音乐专区不得回退/二级菜单三项锚点与标题分类对应/K-pop 游戏占位/电影卡图上文下且不得跨列/等高网格 + 海报撑满卡片高度 + 按钮贴底（不留底部空白）/五部剧集两栏卡片 + SEO title/description 关键词 + 四语 JSON-LD + sitemap/robots + 极窄屏防溢出校验 + 111 项故障注入自检
 .nojekyll                     让 GitHub Pages 跳过 Jekyll
 CHANGELOG.md / PITFALLS.md    改动记账与踩坑记录
 ```

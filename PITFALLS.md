@@ -230,3 +230,10 @@
 - **正解**：`.picks-grid { align-items: start; }`，让每张卡按自身内容高度排。改完首卡回到 380px，空白消失，网格仍是两列，卡片宽度、电影卡图上文下的布局都不动。
 - **之前走过弯路**：为了消这个空白，先把电影卡压成 132px 缩略图两栏（站长说要横向放），又让它跨两列独占一行（站长说不要独占）。其实问题根本不在电影卡，而在 grid 的 `align-items: stretch` 默认值。
 - **故障注入的坑**：`styles.css` 里另一处网格也有 `gap: 20px; align-items: start;`，注入用短字符串 replace 只改到那一处，自测报 `self-test missed`（断言本身是好的，真实文件去掉规则能判红）。注入必须匹配**完整的 `.picks-grid` 规则行**才精准。计数 108 → **109/109**。
+
+## 32. 用户说「占满」时，先确认是降高度还是填内容
+
+- **现象**：站长连续两次截图 challenge——先问「就不能占满吗？看下面这个多好」，我理解成降高度（`align-items:start`）；站长再问「用657px然后想尽一切办法占满，是做不到吗」，才明确：**高度保持 657px 不动，要让内容把卡片填满**。
+- **正解**：网格恢复等高拉伸，卡片改 flex column，`.pick-poster-row { flex:1 }`，海报列加宽（132→210px）并 `height:100%; object-fit:cover` 撑满，`.pick-poster-body .pick-actions { margin-top:auto }` 把按钮/红字/注记贴底。卡底空白 311→35px。
+- **两个调参细节**：① 海报列只有 132px 时撑到 500px 高会裁得只剩中间一条，必须加宽到 ~210px 才不毁图；② 文字区用 `justify-content:space-between` 会把标题和简介拆得太开，改成标题简介留在顶部、只给 `.pick-actions` 加 `margin-top:auto`，视觉自然得多。
+- **旧断言会失配**：海报改成 `object-fit:cover` 后，原「海报保持 native aspect-ratio」的断言文字与注入字符串都要跟着改，否则自测报 `self-test missed`。计数 109 → **111/111**。
