@@ -49,7 +49,7 @@
 
 - 本站是**个人观点页**，不引用未经核实的数据，不写「某国人都如何」这类全称判断，也不代表任何机构。
 - 「延伸阅读」只列公开可访问的链接（原抖音分享、话题文章、一篇关于韩国猫岛计划的报道），仅作线索；本站不对其中的事实、数据与时效性作核查或背书。
-- 「站长推荐」收集韩国电影 / 剧集（韩国音乐占位专区已于 2026-11-22 按站长指令撤销）。片名线索即使来自盗版站，页面也**只写片名、绝不挂该链接**。**主购买按钮按地区定**（2026-11-22 复核版）：
+- 「站长推荐」收集韩国电影 / 剧集（韩国音乐占位专区已于 2026-11-22 按站长指令撤销）。**导航二级菜单**（2026-11-22）：四语的「站长推荐」下面挂「看韩剧 / 听K-pop / 玩游戏」三项，分别指向 `#picks` / `#picks-kpop` / `#picks-games`；标题下的分类名与菜单第一项一一对应。**只在桌面显示**（≤720px 整条导航隐藏），站长明确要求手机端先不做。K-pop 与游戏目前只是**占位**，写「正在开发中，请等待站长写入数据」，等站长填数据。六张影视卡统一「图 + 文」两栏结构，避免首卡被电影卡撑出大块空白。片名线索即使来自盗版站，页面也**只写片名、绝不挂该链接**。**主购买按钮按地区定**（2026-11-22 复核版）：
   - **中文（港区）**：aff 邀请码链接 `https://nfshare.cn/?sid=5rfpUarUEd`，文案「中国香港地区：通过此链接开通（邀请码 5rfpUarUEd）」——**港区口径只有中文能写**。
   - **英文（美区）**：YouTube 美区只有免费带广告，Prime Video 可租可买 → 主按钮挂 `https://watch.amazon.com/detail?gti=amzn1.dv.gti.3a505a12-509d-4f34-af76-47f0ea441f72`，文案「Rent or buy on Prime Video」。
   - **日文（日区）**：Netflix / Amazon Japan / YouTube 均无此片，Apple TV 日区可租 ¥550、可买 ¥2,100 → 主按钮挂 `https://itunes.apple.com/jp/movie/%E3%82%AA-%E3%83%A0%E3%83%8B-%E5%AD%97%E5%B9%95%E7%89%88/id1691528206?uo=4`，文案「Apple TV でレンタル・購入する · 正版で応援しましょう」。
@@ -85,7 +85,7 @@ favicon.svg                   猫爪图标
 sitemap.xml                   四语地址 + hreflang（x-default 指中文）
 robots.txt                    允许抓取并指向 sitemap.xml
 scripts/build-i18n.mjs        由 index.html + 字典生成三张语言页
-scripts/verify-i18n.mjs       四语一致性 + 附页 + 切换器 + 链接状态 + 归属措辞 + 产品名/read4 标签 + 站长推荐按区主按钮（zh=aff、en=Prime Video、jp=Apple TV、ko=YouTube）/三语本地化红字 AFF 入口/港区只中文/预览图/五部剧集时间线（年份倒序、按区购买、竖版海报、按区订阅渠道）/订阅按钮位置与域名白名单/已撤销音乐专区不得回退 + SEO title/description 关键词 + 四语 JSON-LD + sitemap/robots + 极窄屏防溢出校验 + 100 项故障注入自检
+scripts/verify-i18n.mjs       四语一致性 + 附页 + 切换器 + 链接状态 + 归属措辞 + 产品名/read4 标签 + 站长推荐按区主按钮（zh=aff、en=Prime Video、jp=Apple TV、ko=YouTube）/三语本地化红字 AFF 入口/港区只中文/预览图/五部剧集时间线（年份倒序、按区购买、竖版海报、按区订阅渠道）/订阅按钮位置与域名白名单/已撤销音乐专区不得回退/二级菜单三项锚点与标题分类对应/K-pop 游戏占位/统一两栏卡片 + SEO title/description 关键词 + 四语 JSON-LD + sitemap/robots + 极窄屏防溢出校验 + 106 项故障注入自检
 .nojekyll                     让 GitHub Pages 跳过 Jekyll
 CHANGELOG.md / PITFALLS.md    改动记账与踩坑记录
 ```
