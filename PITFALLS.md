@@ -145,3 +145,11 @@
 - **原因**：上一轮「中国大陆一律按港区算」是站长给中文站的地区分类决定（用于解释 aff 链接为何写香港），不是必须逐语复制的文案。做法应是「决策口径中文保留、外文本地化重写」：中文源写「中国香港地区：通过此链接开通」，英/韩只写「Get access through this link / 이 링크로 이용권 구매」+ 邀请码，让国际读者看得懂；日文页本就没有 aff 按钮，不受影响。
 - **诊断坑**：用户截图里英文页每句下面都跟一行中文，看着像「页面混了中文」。实测 `en/index.html` 的 CJK 只有导航的「中文 / 日本語」和署名「新浪」三处——中英逐句对照是**浏览器翻译插件叠加**的效果，不是页面 bug。遇到这类截图先 grep 生成页确认有无真中文残留，别急着改页面。
 - **强制层**：`verify-i18n.mjs` 新增 `FORBIDDEN_REGION_CALQUES = ['Hong Kong, China', '중국 홍콩']`，在 en/ko 的 aff 分支逐页断言不得出现（中文源不受限），+ 1 组故障注入，`SELF-TEST 62 → 63/63`。真实文件把 `Hong Kong, China` 塞回英文页 → 只报新增断言 + 节点不同步两条，恢复后全绿。
+
+## 22. 购买按钮按地区定：查 YouTube 能否租买，别拍脑袋套统一口径
+
+- **规则（站长 2026-11-22 终版）**：所有语言检查一遍、不直译，**只有中文按港区**。英文按美区、日文按日区——YouTube 能租/买就推 YouTube，不能就推 aff；韩文按韩区，YouTube 可租买→推 YouTube。
+- **查证结论（JustWatch / TMDB / Moviefone，2026-11-20/21 快照）**：美区 YouTube 只有「免费带广告」，租买在 Amazon（租 $1.99–2.99 / 买 $7.99–9.99）→ 英文页 aff；日区 JustWatch 页抓不到、TMDB 只说「可通过租借购买观看」未指明平台（疑似 Prime Video），无 YouTube 租买证据 → 日文页 aff；韩区官方 YouTube Movies 租买页（用户给的 `cflWf3XKeFI`）→ 韩文页 YouTube。**YouTube Free（免费带广告）≠ YouTube 商店租买**，别混为一谈。
+- **落地**：zh=aff（港区口径，唯一保留）；en=aff（Get access through this link）；jp=aff（このリンクから視聴権を取得，本轮从「无链接」改为 aff）；ko=YouTube（YouTube에서 대여하거나 구매하기，撤掉 aff/邀请码）。四页红字 Netflix 提示保留，四页禁 Netflix 链接与盗版域名。
+- **强制层**：`verify-i18n.mjs` 用 `PICKS_ACTIONS_EXPECT[lang].primary` 逐区锁定主按钮（aff/youtube），`PICKS_PRIMARY_LABEL` 逐语锁定按钮文案防机翻/漂移；aff 区禁 YouTube 域、YouTube 区禁 aff/邀请码；`FORBIDDEN_REGION_CALQUES` 扩到含 `香港地区/香港地域`。故障注入 63 → **65/65**：实测把韩区按钮改回 aff → 只报「YouTube link missing」+「aff forbidden」两条，恢复后全绿。
+- **验收坑**：日文页新增 aff 按钮、韩文页换成 YouTube 后，重新跑 `cdp-overflow.cjs` 确认 320/360/390/414 四档 `overflowElements=0`，别只看截图。

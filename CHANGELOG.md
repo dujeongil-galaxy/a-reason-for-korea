@@ -2,6 +2,15 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-22 · 购买按钮按地区重设（zh/en/jp=aff、ko=YouTube）
+
+- `2ae0f5c` — 站长终版规则：所有语言检查、不直译，只有中文按港区；英文按美区、日文按日区（YouTube 能租买推 YouTube，反之推 aff）；韩文按韩区（YouTube 可租买）。
+  - **查证结论**：美区 YouTube 仅免费带广告、租买在 Amazon；日区无 YouTube 租买证据（疑似 Prime Video）；韩区官方 YouTube Movies 可租买。据此 zh=aff、en=aff、jp=aff、ko=YouTube。
+  - **改了什么**：`assets/i18n.js` —— jp `picks.film.actions` 从「仅红字」新增 aff 按钮「このリンクから視聴権を取得（招待コード 5rfpUarUEd）」；ko 从 aff 改为 YouTube 按钮「YouTube에서 대여하거나 구매하기 · 정식 서비스로 응원해 주세요」，链接 `https://youtu.be/cflWf3XKeFI?si=pZ-WkU6w5wYkh4Wq`，撤掉 aff/邀请码。中文源不变（唯一保留港区口径）。`en/jp/ko/index.html` 由 `build-i18n.mjs` 重建。四页红字 Netflix 提示都不动。
+  - **机器强制**：`scripts/verify-i18n.mjs` 把 `PICKS_ACTIONS_EXPECT` 从 `aff:bool` 升级为 `primary:'aff'|'youtube'`，新增 `PICKS_PRIMARY_LABEL` 逐语锁定按钮文案、`YOUTUBE_DOMAINS`/`FORBIDDEN_NETFLIX_LINK` 分区禁链，`FORBIDDEN_REGION_CALQUES` 加 `香港地区/香港地域`；故障注入 63 → **65/65**。真实文件把韩区按钮改回 aff → 精准判红两条，恢复后全绿。
+  - **验证**：CDP 截图 `picks-jp-final.png` / `picks-ko-final.png`（及手机版）肉眼确认按钮与红字；`cdp-overflow.cjs` 四档宽度（320/360/390/414）溢出元素 0。
+  - **记账依据**：PITFALLS 新增第 22 条（按区查 YouTube 租买 + YouTube Free≠租买 + 日文新增按钮后重测溢出）。
+
 ## 2026-11-22 · 外文页 aff 按钮去掉「港区」直译
 
 - `ea093ee` — 站长截图指出英文页 aff 按钮写着 `Hong Kong, China: get access through this link`，是把中文的「中国香港地区」直译过去的。站长：英语直接链奈飞没错、挂 aff 也没错，只是不该直译港区。
