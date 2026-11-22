@@ -90,6 +90,8 @@ const STALE_READ4_TAGS = ['近例', 'Another', 'もう一本', '또 하나'];
 const FORBIDDEN_PIRATE_DOMAINS = ['ncat30.com'];
 const FORBIDDEN_PURCHASE_LINKS = ['https://youtu.be/', 'youtube.com/watch', 'https://www.netflix.com/'];
 const AFF_LINK = 'https://nfshare.cn/?sid=5rfpUarUEd';
+/* 外文页 aff 按钮文案禁止直译中文语境的「港区」划分；中文源保留原始口径不受此限 */
+const FORBIDDEN_REGION_CALQUES = ['Hong Kong, China', '중국 홍콩'];
 const PICKS_HEAD = {
   zh: '站长推荐', en: 'Picks from the webmaster', jp: '運営のおすすめ', ko: '운영자 추천'
 };
@@ -460,6 +462,9 @@ function verify(state) {
       if (!actions.includes(AFF_LINK)) errors.push(lang + ': aff link missing');
       if (!actions.includes('5rfpUarUEd')) errors.push(lang + ': invitation code missing');
       if (!/class="pick-link pick-link-featured"/.test(actions)) errors.push(lang + ': aff button class missing');
+      for (const calque of FORBIDDEN_REGION_CALQUES) {
+        if (actions.includes(calque)) errors.push(lang + ': Hong Kong region must not be translated into foreign copy -> ' + calque);
+      }
     } else {
       if (actions.includes('<a ') || actions.includes('href=')) {
         errors.push(lang + ': JP page must not carry any purchase link');
@@ -673,6 +678,10 @@ const faults = [
   } },
   { name: 'aff link stripped from English page', mutate: s => {
     s.pages.en = s.pages.en.replace(AFF_LINK, 'https://nfshare.cn/');
+  } },
+  { name: 'Hong Kong region calque reintroduced into English aff button', mutate: s => {
+    s.dict.en.html['picks.film.actions'] = s.dict.en.html['picks.film.actions']
+      .replace('>Get access through this link', '>Hong Kong, China: get access through this link');
   } },
   { name: 'JP page given an affiliate link', mutate: s => {
     s.dict.jp.html['picks.film.actions'] = s.dict.en.html['picks.film.actions'];
