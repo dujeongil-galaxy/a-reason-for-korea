@@ -131,3 +131,10 @@
 - **踩坑**：图片标签写了 `width="1200" height="675"`（为 CLS 预留空间），CSS 写了 `width:100%; aspect-ratio:16/9` 却没写 `height:auto`——**HTML 的 height 属性作为 presentational hint 压过了 aspect-ratio**，实测渲染成 441×675 的竖长条而不是 16:9 横幅。加 `height:auto` 后变成正确的 441×248。
 - **规则**：凡是用 `width`/`height` 属性 + CSS `aspect-ratio` 的响应式图片，CSS 里必须写 `height:auto`；或者干脆不写 HTML 尺寸属性。上线前用 CDP 读 `naturalWidth` 与 `getBoundingClientRect()` 实测比例，别只看截图。
 - **强制层**：`verify-i18n.mjs` 1d 段新增图片引用 / 文件存在 / `height:auto` 断言，生成页新增四语来源说明逐字断言，3 组故障注入（删图片引用、来源说明留中文、删 `height:auto`），`SELF-TEST 53 → 56/56`。
+
+## 20. YouTube 租买页锁地区；中国大陆一律按港区算，日区不挂购买链接
+
+- **现象**：站长给的 YouTube Movies 链接 `https://youtu.be/cflWf3XKeFI?si=...` 是《오!문희》的官方租买页，但**只有韩国 IP 能租借/买断**。查 JustWatch / Moviefone 各地区数据：美国 YouTube 只有「YouTube Free（免费带广告）」，租买在 Amazon（租 $2.99 / 买 $9.99）；日本与香港 JustWatch 无该片条目。结论：**不存在美区/日区/港区的 YouTube 租买替代链接**，YouTube 的地区可用性由片方授权 + 访问 IP 决定，同一个视频 ID 无法"换地区版本"。
+- **诊断坑**：用 `&gl=US|JP|HK` 参数抓 YouTube 页面并不能真的切换地区，四个地区都返回同一个韩区页面 + `UNPLAYABLE "Video unavailable"`（出口 IP 不变）。地区可用性不能靠 `gl` 参数实测，要查 JustWatch 等地区化流媒体数据库。
+- **最终口径（站长 2026-11-22 指令）**：中国大陆以后都按**港区**算；港区 YouTube 搜不到也不能租买，所以 **aff 邀请码链接不能删，继续保留**——zh/en/ko 三页 featured 按钮指向 `https://nfshare.cn/?sid=5rfpUarUEd`，文案写「中国香港地区」，邀请码 `5rfpUarUEd` 逐字保留；按钮下方红字保留奈飞原文案「到 Netflix 搜索片名观看 · 请支持正版」；**日区（jp）不挂任何购买链接**，只留 Netflix 文字推荐。四页一律禁 `youtu.be` / `youtube.com/watch` / `www.netflix.com` 链接与盗版域名。
+- **实现**：三条按钮 key（youtube / netflix / cn）合并为一条整块 `picks.film.actions`（字典值是完整 HTML 片段，`translateNodes` 直接替换 innerHTML），这样日区能单独去掉 `<a>` 而不影响其他三语。`verify-i18n.mjs` 用 `PICKS_ACTIONS_EXPECT` 逐语校验 aff 有无 / 邀请码 / Netflix 文案，`FORBIDDEN_PURCHASE_LINKS` 四页禁链接；`SELF-TEST 56 → 62/62`。真实文件给日区塞回 aff 链接 → 精准判红两条，恢复后全绿。

@@ -2,6 +2,14 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-22 · 站长推荐链接改港区 aff 口径，日区不挂购买链接
+
+- `86266b0` — 站长指令：韩国 YouTube 租买页只有韩国 IP 可用；中国大陆以后一律按港区算，港区 YouTube 搜不到也不能租买，所以 aff 邀请码链接继续保留。日区不挂链接，直接推荐奈飞。
+  - **检索结论**：YouTube Movies 的《오!문희》租买页锁韩区 IP；美区 YouTube 只有「免费带广告」，租买在 Amazon（$2.99/$9.99）；日区、港区 JustWatch 无该片条目。不存在美/日/港的 YouTube 租买替代链接。`&gl=` 参数不改出口 IP，四地都返回同一韩区页面。
+  - **改了什么**：`index.html` 三条独立按钮 key（youtube/netflix/cn）合并为一条整块 `picks.film.actions`；zh/en/ko 的片段含 aff 链接（港区口径文案 + 邀请码 5rfpUarUEd）+ 红字 Netflix 原文案；jp 片段只有红字 Netflix 日文推荐、无任何 `<a>`。`assets/i18n.js` 三语字典同步。`scripts/verify-i18n.mjs` 新增 `PICKS_ACTIONS_EXPECT`（逐语 aff 有无 / 邀请码 / Netflix 文案）、`FORBIDDEN_PURCHASE_LINKS`（四页禁 youtu.be / youtube.com/watch / netflix.com）；`AFF_LINK_LANGS` 常量。README 计数 56 → 62；PITFALLS 新增第 20 条。
+  - **为什么**：日区要「不挂链接」，而构建器是逐字复制中文源 href 的，三条独立 `<a>` 无法让单语去链接——合并成整块 HTML 片段后，各语可独立决定有没有按钮。
+  - **验证**：`VERIFY OK` + `SELF-TEST 62/62`；真实文件给日区片段塞回 aff 链接，重建后精准判红两条（JP 不得挂购买链接 / 邀请码不得出现在日区），恢复后全绿。CDP 渲染截图确认：中文桌面/手机显示 aff 按钮 + 红字、YouTube 按钮消失；日区只有一行红字 Netflix、无任何按钮。
+
 ## 2026-11-22 · 推荐内容加预览图（长期规则）
 
 - `072a6df` — 站长指出《哦！文姬》推荐卡没有预览图，要求「带图推是最好的，以后也遵循这个规则」。这条作为本站推荐区的**长期约定**：每条推荐都要有来自正版资料站的预览图，本地化引用，四语 alt + 来源说明齐全。
