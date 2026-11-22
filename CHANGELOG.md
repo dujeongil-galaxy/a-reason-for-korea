@@ -2,6 +2,14 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-22 · 美区 / 日区购买按钮改到当地真实可租买渠道
+
+- `50b731e` — 站长追问「美区和日区建议优化一下，美区看看亚马逊那边，日本的话还是不行吗？奈飞也搜不到？」。复核时发现上一轮检索用的是同名印度电影 `Oh! Baby`，本片正确英文名是 **Oh! My Gran**（오! 문희，2020，罗文姬主演）。
+  - **查证结论**：美区 Prime Video 可租 $2.99 / 买 $9.99（JustWatch 美区页 + Moviefone + `watch.amazon.com` 商品页）；日区 Netflix、Amazon Japan、YouTube 均无此片（JustWatch JP 搜索页显示日文名「オ！ムニ (字幕版)」），但 **Apple TV 日区可租 ¥550 / 买 ¥2,100**（iTunes Search API `trackId 1691528206` 确认）；韩区 YouTube 租买不变；中文港区 aff 不变。
+  - **改了什么**：`assets/i18n.js` 英文主按钮 → `https://watch.amazon.com/detail?gti=amzn1.dv.gti.3a505a12-509d-4f34-af76-47f0ea441f72`，文案 `Rent or buy on Prime Video`；日文主按钮 → `https://itunes.apple.com/jp/movie/%E3%82%AA-%E3%83%A0%E3%83%8B-%E5%AD%97%E5%B9%95%E7%89%88/id1691528206?uo=4`，文案 `Apple TV でレンタル・購入する · 正版で応援しましょう`。邀请码只留中文源；四页红字 Netflix 提示、禁 Netflix 链接规则均不动；`en/jp/index.html` 由 `build-i18n.mjs` 重建。
+  - **机器强制**：`verify-i18n.mjs` 新增 `PRIMARY_LINK`（aff / amazon / apple / youtube 四渠道总表），`PICKS_ACTIONS_EXPECT.primary` 从二值扩到四类，`PICKS_PRIMARY_LABEL` 锁新文案；跨区渠道、YouTube 域、aff/邀请码按区禁入。故障注入 65 → **66/66**。真实文件把英文页 Prime Video 链接改回 aff → 判红 4 条（`primary link missing` / `wrong-region primary link` / `aff forbidden` / 节点不同步），重建恢复后全绿。
+  - **记账依据**：PITFALLS 新增第 23 条（同名片误检索 + YouTube 之外渠道复核 + Apple TV 商品页地区 404 干扰）。
+
 ## 2026-11-22 · 购买按钮按地区重设（zh/en/jp=aff、ko=YouTube）
 
 - `2ae0f5c` — 站长终版规则：所有语言检查、不直译，只有中文按港区；英文按美区、日文按日区（YouTube 能租买推 YouTube，反之推 aff）；韩文按韩区（YouTube 可租买）。

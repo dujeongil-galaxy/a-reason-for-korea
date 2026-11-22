@@ -153,3 +153,11 @@
 - **落地**：zh=aff（港区口径，唯一保留）；en=aff（Get access through this link）；jp=aff（このリンクから視聴権を取得，本轮从「无链接」改为 aff）；ko=YouTube（YouTube에서 대여하거나 구매하기，撤掉 aff/邀请码）。四页红字 Netflix 提示保留，四页禁 Netflix 链接与盗版域名。
 - **强制层**：`verify-i18n.mjs` 用 `PICKS_ACTIONS_EXPECT[lang].primary` 逐区锁定主按钮（aff/youtube），`PICKS_PRIMARY_LABEL` 逐语锁定按钮文案防机翻/漂移；aff 区禁 YouTube 域、YouTube 区禁 aff/邀请码；`FORBIDDEN_REGION_CALQUES` 扩到含 `香港地区/香港地域`。故障注入 63 → **65/65**：实测把韩区按钮改回 aff → 只报「YouTube link missing」+「aff forbidden」两条，恢复后全绿。
 - **验收坑**：日文页新增 aff 按钮、韩文页换成 YouTube 后，重新跑 `cdp-overflow.cjs` 确认 320/360/390/414 四档 `overflowElements=0`，别只看截图。
+
+## 23. 按区找正版渠道：先认准片名，别让 Apple TV 的地区 404 骗到
+
+- **现象**：站长要求「美区看看亚马逊，日本还是不行吗？奈飞也搜不到？」复核发现上一轮的结论建立在错误片名上——检索 `Oh! Baby` 命中的是 2019 年印度泰卢固语电影（Samantha主演），而本站推荐的是 2020 年韩国片《哦！文姬》，正确英文名 **Oh! My Gran**（原名 `오! 문희`，罗文姬主演）。同名/近名电影会给出完全错误的「某区没有渠道」结论。
+- **正确片名后的查证**：美区 JustWatch + Moviefone 均列出 Prime Video 租 $2.99 / 买 $9.99，商品页 `watch.amazon.com/detail?gti=amzn1.dv.gti.3a505a12-509d-4f34-af76-47f0ea441f72`；日区 JustWatch 搜索页（`/jp/search?q=Oh! My Gran`）显示日文名「オ！ムニ (字幕版)」，Apple TV 租 ¥550 / 买 ¥2,100、FOD 租 ¥550，**Netflix 与 Amazon Japan 均无此片**；韩区 YouTube 租买页维持不变。
+- **地区 404 的坑**：`tv.apple.com/jp/movie/...` 与 iTunes API 返回的 `trackViewUrl` 在本机都跳到 tv.apple.com 并回 404，因为出口 IP 不在日本；**不能据此判定商品不存在**。权威做法是用 `https://itunes.apple.com/lookup?id=1691528206&country=jp` 看 `trackId` / `trackPrice` / `trackRentalPrice` / `country: JPN`，页面链接直接用 API 的 `trackViewUrl`。同理 Amazon 在非美区出口会跳 `getTheApp` splash，也不代表链接失效。
+- **落地**：zh=aff、en=Prime Video、jp=Apple TV、ko=YouTube；邀请码只剩中文页。`verify-i18n.mjs` 用 `PRIMARY_LINK` 四渠道总表逐区锁主链接，跨区渠道 / YouTube 域 / aff 邀请码按区禁入，新增 1 组故障注入（`65 → 66/66`）。真实文件把英文页 Prime Video 链改回 aff → 判红 4 条，恢复后全绿。
+- **通用规则**：查「某区能不能租买」时，先拿**原名 + 导演 + 主演**确认是同一部片，再分别查 JustWatch 对应国家页、Moviefone where-to-watch、iTunes API；YouTube Free（免费带广告）永远不等于 YouTube 商店租买。
