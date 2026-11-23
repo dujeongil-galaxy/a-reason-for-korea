@@ -490,6 +490,18 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
 }
 .picks-chain-risk strong { font-weight: 800; }
 .picks-chain-credit { font-weight: 700; }
+.picks-chain-credit-standalone { display: block; margin: 16px 0 0; font-size: 13px; }
+.picks-chain-legend { margin: 8px 0 0; font-size: 12px; color: var(--ink-soft); line-height: 1.7; }
+/* 链游健康度徽章：健康=绿 / 尚可=琥珀 / 危险=红；不新增卡片专属布局 */
+.pick-health-row { margin: 0 0 10px; }
+.pick-health {
+  display: inline-block; padding: 3px 11px; border-radius: 999px;
+  font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: .08em;
+  border: 1px solid transparent;
+}
+.pick-health-good { color: #137333; background: #E6F4EA; border-color: #CEEAD6; }
+.pick-health-fair { color: #8A5A00; background: #FEF7E0; border-color: #F5E6B8; }
+.pick-health-risk { color: #C5221F; background: #FCE8E6; border-color: #F5D3D0; }
 .pick-card {
   display: flex; flex-direction: column;
   background: var(--surface); border: 1px solid var(--line);

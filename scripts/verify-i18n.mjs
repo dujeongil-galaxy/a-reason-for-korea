@@ -197,17 +197,15 @@ const MOBILE_LINKS = ['apps.apple.com/', 'play.google.com/store/apps/details', '
 
 /* 链游平台（2026-11-23 站长指令）：手游下方第三个游戏子分类，只推荐平台不推荐游戏。
    四个平台各一张标准两栏卡、单个官网按钮；韩语版 note 必须写明南韩(남한) IP 限制 NFT。 */
-const CHAIN_SLUGS = ['one', 'yooldo', 'wemix', 'msu', 'planetarium'];
+const CHAIN_SLUGS = ['one', 'wemix', 'msu', 'planetarium'];
 const CHAIN_IMAGE = {
   one: 'assets/one-chain.jpg',
-  yooldo: 'assets/yooldo-chain.jpg',
   wemix: 'assets/wemix-platform.jpg',
   msu: 'assets/msu-platform.jpg',
   planetarium: 'assets/planetarium-chain.jpg'
 };
 const CHAIN_LINK = {
   one: 'https://to.nexus/',
-  yooldo: 'https://app.yooldo.pro/',
   wemix: 'https://wemixplay.com/',
   msu: 'https://msu.io/',
   planetarium: 'https://www.planetariumlabs.com/'
@@ -216,8 +214,25 @@ const CHAIN_KO_NFT_NOTE = '남한 IP에서는 NFT 접근이 제한될 수 있습
 const CHAIN_CREDIT_ZH = '站长推荐，内容由 AI 生成';
 const CHAIN_RISK_ZH = '区块链项目与虚拟资产价格波动剧烈';
 const CHAIN_RISK_CSS = '.picks-chain-risk';
-/* 链游区第 6 格占位卡：补两列网格的空位，备注行从区级移到卡内 */
-const CHAIN_SOON_IMAGE = 'assets/chain-soon.jpg';
+/* 链游健康度标记（2026-11-23 站长指令）：撤 Yooldo 与占位卡后剩四张，
+   按运营体检结论打标——MSU / Planetarium = 健康，ONE / WEMIX = 尚可。
+   四语逐语锁定，图例说明评级口径。 */
+const CHAIN_HEALTH = { one: 'fair', wemix: 'fair', msu: 'good', planetarium: 'good' };
+const CHAIN_HEALTH_ZH = { good: '健康', fair: '尚可' };
+const CHAIN_HEALTH_CSS = ['.pick-health-good', '.pick-health-fair'];
+const CHAIN_LEGEND_ZH = '标记说明：健康＝运营与数据都在增长';
+/* 逐语锁定：健康徽章与图例必须是真正的译文，不能用通用汉字检测——
+   日文「健全 / まずまず」本身就是汉字词，会被 CJK 正则误判。 */
+const CHAIN_HEALTH_EXPECT = {
+  en: { good: 'Healthy', fair: 'Fair' },
+  jp: { good: '健全', fair: 'まずまず' },
+  ko: { good: '양호', fair: '보통' }
+};
+const CHAIN_LEGEND_EXPECT = {
+  en: 'Badge key: Healthy = operations and metrics are growing',
+  jp: 'バッジの意味：健全＝運用と指標が伸びている',
+  ko: '배지 기준: 양호 = 운영과 지표가 성장 중'
+};
 
 /* 加速器推荐（2026-11-23 站长指令）：链游区下方两个工具卡，带邀请码/口令。
    外星仔 = 50 小时萌新卡（口令 574567，官网 et001.com）；
@@ -435,6 +450,10 @@ function verify(state) {
   if (!/\.picks-chain-risk\s*\{[^}]*border-left:\s*3px solid #C5221F/.test(state.css)) {
     errors.push('css: chain risk warning must carry a red left border');
   }
+  for (const cssCls of CHAIN_HEALTH_CSS) {
+    if (!state.css.includes(cssCls)) errors.push('css: missing health badge style ' + cssCls);
+  }
+  if (!state.css.includes('.picks-chain-legend')) errors.push('css: chain legend style missing');
   for (const link of [...YOUTUBE_DOMAINS, FORBIDDEN_NETFLIX_LINK]) {
     if (source.includes(link)) errors.push('zh: 中文按港区，购买链接 forbidden -> ' + link);
   }
@@ -588,6 +607,11 @@ function verify(state) {
   if (!(zhNodes['picks.chain.credit'] || '').length) errors.push('zh: chain credit note missing');
   if (!source.includes('data-i18n="picks.chain.credit"')) errors.push('zh: chain credit node missing in source');
   if (!source.includes(CHAIN_CREDIT_ZH)) errors.push('zh: chain credit text must be webmaster + AI');
+  if (!source.includes('picks-chain-credit-standalone')) errors.push('zh: chain credit must be a standalone row below the grid');
+  if (!(zhNodes['picks.chain.legend'] || '').length) errors.push('zh: chain health legend missing');
+  if (!source.includes(CHAIN_LEGEND_ZH)) errors.push('zh: chain legend must explain the health badges');
+  if (source.includes('picks.yooldo.') || source.includes('yooldo-chain.jpg')) errors.push('zh: removed Yooldo card must not return');
+  if (source.includes('picks.chain.soon.') || source.includes('chain-soon.jpg')) errors.push('zh: removed coming-soon card must not return');
   for (const slug of CHAIN_SLUGS) {
     const card = source.match(new RegExp('<article class="pick-card">\\s*<p class="pick-card-label" data-i18n="picks\\.' + slug + '\\.label">([\\s\\S]*?)<\\/article>'));
     if (!card) { errors.push('zh: chain card missing -> ' + slug); continue; }
@@ -619,34 +643,16 @@ function verify(state) {
     if (/apps\.apple\.com|play\.google\.com|qoo-app\.com|store\.steampowered/.test(actions)) {
       errors.push('zh: ' + slug + ' chain card must not carry game download buttons');
     }
-  }
-  /* 占位卡：标准两栏、占位图、开发中文案；credit 备注必须在占位卡内而非独立行 */
-  const soonCard = source.match(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.chain\.soon\.label">([\s\S]*?)<\/article>/);
-  if (!soonCard) {
-    errors.push('zh: chain coming-soon placeholder card missing');
-  } else {
-    const soonBody = soonCard[1];
-    if (!soonBody.includes('<div class="pick-poster-row">')) {
-      errors.push('zh: coming-soon card must use standard two-column row');
+    const healthKey = 'picks.' + slug + '.health';
+    if (!(zhNodes[healthKey] || '').length) errors.push('zh: ' + slug + ' chain health badge missing');
+    if ((zhNodes[healthKey] || '') !== CHAIN_HEALTH_ZH[CHAIN_HEALTH[slug]]) {
+      errors.push('zh: ' + slug + ' health badge must read ' + CHAIN_HEALTH_ZH[CHAIN_HEALTH[slug]]);
     }
-    if (/pick-poster-row-feature|pick-card-feature|pick-figure-still/.test(soonBody)) {
-      errors.push('zh: coming-soon card must not carry special layout');
-    }
-    if (!soonBody.includes('class="pick-image pick-image-poster"')) {
-      errors.push('zh: coming-soon card must reuse standard poster image class');
-    }
-    if (!/data-i18n="picks\.chain\.credit"/.test(soonBody)) {
-      errors.push('zh: chain credit note must live inside the coming-soon card');
-    }
-    if (/正在开发|开发中|扩充中/.test(zhNodes['picks.chain.soon.desc'] || '') === false &&
-        !/开发中|扩充中|正在/.test(soonBody)) {
-      errors.push('zh: coming-soon card must say the projects are still in development');
+    const healthCls = 'pick-health-' + CHAIN_HEALTH[slug];
+    if (!body.includes('class="pick-health ' + healthCls + '"')) {
+      errors.push('zh: ' + slug + ' health badge must carry class ' + healthCls);
     }
   }
-  if (!assetRefs(source).includes(CHAIN_SOON_IMAGE)) {
-    errors.push('zh: coming-soon placeholder poster not referenced');
-  }
-  if (!state.soonImage) errors.push('picks: coming-soon poster file missing from assets/');
 
   /* 1d-6. 加速器推荐：链游区下方两个工具卡，口令/邀请码与官网链接锁死 */
   if (!source.includes('id="picks-accelerators"')) errors.push('zh: accelerators anchor missing');
@@ -1131,29 +1137,15 @@ function verify(state) {
     if (!/<strong>/.test(nodes['picks.chain.risk'] || '')) errors.push(lang + ': chain risk warning label must be bold');
     if (!(nodes['picks.chain.credit'] || '').length) errors.push(lang + ': chain credit note missing');
     if (!page.includes('data-i18n="picks.chain.credit"')) errors.push(lang + ': chain credit node missing in page');
-    /* 占位卡：四语节点齐全、占位图引用正确、credit 在占位卡内 */
-    for (const key of ['label', 'title', 'desc', 'imageCredit']) {
-      if (!(nodes['picks.chain.soon.' + key] || '').length) {
-        errors.push(lang + ': coming-soon node missing -> ' + key);
-      }
+    if (!page.includes('picks-chain-credit-standalone')) errors.push(lang + ': chain credit must be a standalone row');
+    if (!(nodes['picks.chain.legend'] || '').length) errors.push(lang + ': chain health legend missing');
+    if (!(nodes['picks.chain.legend'] || '').includes(CHAIN_LEGEND_EXPECT[lang])) {
+      errors.push(lang + ': chain legend must be the locked translation');
     }
-    if (!attrs['picks.chain.soon.imageAlt']) errors.push(lang + ': coming-soon imageAlt missing');
-    if (!assetRefs(page).includes('../' + CHAIN_SOON_IMAGE)) {
-      errors.push(lang + ': coming-soon poster not referenced');
-    }
-    const soonHtml = (page.match(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.chain\.soon\.label">([\s\S]*?)<\/article>/) || [])[1] || '';
-    if (!soonHtml) {
-      errors.push(lang + ': coming-soon placeholder card missing');
-    } else {
-      if (!soonHtml.includes('<div class="pick-poster-row">')) {
-        errors.push(lang + ': coming-soon card must use standard two-column row');
-      }
-      if (!/data-i18n="picks\.chain\.credit"/.test(soonHtml)) {
-        errors.push(lang + ': chain credit note must live inside the coming-soon card');
-      }
-    }
+    if (page.includes('picks.yooldo.') || page.includes('yooldo-chain.jpg')) errors.push(lang + ': removed Yooldo card must not return');
+    if (page.includes('picks.chain.soon.') || page.includes('chain-soon.jpg')) errors.push(lang + ': removed coming-soon card must not return');
     for (const slug of CHAIN_SLUGS) {
-      for (const key of ['label', 'title', 'desc', 'actions', 'note', 'imageCredit']) {
+      for (const key of ['label', 'title', 'desc', 'actions', 'note', 'imageCredit', 'health']) {
         if (!(nodes['picks.' + slug + '.' + key] || '').length) {
           errors.push(lang + ': ' + slug + ' chain node missing -> ' + key);
         }
@@ -1170,6 +1162,13 @@ function verify(state) {
       const cardHtml = (page.match(new RegExp('<article class="pick-card">\\s*<p class="pick-card-label" data-i18n="picks\\.' + slug + '\\.label">([\\s\\S]*?)<\\/article>')) || [])[1] || '';
       if (!cardHtml.includes('<div class="pick-poster-row">')) {
         errors.push(lang + ': ' + slug + ' chain card must use standard two-column row');
+      }
+      if (!cardHtml.includes('class="pick-health pick-health-' + CHAIN_HEALTH[slug] + '"')) {
+        errors.push(lang + ': ' + slug + ' health badge class drifted');
+      }
+      const expectHealth = CHAIN_HEALTH_EXPECT[lang][CHAIN_HEALTH[slug]];
+      if ((nodes['picks.' + slug + '.health'] || '') !== expectHealth) {
+        errors.push(lang + ': ' + slug + ' health badge must read ' + expectHealth);
       }
     }
     if (lang === 'ko' && !(nodes['picks.msu.note'] || '').includes(CHAIN_KO_NFT_NOTE)) {
@@ -1350,7 +1349,6 @@ const state = {
     fs.existsSync(path.join(ROOT, GAME_IMAGE[slug]))])),
   chainImages: Object.fromEntries(CHAIN_SLUGS.map(slug => [slug,
     fs.existsSync(path.join(ROOT, CHAIN_IMAGE[slug]))])),
-  soonImage: fs.existsSync(path.join(ROOT, CHAIN_SOON_IMAGE)),
   accImages: Object.fromEntries(ACC_SLUGS.map(slug => [slug,
     fs.existsSync(path.join(ROOT, ACC_IMAGE[slug]))])),
   sitemap: fs.existsSync(path.join(ROOT, 'sitemap.xml')) ? fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8') : '',
@@ -1854,22 +1852,35 @@ const faults = [
   { name: 'chain fifth card missing from Chinese source', mutate: s => {
     s.source = s.source.replace(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.planetarium\.label">[\s\S]*?<\/article>/, '');
   } },
-  { name: 'coming-soon placeholder card removed from Chinese source', mutate: s => {
-    s.source = s.source.replace(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.chain\.soon\.label">[\s\S]*?<\/article>/, '');
+  { name: 'health badge removed from Chinese source', mutate: s => {
+    s.source = s.source.replace(/<span class="pick-health pick-health-\w+" data-i18n="picks\.one\.health">[^<]*<\/span>/, '');
   } },
-  { name: 'coming-soon poster marked missing', mutate: s => {
-    s.soonImage = false;
+  { name: 'health badge class downgraded good to fair', mutate: s => {
+    s.source = s.source.replace('class="pick-health pick-health-good" data-i18n="picks.msu.health"', 'class="pick-health pick-health-fair" data-i18n="picks.msu.health"');
   } },
-  { name: 'chain credit note moved out of coming-soon card', mutate: s => {
-    const creditNode = '      <p class="pick-note picks-chain-credit" data-i18n="picks.chain.credit">站长推荐，内容由 AI 生成</p>\n';
-    s.source = s.source.replace(creditNode, '');
-    s.source = s.source.replace('      </div>\n\n      <p class="picks-subhead picks-subhead-platform"',
-                                '      </div>\n' + creditNode + '\n      <p class="picks-subhead picks-subhead-platform"');
+  { name: 'health badge text drifted in Chinese source', mutate: s => {
+    s.source = s.source.replace('data-i18n="picks.msu.health">健康<', 'data-i18n="picks.msu.health">尚可<');
   } },
-  { name: 'coming-soon dev wording scrubbed', mutate: s => {
-    s.source = s.source.split('更多项目 · 正在开发中').join('更多项目');
-    s.dict.en.html['picks.chain.soon.desc'] = 'A short note.';
-    s.dict.jp.html['picks.chain.soon.label'] = '近日公開';
+  { name: 'health legend removed from Chinese source', mutate: s => {
+    s.source = s.source.replace(/<p class="picks-chain-legend"[^>]*>[^<]*<\/p>/, '');
+  } },
+  { name: 'health legend left untranslated in English', mutate: s => {
+    s.dict.en.html['picks.chain.legend'] = '标记说明：健康';
+  } },
+  { name: 'health badge left untranslated in English', mutate: s => {
+    s.dict.en.html['picks.msu.health'] = '健康';
+  } },
+  { name: 'health badge node deleted from Japanese dict', mutate: s => {
+    delete s.dict.jp.html['picks.planetarium.health'];
+  } },
+  { name: 'Yooldo card reintroduced into Chinese source', mutate: s => {
+    s.source = s.source.replace('id="picks-chain-games"', 'id="picks-chain-games" data-yooldo="picks.yooldo.label"');
+  } },
+  { name: 'coming-soon card reintroduced into English page', mutate: s => {
+    s.pages.en = s.pages.en.replace('id="picks-chain-games"', 'id="picks-chain-games" data-soon="picks.chain.soon.label"');
+  } },
+  { name: 'health badge green style stripped', mutate: s => {
+    s.css = s.css.replace('.pick-health-good', '.pick-health-nogood');
   } },
   { name: 'Korean NFT restriction note reverted to generic', mutate: s => {
     s.dict.ko.html['picks.msu.note'] = '플랫폼만 소개하며 개별 게임은 다루지 않습니다.';
