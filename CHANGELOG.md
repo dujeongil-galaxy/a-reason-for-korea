@@ -2,6 +2,14 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-23 · 端游区按发行时间降序重排为 6 款
+
+- `543afe6` — 站长指令「端游区新增 2 个，按发行时间最新的靠前」。用 Steam 官方 `store.steampowered.com/api/appdetails` 核实发行日与开发商：app/2373990《我独自升级：起立·觉醒》Netmarble Neo / Netmarble、2025-11-24；app/1254120《神佑释放 Bless Unleashed》VALOFE、2021-08-06（用户给的链接标题写「神网释放」，以 Steam 官方名「神佑释放」为准，链接原样保留）。
+- **重排**：端游区从 4 卡扩到 6 卡，按发行日降序——我独自升级 2025 → 剑星 2024 → Lies of P 2023 → 神佑释放 2021 → 永恒轮回 2020 → PUBG 2017。此前顺序（2023/2024/2017/2020）本就是乱的，一并理顺。两款新卡沿用标准两栏海报结构，单 Steam 按钮；两张 Steam 官方头图转码为 460×215 JPEG。
+- **四语**：`assets/i18n.js` 为两款新卡补齐 en/jp/ko 的 label / imageCredit / title / desc / actions / note 与四语 imageAlt（zh 只补 attr，html 在源页面），共 44 行键。generated 三语页面已重建。
+- **校验**：`PC_GAME_SLUGS` / `GAME_IMAGE` 加入两款新卡；新增 `PC_GAME_YEAR` 年份映射 + 源页面 label 出现顺序与降序双重断言；故障注入新增 4 组（卡序颠倒、新卡删除、Steam 链接被换、海报文件缺失）。`VERIFY OK` **240 节点 / 33 属性 / 4 语言**，自检 **172/172**（此前 228/31/168）。
+- **验收**：Edge headless + CDP 四语桌面 + 390px 移动共 8 组 56 项断言全过——六卡顺序一致、年份降序、6 张海报加载、6 个 Steam 链接、标准两栏、无横向溢出。截图 `D:/WorkBuddy-Cache/shots/arg-pc/`。
+
 ## 2026-11-23 · 撤 Yooldo 与占位卡，链游区定 4 卡 + 健康度徽章
 
 - `836e946` — 上一轮体检结论落地：Yooldo 代币 5 月单日暴跌约 93%、原团队 Catze Labs 停更、被秃鹫基金接管且第三方评级 4.2/10「Avoid」，判定「危险」→ 撤卡；站长确认「占位的那个一起撤」，链游区从 5 卡 + 占位卡收敛为 **ONE → WEMIX → MSU → Planetarium 四张**，正好铺满两列网格，无空格。
