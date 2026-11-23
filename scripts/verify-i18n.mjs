@@ -180,19 +180,25 @@ const MUSIC_YTNOTE = {
 /* 游戏区（2026-11-23 站长指令）：端游 4 款（Steam 商店页链接）+ 手游 2 款
    （棕色尘埃 / NIKKE，各挂 App Store + Google Play + QooApp）。
    端游/手游拆成两个锚点两个子标题；六张卡全部沿用剧集卡标准两栏结构。 */
-const PC_GAME_SLUGS = ['liesofp', 'stellarblade', 'pubg', 'eternalreturn'];
+const PC_GAME_SLUGS = ['sololeveling', 'stellarblade', 'liesofp', 'blessunleashed', 'eternalreturn', 'pubg'];
 const MOBILE_GAME_SLUGS = ['browndust', 'nikke'];
 const GAME_SLUGS = [...PC_GAME_SLUGS, ...MOBILE_GAME_SLUGS];
 const GAME_IMAGE = {
+  sololeveling: 'assets/sololeveling-poster.jpg',
+  stellarblade: 'assets/stellarblade-poster.jpg',
   liesofp: 'assets/liesofp-poster.jpg',
   stellarblade: 'assets/stellarblade-poster.jpg',
   pubg: 'assets/pubg-poster.jpg',
+  blessunleashed: 'assets/blessunleashed-poster.jpg',
   eternalreturn: 'assets/eternalreturn-poster.jpg',
   browndust: 'assets/browndust-poster.jpg',
   nikke: 'assets/nikke-poster.jpg'
 };
 /* 端游唯一商店 = Steam；手游三通道必须齐全（App Store / Google Play / QooApp） */
 const STEAM_LINK = 'store.steampowered.com/app/';
+/* 端游发行年份（按 Steam 商店页 release date），用于校验「最新靠前」的排序 */
+const PC_GAME_YEAR = { sololeveling: 2025, stellarblade: 2024, liesofp: 2023,
+  blessunleashed: 2021, eternalreturn: 2020, pubg: 2017 };
 const MOBILE_LINKS = ['apps.apple.com/', 'play.google.com/store/apps/details', 'qoo-app.com/'];
 
 /* 链游平台（2026-11-23 站长指令）：手游下方第三个游戏子分类，只推荐平台不推荐游戏。
@@ -554,6 +560,20 @@ function verify(state) {
   if (!source.includes('id="picks-mobile-games"')) errors.push('zh: mobile games anchor missing');
   if (!source.includes('data-i18n="nav.picks.game.pc"')) errors.push('zh: PC games subhead missing');
   if (!source.includes('data-i18n="nav.picks.game.mobile"')) errors.push('zh: mobile games subhead missing');
+  /* 端游必须按发行时间降序：从源 HTML 抽取 .label 节点出现顺序比对 */
+  const pcLabelOrder = [];
+  for (const m of source.matchAll(/data-i18n="picks\.([a-z]+)\.label"/g)) {
+    if (PC_GAME_SLUGS.includes(m[1])) pcLabelOrder.push(m[1]);
+  }
+  if (pcLabelOrder.join(',') !== PC_GAME_SLUGS.join(',')) {
+    errors.push('zh: PC games not in release-date descending order -> ' + pcLabelOrder.join(','));
+  }
+  for (let oi = 1; oi < PC_GAME_SLUGS.length; oi++) {
+    const prev = PC_GAME_SLUGS[oi - 1], cur = PC_GAME_SLUGS[oi];
+    if (!(PC_GAME_YEAR[prev] > PC_GAME_YEAR[cur])) {
+      errors.push('pc order year invalid: ' + prev + ' -> ' + cur);
+    }
+  }
   for (const slug of GAME_SLUGS) {
     const card = source.match(new RegExp('<article class="pick-card">\\s*<p class="pick-card-label" data-i18n="picks\\.' + slug + '\\.label">([\\s\\S]*?)<\\/article>'));
     if (!card) {
@@ -1782,6 +1802,18 @@ const faults = [
   { name: 'game card missing from Chinese source', mutate: s => {
     s.source = s.source.replace(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.nikke\.label">[\s\S]*?<\/article>/, '');
   } },
+  { name: 'PC games order reversed (newest not first)', mutate: s => {
+    s.source = s.source.replace(
+      /(<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.sololeveling\.label">[\s\S]*?<\/article>)(\s*)(<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.stellarblade\.label">[\s\S]*?<\/article>)/,
+      '$3$2$1');
+  } },
+  { name: 'new PC game card removed from Chinese source', mutate: s => {
+    s.source = s.source.replace(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.blessunleashed\.label">[\s\S]*?<\/article>/, '');
+  } },
+  { name: 'new PC game Steam link stripped', mutate: s => {
+    s.dict.en.html['picks.sololeveling.actions'] = '<a class="pick-link pick-link-featured" href="https://example.com/">Steam</a>';
+  } },
+  { name: 'new PC game poster marked missing', mutate: s => { s.gameImages.blessunleashed = false; } },
   { name: 'game poster asset marked missing', mutate: s => { s.gameImages.liesofp = false; } },
   { name: 'game poster reference stripped', mutate: s => {
     s.source = s.source.replace('src="assets/browndust-poster.jpg"', '');
