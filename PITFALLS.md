@@ -252,3 +252,11 @@
 - **规则**：凡是改中文源内容的故障注入，必须操作 `s.source`（即 `index.html` 的字符串），不能操作 `s.dict.zh.html`。例如「中文页 MV 按钮换成 YouTube」应写 `s.source = s.source.replace(QQ_MV_LINK, YT_MV_LINK_WATCH)`。
 - **为什么主流程能过**：`verify()` function 里对 zh 的检查都是读 `s.source` 和 `zhNodes`（从 source 提取的节点），不碰 `s.dict.zh.html`；只有故障注入的 `mutate` 函数会写它，所以主流程 VERIFY OK、注入阶段才崩。
 - **计数**：111 → **122/122**（新增 11 组音乐卡专属注入）。
+
+## 35. 整块替换推荐卡别用全文精确串，锚定 data-i18n label
+
+- **现象**：把 WEMIX 链游卡换成 MIR4 卡，脚本用「整段 article HTML 精确字符串」做 `replace`，报 `MISS wemix card`，一处没改。
+- **原因**：手写精确串与源文件在换行、空格、属性顺序上只要差一个字符就匹配不上；卡片越多、改动间隔越久越容易漂。
+- **规则**：定位整块 `<article class="pick-card">` 用稳定的 `data-i18n="picks.<slug>.label"` 作锚点写正则，整块吞到 `</article>` 再替换/删除；改完 `grep` 确认旧 slug 在 `index.html` 和 `assets/i18n.js` 里都归零。
+- **配套**：删卡必须同批清四语字典键、旧图、verify 的 `*_SLUGS`/`*_IMAGE`/`*_LINK` 和故障注入引用，否则会留下「字典有键但页面无节点」或「图还在但卡没了」的漂移，校验会判红。
+- **计数**：链游从 4 平台收敛为 MIR4 + MSU，节点 221 → 209，自检仍 **149/149**；四语桌面 + 390px 移动截图确认无旧卡残留。

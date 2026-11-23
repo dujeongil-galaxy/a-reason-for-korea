@@ -2,6 +2,43 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-23 · 链游区收敛为 MIR4 + MSU（移除 WEMIX / MARBLEX / ONECHAIN）
+
+- `45e8536` — 站长决定「只保留 wemixplay 和 msu，算了，wemixplay 也替换成 mir4 吧 传奇4」「删掉 MARBLEX」。
+  - 链游区从四平台收敛为两张具体推荐：MIR4（传奇4，WEMADE，官网 `https://mir4global.com/?lang=cn`）+ MapleStory Universe（`https://msu.io/`）；删除 WEMIX PLAY / MARBLEX / ONECHAIN NEXUS 三张卡及其四语字典键，删掉三张旧主视觉，`assets/mir4-platform.jpg`（官方 og 图转码 1280×720）入库。
+  - 四语卡文案保留链上经济 / NFT 风险提示；英文 / 日文 / 韩文 MSU note 仍锁定「南韩（남한）IP 访问 NFT 受限」（中文面不出现，中文读者不在该限制区）。
+  - `CHAIN_SLUGS` 改为 `['mir4','msu']`，`CHAIN_IMAGE` / `CHAIN_LINK` 同步；故障注入里的 wemix / marblex / onechain 引用全部改成 mir4。
+  - 构建 209 节点；`VERIFY OK` + **149/149** 自检全过；zh / en / jp / ko 桌面与 390px 移动 CDP 截图验收通过（两卡完整、无旧内容残留、无溢出）。
+  - 踩坑见 PITFALLS 35（精确整块字符串替换失败，改用 data-i18n label 正则定位 article）。
+
+## 2026-11-23 · 棕色尘埃2 更正 + 新增加速器推荐区
+
+- `d785b76` — 站长更正「棕色尘埃不对，准确说是棕色尘埃2」，并要求链游下方新增加速器推荐（带口令 / 邀请码）。
+  - 手游卡 Brave Nine → Brown Dust 2：四语文案、三通道下载链接（App Store `id6450099588` / Google Play `com.neowizgames.game.browndust2` / QooApp `22741`）、Google Play feature graphic 转码覆盖 `assets/browndust-poster.jpg`；保留 `picks.browndust.*` slug 与文件名，避免连带改校验键。
+  - 加速区两张卡：外星仔（口令 `574567`，50 小时萌新卡，`https://www.et001.com/`）、给梨（邀请码 `9ydA8H`，120 小时 SVIP，`https://www.geilijiasu.com/fission/accept?inviteCode=9ydA8H`）；新增 `picks.accelerator.notice` 风险声明 + `nav.picks.game.accelerator` 导航键，两张官方品牌图本地化。
+  - 校验新增加速器断言 + 8 组故障注入；构建 221 节点、**149/149** 自检全过；四语桌面 + 390px 移动真渲染验收通过。
+  - 踩坑：英文 `webmaster's` 与 `'574567'` 的单引号破坏 JS 字符串，改成无撇号写法；故障注入只删第一处 `574567` 会漏掉正文 `<strong>` 里的第二处，改为 `split().join()` 全删。
+
+## 2026-11-23 · 游戏板块新增链游平台区
+
+- `acfc271` — 站长给出四个平台并要求「手游下方新增链游（注意仍属于游戏板块），仅推荐平台」。
+  - 四个平台单官网按钮卡：WEMIX PLAY / MARBLEX / ONECHAIN NEXUS / MapleStory Universe；官方主视觉转码 1280×720，四语 alt / 来源说明齐备。
+  - 韩文 MSU note 明确「남한 IP 限制访问 NFT」（站长要求写「南韩」而非普通「韩国」）；校验锁定该提示。
+  - 构建 207 节点、142/142 自检全过；四语桌面 + 移动验收通过。该区的四平台后续在 `45e8536` 收敛为 MIR4 + MSU。
+
+## 2026-11-23 · 游戏区落地端游 / 手游两分类
+
+- `7c459a2` — 站长给出四款端游 Steam 链接，要求游戏区做端游 / 手游分类，手游要 App Store + Google Play + QooApp。
+  - 端游 4 款：Lies of P / 剑星 / PUBG / 永恒轮回，各挂 Steam；手游 2 款：棕色尘埃 / NIKKE，各挂三通道下载。六张官方海报本地化（Steam 头图 / Google Play 宣传图，ffmpeg 转 1280×720 JPEG）。
+  - 导航锚点 `#picks-games` 拆为 `#picks-pc-games` / `#picks-mobile-games`；旧游戏占位与 `picks.coming` 键同步撤销。
+  - 校验新增游戏区断言 + 12 组故障注入；构建 181 节点、131/131 自检全过；桌面 + 移动真渲染验收通过。
+
+## 2026-11-22 · 1theK 卡按区挂链，每语只留一个按钮
+
+- `06488a4` — 站长纠正「这个页面你只做中文按钮就可以了啊……别搞这么多按钮出来」。
+  - `picks.1thek.actions` 每语只保留一个对应语言站按钮：zh `/china/`、en `/english/`、jp `/japan/`、ko `/`（此前一张卡挂了多语按钮）。
+  - 构建 144 节点、122/122 自检全过。
+
 ## 2026-11-22 · 音乐区加入任昌丁《请开门》MV 卡（大陆 QQ / 外文 YouTube）
 
 - `62a7c29` — 站长说「音乐区域先加一下这个吧」，给了 QQ 音乐 MV 链接（大陆）和 YouTube MV 链接（其他区域）。
