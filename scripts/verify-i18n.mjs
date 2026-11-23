@@ -180,14 +180,13 @@ const MUSIC_YTNOTE = {
 /* 游戏区（2026-11-23 站长指令）：端游 4 款（Steam 商店页链接）+ 手游 2 款
    （棕色尘埃 / NIKKE，各挂 App Store + Google Play + QooApp）。
    端游/手游拆成两个锚点两个子标题；六张卡全部沿用剧集卡标准两栏结构。 */
-const PC_GAME_SLUGS = ['sololeveling', 'stellarblade', 'liesofp', 'rbeat', 'blessunleashed', 'eternalreturn', 'pubg'];
+const PC_GAME_SLUGS = ['sololeveling', 'stellarblade', 'liesofp', 'blessunleashed', 'eternalreturn', 'pubg'];
 const MOBILE_GAME_SLUGS = ['browndust', 'nikke'];
 const GAME_SLUGS = [...PC_GAME_SLUGS, ...MOBILE_GAME_SLUGS];
 const GAME_IMAGE = {
   sololeveling: 'assets/sololeveling-poster.jpg',
   stellarblade: 'assets/stellarblade-poster.jpg',
   liesofp: 'assets/liesofp-poster.jpg',
-  rbeat: 'assets/rbeat-poster.jpg',
   stellarblade: 'assets/stellarblade-poster.jpg',
   pubg: 'assets/pubg-poster.jpg',
   blessunleashed: 'assets/blessunleashed-poster.jpg',
@@ -199,7 +198,7 @@ const GAME_IMAGE = {
 const STEAM_LINK = 'store.steampowered.com/app/';
 /* 端游发行年份（按 Steam 商店页 release date），用于校验「最新靠前」的排序 */
 const PC_GAME_YEAR = { sololeveling: 2025, stellarblade: 2024, liesofp: 2023,
-  rbeat: 2022, blessunleashed: 2021, eternalreturn: 2020, pubg: 2017 };
+  blessunleashed: 2021, eternalreturn: 2020, pubg: 2017 };
 
 /* 端游主机商店地区规则（站长 2026-11-23 定为长期规则）：
    zh=港区 / en=美区 / jp=日区 / ko=韩区。PS 用 concept 页（ID 跨区通用），
@@ -215,7 +214,6 @@ const PC_PLATFORM = {
   sololeveling:   { ps: '10018442', xb: 'solo-levelingarise-overdrive/9MVHCQ7CJX01' },
   stellarblade:   { ps: '10006891', xb: null },
   liesofp:        { ps: '10006052', xb: 'lies-of-p/9PCM4CMTPPGC' },
-  rbeat:         { ps: null, xb: null },
   blessunleashed: { ps: null, xb: null },
   eternalreturn:  { ps: null, xb: null },
   pubg:           { ps: '232860', xb: 'pubg-battlegrounds/C0MN5DN8KR3F' }
@@ -1396,7 +1394,7 @@ function verify(state) {
      这些卡只在中文源页出现，build-i18n.mjs 生成 en/jp/ko 时整块剔除。
      不变量：① 卡内不得含任何 data-i18n（否则四语键位一致校验会失败）；
      ② 生成页里绝不能残留 data-zh-only 标记或该卡内容。 */
-  const ZH_ONLY_GAMES = ['泡泡堂', '跑跑卡丁车', '劲舞团'];
+  const ZH_ONLY_GAMES = ['泡泡堂', '跑跑卡丁车', '劲舞团', '音速觉醒'];
   const zhOnlyCards = (state.source.match(/<article class="pick-card" data-zh-only>[\s\S]*?<\/article>/g) || []);
   if (zhOnlyCards.length !== ZH_ONLY_GAMES.length) {
     errors.push('zh-only: 仅中文卡数量应为 ' + ZH_ONLY_GAMES.length + '，实际 ' + zhOnlyCards.length);
