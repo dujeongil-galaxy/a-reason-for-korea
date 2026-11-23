@@ -2,6 +2,15 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-23 · 端游卡加 PlayStation / Xbox 按钮（四语按地区挂链接）
+
+- `f44ce23` — 站长指令「端游板块把 PlayStation 和 Xbox 的也挂一下，中文用港区、英文美区、日语日区、韩语韩区，以后都这个规则」。**这条地区规则是长期约定**，已写入项目 `.workbuddy/memory/MEMORY.md` 与用户级记忆。
+- **地区映射**：zh=港区（PS `zh-hant-hk` / Xbox `zh-HK`）、en=美区（`en-us` / `en-US`）、jp=日区（`ja-jp` / `ja-JP`）、ko=韩区（`ko-kr` / `ko-KR`）。PS 前缀全小写、Xbox 首字母大写，写错即 404。
+- **链接形式（关键）**：PS 商品 ID 按地区绑定、跨区失效，**改用 concept 页**（concept ID 跨区通用，`/{地区}/concept/{ID}` 自动落该地区 SKU）；Xbox 商品 ID 跨区通用，只换前缀。逐个 curl 验证 6 个 PS concept + 3 个 Xbox 商品页在四语地区均 200 且命中游戏名。
+- **平台例外**：剑星无 Xbox 版（截至 2026-11 仍 PS/PC/Switch2，跳过 Xbox）；神佑释放 PS/Xbox 主机服 2022-11-30 已停服；永恒轮回 PC only（Xbox 页是 2021 遗留占位、从未正式发售）。这三张按实际可用性挂按钮——前两张里的神佑释放/永恒轮回只有 Steam，剑星 Steam + PS。三款有全平台的（我独自升级/Lies of P/PUBG）挂 Steam + PS + Xbox 三按钮。Steam 保持橙色主按钮，PS/Xbox 用 secondary 样式（复用既有 `.pick-link-secondary`，无新 CSS）。
+- **校验**：新增 `REGION_LOCALE` / `PC_PLATFORM` / `PS_BASE` / `XB_BASE` 常量；四语逐语断言每张卡的平台按钮组合、地区前缀正确、串区检测（其他三地区前缀泄露即判红）、无平台卡不得挂按钮；新增 4 组故障注入（地区前缀错、串区泄露、无 PS 版本卡强挂 PS、有 PS 版本卡漏挂）。`VERIFY OK` **240 节点 / 33 属性 / 4 语言**，自检 **176/176**（上一轮 172）。
+- **验收**：Edge headless + CDP 四语各 6 张卡共 124 项断言全过——按钮组合、地区前缀、无串区泄露全部正确；肉眼看中文页确认 Steam 橙色高亮 + PlayStation + Xbox 竖排整齐。截图 `D:/WorkBuddy-Cache/shots/arg-plat/`。
+
 ## 2026-11-23 · 端游区按发行时间降序重排为 6 款
 
 - `543afe6` — 站长指令「端游区新增 2 个，按发行时间最新的靠前」。用 Steam 官方 `store.steampowered.com/api/appdetails` 核实发行日与开发商：app/2373990《我独自升级：起立·觉醒》Netmarble Neo / Netmarble、2025-11-24；app/1254120《神佑释放 Bless Unleashed》VALOFE、2021-08-06（用户给的链接标题写「神网释放」，以 Steam 官方名「神佑释放」为准，链接原样保留）。

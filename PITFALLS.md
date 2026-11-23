@@ -308,3 +308,17 @@
 - **规则**：定位 HTML 区块结尾要用**后继兄弟锚点反查**——先 `s.index(下一个兄弟标题, start)`，再在其之前 `s.rindex('      </div>'+NL, start, next_sibling)`；不要用裸 `index()` 找通用闭合标签。替换后立刻做结构断言（`<article>` 开合计数、label 计数、div 开合计数）确认没有残片。
 - **另**：`git checkout -- file` 会按仓库的 autocrlf 设置恢复 CRLF，重建脚本必须**自动探测**原文件换行符（`raw.count('\r\n') > raw.count('\n')-raw.count('\r\n')`），不能硬编码 `'\n'`，否则写回后混用换行。
 - **另**：CDP 截图验收懒加载图片（`loading="lazy"`）必须先滚动全页触发加载再等 ≥1.5s；900ms 在 390px 移动端不够，桌面 1200ms 够。`/json/new` 在新版 Edge 需要 PUT 方法且返回 JSON，`/json/close` 返回纯文本 `Target is closing`，解析要容错。
+
+## 42. PlayStation 商品 ID 跨地区失效，四语站必须挂 concept 页
+
+- **现象**：想给四语站按地区挂 PS 商品页，先取 Lies of P 美区 `product/UP1685-PPSA10261_...`，把前缀换成 `zh-hant-hk` / `ja-jp` / `ko-kr`——HTTP 虽 200，页面标题变成「最新/Latest」，游戏名 0 次命中，等于挂了个无效页。
+- **原因**：PS 的 `product/{ID}` 商品 ID 是**按地区绑定**的 SKU，同一个游戏在各地区 ID 不同；Xbox 反过来，商品 ID 是全局的、跨区通用。两者不一样，不能套同一套模板。
+- **规则**：四语/多地区站挂 PS 链接一律用 **concept 主概念页** `store.playstation.com/{地区}/concept/{ID}`——concept ID 跨地区通用，换前缀会自动落到该地区正确 SKU。Xbox 用 `www.xbox.com/{地区}/games/store/{slug}/{ID}` 换前缀即可。
+- **地区前缀大小写**：PS 全小写 `zh-hant-hk` / `en-us` / `ja-jp` / `ko-kr`；Xbox 首字母大写 `zh-HK` / `en-US` / `ja-JP` / `ko-KR`，写错 Xbox 404。
+- **验收**：6 个 PS concept + 3 个 Xbox 商品页 × 四地区逐个 curl，查 200 **且**页面标题/HTML 命中游戏名（只查状态码不够，失效页也返回 200）。
+
+## 43. 故障注入写错正则导致「self-test missed」，不能当成校验漏检
+
+- **现象**：新增「有 PS 版本的卡漏挂 PS 按钮」故障注入，self-test 报 `175/176 missed`。正则 `/href="https:////store/.playstation/.com[^"]*">PlayStation<//a>/` 漏了 `target="_blank" rel="noopener noreferrer"`，实际锚点里 `">` 不紧跟 URL，正则没匹配 → mutate 什么都没改 → 校验当然不报错。
+- **规则**：`mutate` 必须**自证真的改到了**——注入后对比 mutate 前后 state 是否不同（或断言目标子串存在），否则「missed」可能只是注入本身是空操作。修法：用完整精确锚点字符串替换（含 target/rel），并同时改 `s.dict[lang].html[key]` 与 `s.pages[lang]`，让节点同步检查不抢先报错，确保判红来自目标断言本身。
+- **另**：四语页校验读的是 `s.pages[lang]` 提取的 `nodes`，不是 `s.dict`；只改 dict 会被 `node out of sync` 先拦下，测不到目标断言。故障注入要改对数据流。
