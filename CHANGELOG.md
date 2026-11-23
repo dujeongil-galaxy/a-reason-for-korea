@@ -2,6 +2,15 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-23 · 撤 Yooldo 与占位卡，链游区定 4 卡 + 健康度徽章
+
+- `836e946` — 上一轮体检结论落地：Yooldo 代币 5 月单日暴跌约 93%、原团队 Catze Labs 停更、被秃鹫基金接管且第三方评级 4.2/10「Avoid」，判定「危险」→ 撤卡；站长确认「占位的那个一起撤」，链游区从 5 卡 + 占位卡收敛为 **ONE → WEMIX → MSU → Planetarium 四张**，正好铺满两列网格，无空格。
+- **健康度标记**：按体检结论给每张卡的标题上方加徽章——ONE / WEMIX = **尚可**（琥珀），MSU / Planetarium = **健康**（绿）；「危险」档 Yooldo 已撤故四卡无红档，但 CSS 保留 `.pick-health-risk`（防未来回退）。徽章文案逐语锁定：zh「健康/尚可」、en「Healthy/Fair」、jp「健全/まずまず」、ko「양호/보통」，均为自然译文，未照搬站长措辞。
+- **图例说明**：底部新增 `picks.chain.legend` 独立行解释评级口径——zh「标记说明：健康＝运营与数据都在增长；尚可＝仍在运营，但有明显隐忧。评级依据公开信息，仅供参考。」，四语自然句。`picks.chain.credit`（站长推荐，内容由 AI 生成）从原占位卡内移回网格下方独立行（`.picks-chain-credit-standalone`），保持加粗。
+- **资源清理**：`git rm assets/yooldo-chain.jpg` 与 `assets/chain-soon.jpg`；四语字典删除全部 `picks.yooldo.*` / `picks.chain.soon.*` 键（attr + html 共 38 行）。
+- **校验**：`CHAIN_SLUGS` 从 5 去 yooldo，`CHAIN_HEALTH` / `CHAIN_HEALTH_ZH` / `CHAIN_HEALTH_EXPECT` / `CHAIN_LEGEND_ZH` / `CHAIN_LEGEND_EXPECT` 常量 + 四语逐语锁定断言 + 徽章 class 断言 + 图例断言 + 旧卡残留断言 + CSS 颜色断言；删占位卡相关断言与 4 组故障注入，新增 10 组健康徽章故障注入。`VERIFY OK` **228 节点 / 31 属性 / 4 语言**，自检 **168/168**（此前 233/33/162，因删卡减少、加徽章图例增加）。
+- **验收**：Edge headless + CDP 四语桌面 + 390px 移动共 8 组截图与 DOM 断言全过——四卡数=4、徽章文案/颜色正确（尚可 rgb(138,90,0) / 健康 rgb(19,115,51)）、无 Yooldo/占位残留、credit 独立行、图例行齐全、无横向溢出。截图 `D:/WorkBuddy-Cache/shots/arg-health/`。
+
 ## 2026-11-23 · 链游区加区块链高风险提示（四语红字警示条）
 
 - `67308e8` — 站长要求提醒访客「区块链属高风险投资、请量力而行」，并强调整句自己写、不照搬其措辞与写作风格。在链游区说明行下方、`#picks-chain-games` 网格上方新增 `picks.chain.risk` 警示条：中「风险提示：区块链项目与虚拟资产价格波动剧烈，投入前请先确认自己能够承受相应损失，按自身财力谨慎参与。」；en/jp/ko 各写自然完整句（含 <strong> 加粗前缀），覆盖「高波动 + 量力而行」两层意思，未照抄原话标签式表达。
