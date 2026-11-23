@@ -2,6 +2,13 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-23 · 加速器正文内联超链接改红色加粗
+
+- `a7f61d4` — 站长发截图要求「超链接，文字改用红色加粗」：指加速器两卡正文里的内联链接（外星仔「外星仔加速器 PC 端」/ 给梨「专属邀请链接」），原为继承 `--ink-soft` 的墨色，看不出是链接。
+  - 实质确认：全站只有这两处正文段落含内联 `<a>`（四语各两处，其余卡片正文无链接），故一条 `.pick-desc a { font-weight: 700; color: #C5221F; }` 精确命中、四语同步，不改 HTML / i18n、不动按钮样式。
+  - **坑**：属性顺序要与已存在的 `.pick-netflix-note { color:#C5221F; font-weight:700 }` 相反（写成 `font-weight` 在前），否则校验里 Netflix 红字那条故障注入 `replace('color: #C5221F; font-weight: 700;', ...)` 会连同新规则一起改，自检对不上。
+  - 校验新增 `pick-desc a` 红加粗断言 + 1 组故障注入，149 → **150/150**；zh/en/jp/ko 桌面 + 390px 移动真渲染截图确认链接红加粗、正文其余墨色、按钮未误伤、无溢出。截图 `D:/WorkBuddy-Cache/shots/arg-acc-red/`。
+
 ## 2026-11-23 · 链游区收敛为 MIR4 + MSU（移除 WEMIX / MARBLEX / ONECHAIN）
 
 - `45e8536` — 站长决定「只保留 wemixplay 和 msu，算了，wemixplay 也替换成 mir4 吧 传奇4」「删掉 MARBLEX」。

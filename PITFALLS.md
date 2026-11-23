@@ -260,3 +260,9 @@
 - **规则**：定位整块 `<article class="pick-card">` 用稳定的 `data-i18n="picks.<slug>.label"` 作锚点写正则，整块吞到 `</article>` 再替换/删除；改完 `grep` 确认旧 slug 在 `index.html` 和 `assets/i18n.js` 里都归零。
 - **配套**：删卡必须同批清四语字典键、旧图、verify 的 `*_SLUGS`/`*_IMAGE`/`*_LINK` 和故障注入引用，否则会留下「字典有键但页面无节点」或「图还在但卡没了」的漂移，校验会判红。
 - **计数**：链游从 4 平台收敛为 MIR4 + MSU，节点 221 → 209，自检仍 **149/149**；四语桌面 + 390px 移动截图确认无旧卡残留。
+
+## 36. 新增同色 CSS 规则时，属性顺序别和已有故障注入的 replace 串撞车
+
+- **现象**：给正文内联链接加 `.pick-desc a { color:#C5221F; font-weight:700 }`，与已有的 `.pick-netflix-note { color:#C5221F; font-weight:700 }` 写法完全一致。校验里 Netflix 那条故障注入是 `s.css.replace('color: #C5221F; font-weight: 700;', ...)`，会同时命中两处（或命中错处），自检计数对不上。
+- **规则**：新增同属性组合的规则时，把属性顺序写反（如 `font-weight:700; color:#C5221F`），让精确字符串替换只命中原目标；断言用正则 `\{[^}]*font-weight[^}]*color[^}]*\}` 不依赖顺序。
+- **验收**：新增规则自带的故障注入必须能从 149 → 150 且全过；真浏览器截图确认新规则生效、原 Netflix 红字不受影响。
