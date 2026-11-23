@@ -214,6 +214,8 @@ const CHAIN_LINK = {
 };
 const CHAIN_KO_NFT_NOTE = '남한 IP에서는 NFT 접근이 제한될 수 있습니다.';
 const CHAIN_CREDIT_ZH = '站长推荐，内容由 AI 生成';
+const CHAIN_RISK_ZH = '区块链项目与虚拟资产价格波动剧烈';
+const CHAIN_RISK_CSS = '.picks-chain-risk';
 /* 链游区第 6 格占位卡：补两列网格的空位，备注行从区级移到卡内 */
 const CHAIN_SOON_IMAGE = 'assets/chain-soon.jpg';
 
@@ -427,6 +429,12 @@ function verify(state) {
   if (!/\.picks-chain-credit\s*\{[^}]*font-weight:\s*700/.test(state.css)) {
     errors.push('css: chain credit note must be bold');
   }
+  if (!/\.picks-chain-risk\s*\{[^}]*color:\s*#C5221F[^}]*font-weight:\s*700/.test(state.css)) {
+    errors.push('css: chain risk warning must be red and bold');
+  }
+  if (!/\.picks-chain-risk\s*\{[^}]*border-left:\s*3px solid #C5221F/.test(state.css)) {
+    errors.push('css: chain risk warning must carry a red left border');
+  }
   for (const link of [...YOUTUBE_DOMAINS, FORBIDDEN_NETFLIX_LINK]) {
     if (source.includes(link)) errors.push('zh: 中文按港区，购买链接 forbidden -> ' + link);
   }
@@ -573,6 +581,10 @@ function verify(state) {
   if (!source.includes('id="picks-chain-games"')) errors.push('zh: chain platforms anchor missing');
   if (!source.includes('data-i18n="nav.picks.game.chain"')) errors.push('zh: chain platforms subhead missing');
   if (!(zhNodes['picks.chain.notice'] || '').length) errors.push('zh: chain risk notice missing');
+  if (!source.includes('data-i18n="picks.chain.risk"')) errors.push('zh: chain risk-warning node missing in source');
+  if (!source.includes(CHAIN_RISK_ZH)) errors.push('zh: chain risk warning must state high volatility');
+  if (!source.includes('承受相应损失')) errors.push('zh: chain risk warning must mention affording the loss');
+  if (!source.includes('按自身财力谨慎参与')) errors.push('zh: chain risk warning must advise participating within ones means');
   if (!(zhNodes['picks.chain.credit'] || '').length) errors.push('zh: chain credit note missing');
   if (!source.includes('data-i18n="picks.chain.credit"')) errors.push('zh: chain credit node missing in source');
   if (!source.includes(CHAIN_CREDIT_ZH)) errors.push('zh: chain credit text must be webmaster + AI');
@@ -1114,6 +1126,9 @@ function verify(state) {
        韩语版 note 必须含南韩(남한) IP 限制 NFT 的提示。 */
     if (!page.includes('id="picks-chain-games"')) errors.push(lang + ': chain platforms anchor missing');
     if (!(nodes['picks.chain.notice'] || '').length) errors.push(lang + ': chain risk notice missing');
+    if (!(nodes['picks.chain.risk'] || '').length) errors.push(lang + ': chain risk warning node missing');
+    if (!page.includes('data-i18n="picks.chain.risk"')) errors.push(lang + ': chain risk warning node missing in page');
+    if (!/<strong>/.test(nodes['picks.chain.risk'] || '')) errors.push(lang + ': chain risk warning label must be bold');
     if (!(nodes['picks.chain.credit'] || '').length) errors.push(lang + ': chain credit note missing');
     if (!page.includes('data-i18n="picks.chain.credit"')) errors.push(lang + ': chain credit node missing in page');
     /* 占位卡：四语节点齐全、占位图引用正确、credit 在占位卡内 */
@@ -1507,6 +1522,15 @@ const faults = [
   } },
   { name: 'YouTube purchase link reintroduced into US English page', mutate: s => {
     s.pages.en = s.pages.en.replace(AMAZON_LINK, YOUTUBE_LINK);
+  } },
+  { name: 'chain risk warning removed from Chinese source', mutate: s => {
+    s.source = s.source.replace(/<p class="picks-chain-risk"[\s\S]*?<\/p>\r?\n/, '');
+  } },
+  { name: 'chain risk warning softened to generic advice', mutate: s => {
+    s.source = s.source.replace(CHAIN_RISK_ZH, '请理性参与');
+  } },
+  { name: 'chain risk warning red and bold styling stripped', mutate: s => {
+    s.css = s.css.replace('color: #C5221F; font-size: 13px; font-weight: 700;', 'color: var(--ink-soft); font-size: 13px; font-weight: 400;');
   } },
   { name: 'chain credit bold styling stripped', mutate: s => {
     s.css = s.css.replace('.picks-chain-credit { font-weight: 700; }', '.picks-chain-credit { font-weight: 400; }');
