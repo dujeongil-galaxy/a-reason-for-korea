@@ -199,6 +199,27 @@ const STEAM_LINK = 'store.steampowered.com/app/';
 /* 端游发行年份（按 Steam 商店页 release date），用于校验「最新靠前」的排序 */
 const PC_GAME_YEAR = { sololeveling: 2025, stellarblade: 2024, liesofp: 2023,
   blessunleashed: 2021, eternalreturn: 2020, pubg: 2017 };
+
+/* 端游主机商店地区规则（站长 2026-11-23 定为长期规则）：
+   zh=港区 / en=美区 / jp=日区 / ko=韩区。PS 用 concept 页（ID 跨区通用），
+   Xbox 用商品 ID（跨区通用）；PS 前缀全小写、Xbox 首字母大写，写错即 404。 */
+const REGION_LOCALE = {
+  zh: { ps: 'zh-hant-hk', xb: 'zh-HK' },
+  en: { ps: 'en-us', xb: 'en-US' },
+  jp: { ps: 'ja-jp', xb: 'ja-JP' },
+  ko: { ps: 'ko-kr', xb: 'ko-KR' }
+};
+/* null = 该平台无可用版本，不得挂按钮（剑星无 Xbox；神佑释放主机服 2022 停服；永恒轮回 PC only） */
+const PC_PLATFORM = {
+  sololeveling:   { ps: '10018442', xb: 'solo-levelingarise-overdrive/9MVHCQ7CJX01' },
+  stellarblade:   { ps: '10006891', xb: null },
+  liesofp:        { ps: '10006052', xb: 'lies-of-p/9PCM4CMTPPGC' },
+  blessunleashed: { ps: null, xb: null },
+  eternalreturn:  { ps: null, xb: null },
+  pubg:           { ps: '232860', xb: 'pubg-battlegrounds/C0MN5DN8KR3F' }
+};
+const PS_BASE = 'https://store.playstation.com/';
+const XB_BASE = 'https://www.xbox.com/';
 const MOBILE_LINKS = ['apps.apple.com/', 'play.google.com/store/apps/details', 'qoo-app.com/'];
 
 /* 链游平台（2026-11-23 站长指令）：手游下方第三个游戏子分类，只推荐平台不推荐游戏。
@@ -608,6 +629,13 @@ function verify(state) {
     const actions = zhNodes['picks.' + slug + '.actions'] || '';
     if (PC_GAME_SLUGS.includes(slug)) {
       if (!actions.includes(STEAM_LINK)) errors.push('zh: ' + slug + ' Steam link missing');
+      const p = PC_PLATFORM[slug], loc = REGION_LOCALE.zh;
+      if (p.ps) {
+        if (!actions.includes(PS_BASE + loc.ps + '/concept/' + p.ps)) errors.push('zh: ' + slug + ' PS link wrong region ->港区');
+      } else if (actions.includes(PS_BASE)) errors.push('zh: ' + slug + ' must not carry a PS button');
+      if (p.xb) {
+        if (!actions.includes(XB_BASE + loc.xb + '/games/store/' + p.xb)) errors.push('zh: ' + slug + ' Xbox link wrong region ->港区');
+      } else if (actions.includes(XB_BASE)) errors.push('zh: ' + slug + ' must not carry an Xbox button');
     } else {
       for (const link of MOBILE_LINKS) {
         if (!actions.includes(link)) errors.push('zh: ' + slug + ' mobile channel missing -> ' + link);
@@ -1134,6 +1162,19 @@ function verify(state) {
       const actions = nodes['picks.' + slug + '.actions'] || '';
       if (PC_GAME_SLUGS.includes(slug)) {
         if (!actions.includes(STEAM_LINK)) errors.push(lang + ': ' + slug + ' Steam link missing');
+        const p = PC_PLATFORM[slug], loc = REGION_LOCALE[lang];
+        if (p.ps) {
+          if (!actions.includes(PS_BASE + loc.ps + '/concept/' + p.ps)) errors.push(lang + ': ' + slug + ' PS link wrong region -> ' + loc.ps);
+        } else if (actions.includes(PS_BASE)) errors.push(lang + ': ' + slug + ' must not carry a PS button');
+        if (p.xb) {
+          if (!actions.includes(XB_BASE + loc.xb + '/games/store/' + p.xb)) errors.push(lang + ': ' + slug + ' Xbox link wrong region -> ' + loc.xb);
+        } else if (actions.includes(XB_BASE)) errors.push(lang + ': ' + slug + ' must not carry an Xbox button');
+        /* 串区检测：四语各自只允许自己地区的 PS/Xbox 前缀 */
+        for (const other of Object.keys(REGION_LOCALE)) {
+          if (other === lang) continue;
+          if (actions.includes(PS_BASE + REGION_LOCALE[other].ps + '/')) errors.push(lang + ': ' + slug + ' PS link leaked into ' + other + ' region');
+          if (actions.includes(XB_BASE + REGION_LOCALE[other].xb + '/')) errors.push(lang + ': ' + slug + ' Xbox link leaked into ' + other + ' region');
+        }
       } else {
         for (const link of MOBILE_LINKS) {
           if (!actions.includes(link)) errors.push(lang + ': ' + slug + ' mobile channel missing -> ' + link);
@@ -1814,6 +1855,25 @@ const faults = [
     s.dict.en.html['picks.sololeveling.actions'] = '<a class="pick-link pick-link-featured" href="https://example.com/">Steam</a>';
   } },
   { name: 'new PC game poster marked missing', mutate: s => { s.gameImages.blessunleashed = false; } },
+  { name: 'PC platform button uses wrong region prefix', mutate: s => {
+    s.dict.en.html['picks.liesofp.actions'] = s.dict.en.html['picks.liesofp.actions']
+      .replace('store.playstation.com/en-us/', 'store.playstation.com/zh-hant-hk/');
+  } },
+  { name: 'PC platform button cross-region leak', mutate: s => {
+    s.dict.jp.html['picks.pubg.actions'] = s.dict.jp.html['picks.pubg.actions']
+      .replace('www.xbox.com/ja-JP/', 'www.xbox.com/en-US/');
+  } },
+  { name: 'PS button added to a game with no PS version', mutate: s => {
+    s.dict.zh === undefined || (s.source = s.source.replace(
+      'data-i18n="picks.eternalreturn.actions">',
+      'data-i18n="picks.eternalreturn.actions">'));
+    s.dict.en.html['picks.eternalreturn.actions'] += '<a class="pick-link pick-link-secondary" href="https://store.playstation.com/en-us/concept/10006052">PlayStation</a>';
+  } },
+  { name: 'PS button missing from a game that has a PS version', mutate: s => {
+    const tag = '<a class="pick-link pick-link-secondary" href="https://store.playstation.com/ko-kr/concept/10006891" target="_blank" rel="noopener noreferrer">PlayStation</a>';
+    s.dict.ko.html['picks.stellarblade.actions'] = s.dict.ko.html['picks.stellarblade.actions'].replace(tag, '');
+    s.pages.ko = s.pages.ko.replace(tag, '');
+  } },
   { name: 'game poster asset marked missing', mutate: s => { s.gameImages.liesofp = false; } },
   { name: 'game poster reference stripped', mutate: s => {
     s.source = s.source.replace('src="assets/browndust-poster.jpg"', '');
