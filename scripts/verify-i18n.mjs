@@ -197,16 +197,23 @@ const MOBILE_LINKS = ['apps.apple.com/', 'play.google.com/store/apps/details', '
 
 /* 链游平台（2026-11-23 站长指令）：手游下方第三个游戏子分类，只推荐平台不推荐游戏。
    四个平台各一张标准两栏卡、单个官网按钮；韩语版 note 必须写明南韩(남한) IP 限制 NFT。 */
-const CHAIN_SLUGS = ['mir4', 'msu'];
+const CHAIN_SLUGS = ['one', 'yooldo', 'wemix', 'msu', 'planetarium'];
 const CHAIN_IMAGE = {
-  mir4: 'assets/mir4-platform.jpg',
-  msu: 'assets/msu-platform.jpg'
+  one: 'assets/one-chain.jpg',
+  yooldo: 'assets/yooldo-chain.jpg',
+  wemix: 'assets/wemix-platform.jpg',
+  msu: 'assets/msu-platform.jpg',
+  planetarium: 'assets/planetarium-chain.jpg'
 };
 const CHAIN_LINK = {
-  mir4: 'https://mir4global.com/',
-  msu: 'https://msu.io/'
+  one: 'https://to.nexus/',
+  yooldo: 'https://app.yooldo.pro/',
+  wemix: 'https://wemixplay.com/',
+  msu: 'https://msu.io/',
+  planetarium: 'https://www.planetariumlabs.com/'
 };
 const CHAIN_KO_NFT_NOTE = '남한 IP에서는 NFT 접근이 제한될 수 있습니다.';
+const CHAIN_CREDIT_ZH = '站长推荐 + AI 自动生成';
 
 /* 加速器推荐（2026-11-23 站长指令）：链游区下方两个工具卡，带邀请码/口令。
    外星仔 = 50 小时萌新卡（口令 574567，官网 et001.com）；
@@ -561,6 +568,9 @@ function verify(state) {
   if (!source.includes('id="picks-chain-games"')) errors.push('zh: chain platforms anchor missing');
   if (!source.includes('data-i18n="nav.picks.game.chain"')) errors.push('zh: chain platforms subhead missing');
   if (!(zhNodes['picks.chain.notice'] || '').length) errors.push('zh: chain risk notice missing');
+  if (!(zhNodes['picks.chain.credit'] || '').length) errors.push('zh: chain credit note missing');
+  if (!source.includes('data-i18n="picks.chain.credit"')) errors.push('zh: chain credit node missing in source');
+  if (!source.includes(CHAIN_CREDIT_ZH)) errors.push('zh: chain credit text must be webmaster + AI');
   for (const slug of CHAIN_SLUGS) {
     const card = source.match(new RegExp('<article class="pick-card">\\s*<p class="pick-card-label" data-i18n="picks\\.' + slug + '\\.label">([\\s\\S]*?)<\\/article>'));
     if (!card) { errors.push('zh: chain card missing -> ' + slug); continue; }
@@ -1072,6 +1082,8 @@ function verify(state) {
        韩语版 note 必须含南韩(남한) IP 限制 NFT 的提示。 */
     if (!page.includes('id="picks-chain-games"')) errors.push(lang + ': chain platforms anchor missing');
     if (!(nodes['picks.chain.notice'] || '').length) errors.push(lang + ': chain risk notice missing');
+    if (!(nodes['picks.chain.credit'] || '').length) errors.push(lang + ': chain credit note missing');
+    if (!page.includes('data-i18n="picks.chain.credit"')) errors.push(lang + ': chain credit node missing in page');
     for (const slug of CHAIN_SLUGS) {
       for (const key of ['label', 'title', 'desc', 'actions', 'note', 'imageCredit']) {
         if (!(nodes['picks.' + slug + '.' + key] || '').length) {
@@ -1728,26 +1740,38 @@ const faults = [
   { name: 'chain card missing from Chinese source', mutate: s => {
     s.source = s.source.replace(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.msu\.label">[\s\S]*?<\/article>/, '');
   } },
-  { name: 'chain poster asset marked missing', mutate: s => { s.chainImages.mir4 = false; } },
+  { name: 'chain poster asset marked missing', mutate: s => { s.chainImages.one = false; } },
   { name: 'chain poster reference stripped from translated page', mutate: s => {
-    s.pages.en = s.pages.en.replace('src="../assets/mir4-platform.jpg"', '');
+    s.pages.en = s.pages.en.replace('src="../assets/one-chain.jpg"', '');
   } },
   { name: 'chain card forced into special layout', mutate: s => {
-    s.source = s.source.replace(/(data-i18n="picks\.mir4\.label"[^>]*>[\s\S]*?<\/p>\s*)<div class="pick-poster-row">/,
+    s.source = s.source.replace(/(data-i18n="picks\.one\.label"[^>]*>[\s\S]*?<\/p>\s*)<div class="pick-poster-row">/,
       '$1<div class="pick-poster-row pick-poster-row-feature">');
   } },
   { name: 'chain official link swapped to a game store', mutate: s => {
-    s.dict.ko.html['picks.mir4.actions'] = s.dict.ko.html['picks.mir4.actions'].replace('mir4global.com', 'apps.apple.com');
+    s.dict.ko.html['picks.one.actions'] = s.dict.ko.html['picks.one.actions'].replace('to.nexus', 'apps.apple.com');
   } },
   { name: 'chain download button added to Chinese card', mutate: s => {
     s.source = s.source.replace(/(data-i18n="picks\.msu\.actions">)/,
       '$1<a class="pick-link pick-link-secondary" href="https://play.google.com/store/apps/details?id=x">Download</a>');
   } },
   { name: 'chain imageAlt left untranslated in English', mutate: s => {
-    s.dict.en.attr['picks.mir4.imageAlt'] = 'MIR4 官方主视觉';
+    s.dict.en.attr['picks.one.imageAlt'] = 'ONE 官方主视觉（未翻译）';
   } },
   { name: 'chain imageCredit node deleted from Japanese', mutate: s => {
-    delete s.dict.jp.html['picks.mir4.imageCredit'];
+    delete s.dict.jp.html['picks.one.imageCredit'];
+  } },
+  { name: 'chain credit note removed from Chinese source', mutate: s => {
+    s.source = s.source.replace(/data-i18n="picks\.chain\.credit">[^<]*<\/p>/, '');
+  } },
+  { name: 'chain credit text reverted to generic', mutate: s => {
+    s.source = s.source.replace(CHAIN_CREDIT_ZH, '仅仅推荐');
+  } },
+  { name: 'chain credit node deleted from English dict', mutate: s => {
+    delete s.dict.en.html['picks.chain.credit'];
+  } },
+  { name: 'chain fifth card missing from Chinese source', mutate: s => {
+    s.source = s.source.replace(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.planetarium\.label">[\s\S]*?<\/article>/, '');
   } },
   { name: 'Korean NFT restriction note reverted to generic', mutate: s => {
     s.dict.ko.html['picks.msu.note'] = '플랫폼만 소개하며 개별 게임은 다루지 않습니다.';
