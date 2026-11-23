@@ -195,6 +195,23 @@ const GAME_IMAGE = {
 const STEAM_LINK = 'store.steampowered.com/app/';
 const MOBILE_LINKS = ['apps.apple.com/', 'play.google.com/store/apps/details', 'qoo-app.com/'];
 
+/* 链游平台（2026-11-23 站长指令）：手游下方第三个游戏子分类，只推荐平台不推荐游戏。
+   四个平台各一张标准两栏卡、单个官网按钮；韩语版 note 必须写明南韩(남한) IP 限制 NFT。 */
+const CHAIN_SLUGS = ['wemix', 'marblex', 'onechain', 'msu'];
+const CHAIN_IMAGE = {
+  wemix: 'assets/wemix-platform.jpg',
+  marblex: 'assets/marblex-platform.jpg',
+  onechain: 'assets/onechain-platform.jpg',
+  msu: 'assets/msu-platform.jpg'
+};
+const CHAIN_LINK = {
+  wemix: 'https://wemixplay.com/',
+  marblex: 'https://www.marblex.io/',
+  onechain: 'https://www.onechain.nexus/',
+  msu: 'https://msu.io/'
+};
+const CHAIN_KO_NFT_NOTE = '남한 IP에서는 NFT 접근이 제한될 수 있습니다.';
+
 /* 剧集时间线（2026-11-22 站长规则：新增推荐按年份倒序，越近越靠前）。
    五部剧按年份：2023 车贞淑医生 / 2015 无理的前进 / 2013 来自星星的你 /
    2013 继承者们 / 2003 大长今。每部本地竖版海报 + 四语 alt/来源说明。 */
@@ -526,6 +543,44 @@ function verify(state) {
       for (const link of MOBILE_LINKS) {
         if (!actions.includes(link)) errors.push('zh: ' + slug + ' mobile channel missing -> ' + link);
       }
+    }
+  }
+
+  /* 1d-5. 链游平台（2026-11-23）：手游下方第三个游戏子分类，只推荐平台。
+     四张卡标准两栏 + 单官网按钮；区级 notice 提示风险；无游戏下载链接。 */
+  if (!source.includes('id="picks-chain-games"')) errors.push('zh: chain platforms anchor missing');
+  if (!source.includes('data-i18n="nav.picks.game.chain"')) errors.push('zh: chain platforms subhead missing');
+  if (!(zhNodes['picks.chain.notice'] || '').length) errors.push('zh: chain risk notice missing');
+  for (const slug of CHAIN_SLUGS) {
+    const card = source.match(new RegExp('<article class="pick-card">\\s*<p class="pick-card-label" data-i18n="picks\\.' + slug + '\\.label">([\\s\\S]*?)<\\/article>'));
+    if (!card) { errors.push('zh: chain card missing -> ' + slug); continue; }
+    const body = card[1];
+    if (!body.includes('<div class="pick-poster-row">')) {
+      errors.push('zh: ' + slug + ' chain card must use standard two-column row');
+    }
+    if (/pick-poster-row-feature|pick-card-feature|pick-figure-still/.test(body)) {
+      errors.push('zh: ' + slug + ' chain card must not carry special layout');
+    }
+    if (!body.includes('class="pick-figure pick-figure-poster"') ||
+        !body.includes('class="pick-image pick-image-poster"')) {
+      errors.push('zh: ' + slug + ' chain card must reuse standard poster classes');
+    }
+    if (!assetRefs(source).includes(CHAIN_IMAGE[slug])) {
+      errors.push('zh: ' + slug + ' chain poster not referenced');
+    }
+    if (!state.chainImages[slug]) {
+      errors.push('picks: ' + slug + ' chain poster file missing from assets/');
+    }
+    for (const key of ['label', 'title', 'desc', 'actions', 'note', 'imageCredit']) {
+      if (!(zhNodes['picks.' + slug + '.' + key] || '').length) {
+        errors.push('zh: ' + slug + ' chain node missing -> ' + key);
+      }
+    }
+    const actions = zhNodes['picks.' + slug + '.actions'] || '';
+    if (!actions.includes(CHAIN_LINK[slug])) errors.push('zh: ' + slug + ' chain official link missing');
+    if (!actions.includes('pick-link-featured')) errors.push('zh: ' + slug + ' chain featured button missing');
+    if (/apps\.apple\.com|play\.google\.com|qoo-app\.com|store\.steampowered/.test(actions)) {
+      errors.push('zh: ' + slug + ' chain card must not carry game download buttons');
     }
   }
 
@@ -968,6 +1023,34 @@ function verify(state) {
       }
     }
 
+    /* 链游平台四语（2026-11-23）：四卡节点齐全、官方链接正确、海报引用正确；
+       韩语版 note 必须含南韩(남한) IP 限制 NFT 的提示。 */
+    if (!page.includes('id="picks-chain-games"')) errors.push(lang + ': chain platforms anchor missing');
+    if (!(nodes['picks.chain.notice'] || '').length) errors.push(lang + ': chain risk notice missing');
+    for (const slug of CHAIN_SLUGS) {
+      for (const key of ['label', 'title', 'desc', 'actions', 'note', 'imageCredit']) {
+        if (!(nodes['picks.' + slug + '.' + key] || '').length) {
+          errors.push(lang + ': ' + slug + ' chain node missing -> ' + key);
+        }
+      }
+      if (!attrs['picks.' + slug + '.imageAlt']) errors.push(lang + ': ' + slug + ' chain imageAlt missing');
+      if (!assetRefs(page).includes('../' + CHAIN_IMAGE[slug])) {
+        errors.push(lang + ': ' + slug + ' chain poster not referenced');
+      }
+      const actions = nodes['picks.' + slug + '.actions'] || '';
+      if (!actions.includes(CHAIN_LINK[slug])) errors.push(lang + ': ' + slug + ' chain official link missing');
+      if (/apps\.apple\.com|play\.google\.com|qoo-app\.com|store\.steampowered/.test(actions)) {
+        errors.push(lang + ': ' + slug + ' chain card must not carry game download buttons');
+      }
+      const cardHtml = (page.match(new RegExp('<article class="pick-card">\\s*<p class="pick-card-label" data-i18n="picks\\.' + slug + '\\.label">([\\s\\S]*?)<\\/article>')) || [])[1] || '';
+      if (!cardHtml.includes('<div class="pick-poster-row">')) {
+        errors.push(lang + ': ' + slug + ' chain card must use standard two-column row');
+      }
+    }
+    if (lang === 'ko' && !(nodes['picks.msu.note'] || '').includes(CHAIN_KO_NFT_NOTE)) {
+      errors.push('ko: MapleStory Universe note must state South Korean (남한) IP NFT restriction');
+    }
+
     /* 剧集时间线四语校验：五部齐全、红字本地化、按区按钮与海报 alt/来源不缺 */
     const note = DRAMA_NOTE[lang];
     for (const slug of DRAMA_SLUGS) {
@@ -1114,6 +1197,8 @@ const state = {
     fs.existsSync(path.join(ROOT, DRAMA_IMAGE[slug]))])),
   gameImages: Object.fromEntries(GAME_SLUGS.map(slug => [slug,
     fs.existsSync(path.join(ROOT, GAME_IMAGE[slug]))])),
+  chainImages: Object.fromEntries(CHAIN_SLUGS.map(slug => [slug,
+    fs.existsSync(path.join(ROOT, CHAIN_IMAGE[slug]))])),
   sitemap: fs.existsSync(path.join(ROOT, 'sitemap.xml')) ? fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8') : '',
   robots: fs.existsSync(path.join(ROOT, 'robots.txt')) ? fs.readFileSync(path.join(ROOT, 'robots.txt'), 'utf8') : ''
 };
@@ -1555,6 +1640,40 @@ const faults = [
   } },
   { name: 'game translated page missing mobile games anchor', mutate: s => {
     s.pages.jp = s.pages.jp.replace('id="picks-mobile-games"', '');
+  } },
+  /* 链游平台（2026-11-23） */
+  { name: 'chain platforms anchor removed from Chinese source', mutate: s => {
+    s.source = s.source.replace('id="picks-chain-games"', '');
+  } },
+  { name: 'chain risk notice deleted from Chinese source', mutate: s => {
+    s.source = s.source.replace(/data-i18n="picks\.chain\.notice">[^<]*<\/p>/, '');
+  } },
+  { name: 'chain card missing from Chinese source', mutate: s => {
+    s.source = s.source.replace(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.msu\.label">[\s\S]*?<\/article>/, '');
+  } },
+  { name: 'chain poster asset marked missing', mutate: s => { s.chainImages.wemix = false; } },
+  { name: 'chain poster reference stripped from translated page', mutate: s => {
+    s.pages.en = s.pages.en.replace('src="../assets/marblex-platform.jpg"', '');
+  } },
+  { name: 'chain card forced into special layout', mutate: s => {
+    s.source = s.source.replace(/(data-i18n="picks\.onechain\.label"[^>]*>[\s\S]*?<\/p>\s*)<div class="pick-poster-row">/,
+      '$1<div class="pick-poster-row pick-poster-row-feature">');
+  } },
+  { name: 'chain official link swapped to a game store', mutate: s => {
+    s.dict.ko.html['picks.wemix.actions'] = s.dict.ko.html['picks.wemix.actions'].replace('wemixplay.com', 'apps.apple.com');
+  } },
+  { name: 'chain download button added to Chinese card', mutate: s => {
+    s.source = s.source.replace(/(data-i18n="picks\.msu\.actions">)/,
+      '$1<a class="pick-link pick-link-secondary" href="https://play.google.com/store/apps/details?id=x">Download</a>');
+  } },
+  { name: 'chain imageAlt left untranslated in English', mutate: s => {
+    s.dict.en.attr['picks.marblex.imageAlt'] = 'MARBLEX 平台官方标志';
+  } },
+  { name: 'chain imageCredit node deleted from Japanese', mutate: s => {
+    delete s.dict.jp.html['picks.onechain.imageCredit'];
+  } },
+  { name: 'Korean NFT restriction note reverted to generic', mutate: s => {
+    s.dict.ko.html['picks.msu.note'] = '플랫폼만 소개하며 개별 게임은 다루지 않습니다.';
   } }
 ];
 
