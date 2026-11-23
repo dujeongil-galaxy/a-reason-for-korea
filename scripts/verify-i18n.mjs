@@ -212,6 +212,17 @@ const CHAIN_LINK = {
 };
 const CHAIN_KO_NFT_NOTE = '남한 IP에서는 NFT 접근이 제한될 수 있습니다.';
 
+/* 加速器推荐（2026-11-23 站长指令）：链游区下方两个工具卡，带邀请码/口令。
+   外星仔 = 50 小时萌新卡（口令 574567，官网 et001.com）；
+   给梨 = 120 小时 SVIP（邀请码 9ydA8H，专属 fission 链接）。 */
+const ACC_SLUGS = ['etalien', 'geili'];
+const ACC_IMAGE = { etalien: 'assets/etalien-accelerator.jpg', geili: 'assets/geili-accelerator.jpg' };
+const ACC_LINK = {
+  etalien: 'https://www.et001.com/',
+  geili: 'https://www.geilijiasu.com/fission/accept?inviteCode=9ydA8H'
+};
+const ACC_CODE = { etalien: '574567', geili: '9ydA8H' };
+
 /* 剧集时间线（2026-11-22 站长规则：新增推荐按年份倒序，越近越靠前）。
    五部剧按年份：2023 车贞淑医生 / 2015 无理的前进 / 2013 来自星星的你 /
    2013 继承者们 / 2003 大长今。每部本地竖版海报 + 四语 alt/来源说明。 */
@@ -582,6 +593,41 @@ function verify(state) {
     if (/apps\.apple\.com|play\.google\.com|qoo-app\.com|store\.steampowered/.test(actions)) {
       errors.push('zh: ' + slug + ' chain card must not carry game download buttons');
     }
+  }
+
+  /* 1d-6. 加速器推荐：链游区下方两个工具卡，口令/邀请码与官网链接锁死 */
+  if (!source.includes('id="picks-accelerators"')) errors.push('zh: accelerators anchor missing');
+  if (!source.includes('data-i18n="nav.picks.game.accelerator"')) errors.push('zh: accelerators subhead missing');
+  if (!(zhNodes['picks.accelerator.notice'] || '').length) errors.push('zh: accelerators notice missing');
+  for (const slug of ACC_SLUGS) {
+    const card = source.match(new RegExp('<article class="pick-card">\\s*<p class="pick-card-label" data-i18n="picks\\.' + slug + '\\.label">([\\s\\S]*?)<\\/article>'));
+    if (!card) { errors.push('zh: accelerator card missing -> ' + slug); continue; }
+    const body = card[1];
+    if (!body.includes('<div class="pick-poster-row">')) {
+      errors.push('zh: ' + slug + ' accelerator card must use standard two-column row');
+    }
+    if (/pick-poster-row-feature|pick-card-feature|pick-figure-still/.test(body)) {
+      errors.push('zh: ' + slug + ' accelerator card must not carry special layout');
+    }
+    if (!body.includes('class="pick-figure pick-figure-poster"') ||
+        !body.includes('class="pick-image pick-image-poster"')) {
+      errors.push('zh: ' + slug + ' accelerator card must reuse standard poster classes');
+    }
+    if (!assetRefs(source).includes(ACC_IMAGE[slug])) {
+      errors.push('zh: ' + slug + ' accelerator poster not referenced');
+    }
+    if (!state.accImages[slug]) {
+      errors.push('picks: ' + slug + ' accelerator poster file missing from assets/');
+    }
+    for (const key of ['label', 'title', 'desc', 'actions', 'note', 'imageCredit']) {
+      if (!(zhNodes['picks.' + slug + '.' + key] || '').length) {
+        errors.push('zh: ' + slug + ' accelerator node missing -> ' + key);
+      }
+    }
+    const actions = zhNodes['picks.' + slug + '.actions'] || '';
+    if (!actions.includes(ACC_LINK[slug])) errors.push('zh: ' + slug + ' accelerator official link missing');
+    if (!actions.includes('pick-link-featured')) errors.push('zh: ' + slug + ' accelerator featured button missing');
+    if (!body.includes(ACC_CODE[slug])) errors.push('zh: ' + slug + ' accelerator code missing in card body');
   }
 
   /* 1d-2. 剧集时间线：五部剧按年份倒序，竖版海报 + 四语本地化 + 按区按钮 */
@@ -1051,6 +1097,32 @@ function verify(state) {
       errors.push('ko: MapleStory Universe note must state South Korean (남한) IP NFT restriction');
     }
 
+    /* 加速器四语校验：两卡齐全、官网与口令/邀请码不丢、标准两栏、海报 alt/来源不缺 */
+    if (!page.includes('id="picks-accelerators"')) errors.push(lang + ': accelerators anchor missing');
+    if (!(nodes['picks.accelerator.notice'] || '').length) errors.push(lang + ': accelerators notice missing');
+    for (const slug of ACC_SLUGS) {
+      if (!nodes['picks.' + slug + '.title']) errors.push(lang + ': ' + slug + ' accelerator title missing');
+      if (!nodes['picks.' + slug + '.desc']) errors.push(lang + ': ' + slug + ' accelerator desc missing');
+      if (!nodes['picks.' + slug + '.note']) errors.push(lang + ': ' + slug + ' accelerator note missing');
+      if (!nodes['picks.' + slug + '.imageCredit']) errors.push(lang + ': ' + slug + ' accelerator imageCredit missing');
+      if (!attrs['picks.' + slug + '.imageAlt']) errors.push(lang + ': ' + slug + ' accelerator imageAlt missing');
+      if (!assetRefs(page).includes('../' + ACC_IMAGE[slug])) {
+        errors.push(lang + ': ' + slug + ' accelerator poster not referenced');
+      }
+      const actions = nodes['picks.' + slug + '.actions'] || '';
+      if (!actions.includes(ACC_LINK[slug])) errors.push(lang + ': ' + slug + ' accelerator official link missing');
+      if (!actions.includes('pick-link-featured')) errors.push(lang + ': ' + slug + ' accelerator featured button missing');
+      const cardHtml = (page.match(new RegExp('<article class="pick-card">\\s*<p class="pick-card-label" data-i18n="picks\\.' + slug + '\\.label">([\\s\\S]*?)<\\/article>')) || [])[1] || '';
+      if (!cardHtml.includes('<div class="pick-poster-row">')) {
+        errors.push(lang + ': ' + slug + ' accelerator card must use standard two-column row');
+      }
+      if (/pick-poster-row-feature|pick-card-feature|pick-figure-still/.test(cardHtml)) {
+        errors.push(lang + ': ' + slug + ' accelerator card must not carry special layout');
+      }
+      const desc = nodes['picks.' + slug + '.desc'] || '';
+      if (!desc.includes(ACC_LINK[slug])) errors.push(lang + ': ' + slug + ' accelerator desc link missing');
+    }
+
     /* 剧集时间线四语校验：五部齐全、红字本地化、按区按钮与海报 alt/来源不缺 */
     const note = DRAMA_NOTE[lang];
     for (const slug of DRAMA_SLUGS) {
@@ -1199,6 +1271,8 @@ const state = {
     fs.existsSync(path.join(ROOT, GAME_IMAGE[slug]))])),
   chainImages: Object.fromEntries(CHAIN_SLUGS.map(slug => [slug,
     fs.existsSync(path.join(ROOT, CHAIN_IMAGE[slug]))])),
+  accImages: Object.fromEntries(ACC_SLUGS.map(slug => [slug,
+    fs.existsSync(path.join(ROOT, ACC_IMAGE[slug]))])),
   sitemap: fs.existsSync(path.join(ROOT, 'sitemap.xml')) ? fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8') : '',
   robots: fs.existsSync(path.join(ROOT, 'robots.txt')) ? fs.readFileSync(path.join(ROOT, 'robots.txt'), 'utf8') : ''
 };
@@ -1674,6 +1748,28 @@ const faults = [
   } },
   { name: 'Korean NFT restriction note reverted to generic', mutate: s => {
     s.dict.ko.html['picks.msu.note'] = '플랫폼만 소개하며 개별 게임은 다루지 않습니다.';
+  } },
+  { name: 'accelerators anchor removed from Chinese source', mutate: s => {
+    s.source = s.source.replace('id="picks-accelerators"', '');
+  } },
+  { name: 'ETalien promo code 574567 scrubbed', mutate: s => {
+    s.source = s.source.split('574567').join('');
+  } },
+  { name: 'Geili invite code link replaced with bare homepage', mutate: s => {
+    s.source = s.source.split('https://www.geilijiasu.com/fission/accept?inviteCode=9ydA8H').join('https://www.geilijiasu.com/');
+    s.dict.en.html['picks.geili.actions'] = s.dict.en.html['picks.geili.actions'].replace(/https:\/\/www\.geilijiasu\.com\/fission\/accept\?inviteCode=9ydA8H/, 'https://www.geilijiasu.com/');
+  } },
+  { name: 'accelerator poster removed from Chinese source', mutate: s => {
+    s.source = s.source.replace('src="assets/etalien-accelerator.jpg"', '');
+  } },
+  { name: 'accelerator card switched to special feature layout', mutate: s => {
+    s.source = s.source.replace(/(data-i18n="picks\.geili\.label">[\s\S]{0,80}?)<div class="pick-poster-row">/, '$1<div class="pick-poster-row-feature">');
+  } },
+  { name: 'accelerator imageCredit deleted from Japanese', mutate: s => {
+    delete s.dict.jp.html['picks.etalien.imageCredit'];
+  } },
+  { name: 'accelerator notice deleted from Korean', mutate: s => {
+    delete s.dict.ko.html['picks.accelerator.notice'];
   } }
 ];
 
