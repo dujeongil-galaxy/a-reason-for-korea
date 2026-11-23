@@ -30,6 +30,16 @@ if (!I18N) throw new Error('i18n.js did not define window.SITE_I18N');
 const source = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
 const missing = [];
 
+/* --- 0. strip Chinese-only cards before generating en/jp/ko ---
+   Elements marked `data-zh-only` exist ONLY on the Chinese source page.
+   They must carry no data-i18n keys (verified by verify-i18n.mjs), so
+   removing the whole block here is enough to keep them off the other
+   three languages without touching parity. */
+function stripZhOnly(html) {
+  return html.replace(/[ \t]*<article class="pick-card" data-zh-only>[\s\S]*?<\/article>\r?\n/g, '');
+}
+const sourceForLangs = stripZhOnly(source);
+
 /* --- 1. translate innerHTML of every [data-i18n] element --- */
 function translateNodes(html, dict) {
   return html.replace(
@@ -90,7 +100,7 @@ for (const lang of LANGS) {
   if (!dict || !dict.html || !dict.attr) throw new Error('missing dictionary for ' + lang);
   const pageUrl = SITE + lang + '/';
 
-  let out = translateNodes(source, dict.html);
+  let out = translateNodes(sourceForLangs, dict.html);
   out = translateAttrs(out, dict.attr);
   out = rewriteLangLinks(out, lang);
 

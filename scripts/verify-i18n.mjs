@@ -1392,6 +1392,29 @@ function verify(state) {
   if (!/User-agent:\s*\*/.test(robots)) errors.push('robots.txt: missing User-agent rule');
   if (!robots.includes('Sitemap: ' + SITE + 'sitemap.xml')) errors.push('robots.txt: sitemap directive missing or wrong');
 
+  /* ---------- 仅中文卡片（data-zh-only）机制 ----------
+     这些卡只在中文源页出现，build-i18n.mjs 生成 en/jp/ko 时整块剔除。
+     不变量：① 卡内不得含任何 data-i18n（否则四语键位一致校验会失败）；
+     ② 生成页里绝不能残留 data-zh-only 标记或该卡内容。 */
+  const ZH_ONLY_GAMES = ['泡泡堂', '跑跑卡丁车', '劲舞团'];
+  const zhOnlyCards = (state.source.match(/<article class="pick-card" data-zh-only>[\s\S]*?<\/article>/g) || []);
+  if (zhOnlyCards.length !== ZH_ONLY_GAMES.length) {
+    errors.push('zh-only: 仅中文卡数量应为 ' + ZH_ONLY_GAMES.length + '，实际 ' + zhOnlyCards.length);
+  }
+  for (const card of zhOnlyCards) {
+    if (/data-i18n/.test(card)) errors.push('zh-only: 仅中文卡内出现 data-i18n（应纯中文内联，保四语键位一致）');
+  }
+  for (const name of ZH_ONLY_GAMES) {
+    if (!state.source.includes(name)) errors.push('zh: 缺少仅中文游戏 -> ' + name);
+  }
+  for (const lang of LANGS) {
+    const page = state.pages[lang] || '';
+    if (page.includes('data-zh-only')) errors.push(lang + ': 仅中文卡未被剔除（残留 data-zh-only 标记）');
+    for (const name of ZH_ONLY_GAMES) {
+      if (page.includes(name)) errors.push(lang + ': 仅中文内容泄漏到外文页 -> ' + name);
+    }
+  }
+
   return errors;
 }
 
@@ -2000,6 +2023,19 @@ const faults = [
   } },
   { name: 'accelerator notice deleted from Korean', mutate: s => {
     delete s.dict.ko.html['picks.accelerator.notice'];
+  } },
+  { name: 'zh-only card leaked into English page', mutate: s => {
+    s.pages.en = s.pages.en.replace('</body>', '<article class="pick-card" data-zh-only><p>泡泡堂</p></article></body>');
+  } },
+  { name: 'zh-only card carries a data-i18n key', mutate: s => {
+    s.source = s.source.replace('<article class="pick-card" data-zh-only>',
+      '<article class="pick-card" data-zh-only><p class="pick-title" data-i18n="picks.zhonly.x">泡泡堂</p>');
+  } },
+  { name: 'a zh-only game removed from Chinese source', mutate: s => {
+    s.source = s.source.replace(/[ \t]*<article class="pick-card" data-zh-only>[\s\S]*?<\/article>\r?\n/, '');
+  } },
+  { name: 'zh-only game name leaked into Japanese page', mutate: s => {
+    s.pages.jp = s.pages.jp.replace('</body>', '<div>劲舞团</div></body>');
   } }
 ];
 
