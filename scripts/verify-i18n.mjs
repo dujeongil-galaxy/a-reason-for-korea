@@ -197,17 +197,13 @@ const MOBILE_LINKS = ['apps.apple.com/', 'play.google.com/store/apps/details', '
 
 /* 链游平台（2026-11-23 站长指令）：手游下方第三个游戏子分类，只推荐平台不推荐游戏。
    四个平台各一张标准两栏卡、单个官网按钮；韩语版 note 必须写明南韩(남한) IP 限制 NFT。 */
-const CHAIN_SLUGS = ['wemix', 'marblex', 'onechain', 'msu'];
+const CHAIN_SLUGS = ['mir4', 'msu'];
 const CHAIN_IMAGE = {
-  wemix: 'assets/wemix-platform.jpg',
-  marblex: 'assets/marblex-platform.jpg',
-  onechain: 'assets/onechain-platform.jpg',
+  mir4: 'assets/mir4-platform.jpg',
   msu: 'assets/msu-platform.jpg'
 };
 const CHAIN_LINK = {
-  wemix: 'https://wemixplay.com/',
-  marblex: 'https://www.marblex.io/',
-  onechain: 'https://www.onechain.nexus/',
+  mir4: 'https://mir4global.com/',
   msu: 'https://msu.io/'
 };
 const CHAIN_KO_NFT_NOTE = '남한 IP에서는 NFT 접근이 제한될 수 있습니다.';
@@ -1725,26 +1721,26 @@ const faults = [
   { name: 'chain card missing from Chinese source', mutate: s => {
     s.source = s.source.replace(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.msu\.label">[\s\S]*?<\/article>/, '');
   } },
-  { name: 'chain poster asset marked missing', mutate: s => { s.chainImages.wemix = false; } },
+  { name: 'chain poster asset marked missing', mutate: s => { s.chainImages.mir4 = false; } },
   { name: 'chain poster reference stripped from translated page', mutate: s => {
-    s.pages.en = s.pages.en.replace('src="../assets/marblex-platform.jpg"', '');
+    s.pages.en = s.pages.en.replace('src="../assets/mir4-platform.jpg"', '');
   } },
   { name: 'chain card forced into special layout', mutate: s => {
-    s.source = s.source.replace(/(data-i18n="picks\.onechain\.label"[^>]*>[\s\S]*?<\/p>\s*)<div class="pick-poster-row">/,
+    s.source = s.source.replace(/(data-i18n="picks\.mir4\.label"[^>]*>[\s\S]*?<\/p>\s*)<div class="pick-poster-row">/,
       '$1<div class="pick-poster-row pick-poster-row-feature">');
   } },
   { name: 'chain official link swapped to a game store', mutate: s => {
-    s.dict.ko.html['picks.wemix.actions'] = s.dict.ko.html['picks.wemix.actions'].replace('wemixplay.com', 'apps.apple.com');
+    s.dict.ko.html['picks.mir4.actions'] = s.dict.ko.html['picks.mir4.actions'].replace('mir4global.com', 'apps.apple.com');
   } },
   { name: 'chain download button added to Chinese card', mutate: s => {
     s.source = s.source.replace(/(data-i18n="picks\.msu\.actions">)/,
       '$1<a class="pick-link pick-link-secondary" href="https://play.google.com/store/apps/details?id=x">Download</a>');
   } },
   { name: 'chain imageAlt left untranslated in English', mutate: s => {
-    s.dict.en.attr['picks.marblex.imageAlt'] = 'MARBLEX 平台官方标志';
+    s.dict.en.attr['picks.mir4.imageAlt'] = 'MIR4 官方主视觉';
   } },
   { name: 'chain imageCredit node deleted from Japanese', mutate: s => {
-    delete s.dict.jp.html['picks.onechain.imageCredit'];
+    delete s.dict.jp.html['picks.mir4.imageCredit'];
   } },
   { name: 'Korean NFT restriction note reverted to generic', mutate: s => {
     s.dict.ko.html['picks.msu.note'] = '플랫폼만 소개하며 개별 게임은 다루지 않습니다.';
