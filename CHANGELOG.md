@@ -2,6 +2,14 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-23 · 链游区重写为 5 卡（顺序打乱 + 底部 AI 备注）
+
+- `bade3b8` — 站长指令「这几都加上吧，mir4 还是转 wemixplay，msu 保持不变，顺序打乱，底部写『站长推荐 + AI 自动生成』」。按上一轮「第一梯队」口径落地 5 卡，顺序打乱为 **ONE → Yooldo → WEMIX PLAY → MapleStory Universe → Planetarium Labs**。
+  - **选型与链接规则**：有平台挂平台官网（ONE → `to.nexus`、WEMIX → `wemixplay.com`、MSU → `msu.io`），工作室挂其官网（Planetarium → `planetariumlabs.com`）；Yooldo 原 `yooldo.gg` 已失效（402），改用仍在运营的 `app.yooldo.pro`，note 内说明域名变更。MIR4 卡换回 WEMIX（四语文案 + 图片从 `45e8536^` 历史恢复），MSU 卡未动。
+  - **图片**：ONE / Planetarium 用官网 og:image、WEMIX 从 git 历史恢复、Yooldo 用 Trouble Punk 官方 logo 叠底生成（原站有 Cloudflare 验证抓不到 og）；统一 ffmpeg 转 1280×720 JPEG。已关停的 Arena-Z / XOCIETY / Intella X / Ragnarok Libre 与转型金融的 CONX(XPLA) 未加入。
+  - **底部备注**：新增 `picks.chain.credit` 四语键（zh「站长推荐 + AI 自动生成」/ en「Webmaster picks + AI-generated」/ jp「運営者のおすすめ + AI 自動生成」/ ko「운영자 추천 + AI 자동 생성」），带专属 class `picks-chain-credit`，校验锁定。区级 notice 从「只推荐平台」改为「平台与工作室为主」以匹配实况。
+  - **记账**：校验常量 `CHAIN_SLUGS` 从 2 改 5，新增 credit 断言 2 组 + 故障注入 4 组，149 → **154/154**；节点 209 → 228、属性 29 → 32。四语桌面 + 390px 移动真渲染截图确认 5 卡、图片、南韩 IP 提示、AI 备注齐全，无溢出/乱码。截图 `D:/WorkBuddy-Cache/shots/arg-chain-v3/`。
+
 ## 2026-11-23 · 加速器正文内联超链接改红色加粗
 
 - `a7f61d4` — 站长发截图要求「超链接，文字改用红色加粗」：指加速器两卡正文里的内联链接（外星仔「外星仔加速器 PC 端」/ 给梨「专属邀请链接」），原为继承 `--ink-soft` 的墨色，看不出是链接。
