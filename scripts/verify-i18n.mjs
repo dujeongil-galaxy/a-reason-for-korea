@@ -412,6 +412,9 @@ function verify(state) {
   if (!/\.pick-netflix-note\s*\{[^}]*color:\s*#C5221F[^}]*font-weight:\s*700/.test(state.css)) {
     errors.push('zh: Netflix note must be red and bold');
   }
+  if (!/\.pick-desc a\s*\{[^}]*font-weight:\s*700[^}]*color:\s*#C5221F/.test(state.css)) {
+    errors.push('css: inline links in pick-desc must be red and bold');
+  }
   for (const link of [...YOUTUBE_DOMAINS, FORBIDDEN_NETFLIX_LINK]) {
     if (source.includes(link)) errors.push('zh: 中文按港区，购买链接 forbidden -> ' + link);
   }
@@ -1441,6 +1444,10 @@ const faults = [
   } },
   { name: 'Netflix red bold note styling stripped', mutate: s => {
     s.css = s.css.replace('color: #C5221F; font-weight: 700;', 'color: var(--ink-soft); font-weight: 400;');
+  } },
+  { name: 'pick-desc inline link red bold styling stripped', mutate: s => {
+    s.css = s.css.replace('.pick-desc a { font-weight: 700; color: #C5221F; }',
+                          '.pick-desc a { font-weight: 400; color: var(--ink-soft); }');
   } },
   { name: 'Netflix note line removed from film actions', mutate: s => {
     s.source = s.source.replace(/<div class="pick-actions" data-i18n="picks\.film\.actions">[\s\S]*?<\/div>/,
