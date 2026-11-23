@@ -214,6 +214,8 @@ const CHAIN_LINK = {
 };
 const CHAIN_KO_NFT_NOTE = '남한 IP에서는 NFT 접근이 제한될 수 있습니다.';
 const CHAIN_CREDIT_ZH = '站长推荐，内容由 AI 生成';
+/* 链游区第 6 格占位卡：补两列网格的空位，备注行从区级移到卡内 */
+const CHAIN_SOON_IMAGE = 'assets/chain-soon.jpg';
 
 /* 加速器推荐（2026-11-23 站长指令）：链游区下方两个工具卡，带邀请码/口令。
    外星仔 = 50 小时萌新卡（口令 574567，官网 et001.com）；
@@ -606,6 +608,33 @@ function verify(state) {
       errors.push('zh: ' + slug + ' chain card must not carry game download buttons');
     }
   }
+  /* 占位卡：标准两栏、占位图、开发中文案；credit 备注必须在占位卡内而非独立行 */
+  const soonCard = source.match(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.chain\.soon\.label">([\s\S]*?)<\/article>/);
+  if (!soonCard) {
+    errors.push('zh: chain coming-soon placeholder card missing');
+  } else {
+    const soonBody = soonCard[1];
+    if (!soonBody.includes('<div class="pick-poster-row">')) {
+      errors.push('zh: coming-soon card must use standard two-column row');
+    }
+    if (/pick-poster-row-feature|pick-card-feature|pick-figure-still/.test(soonBody)) {
+      errors.push('zh: coming-soon card must not carry special layout');
+    }
+    if (!soonBody.includes('class="pick-image pick-image-poster"')) {
+      errors.push('zh: coming-soon card must reuse standard poster image class');
+    }
+    if (!/data-i18n="picks\.chain\.credit"/.test(soonBody)) {
+      errors.push('zh: chain credit note must live inside the coming-soon card');
+    }
+    if (/正在开发|开发中|扩充中/.test(zhNodes['picks.chain.soon.desc'] || '') === false &&
+        !/开发中|扩充中|正在/.test(soonBody)) {
+      errors.push('zh: coming-soon card must say the projects are still in development');
+    }
+  }
+  if (!assetRefs(source).includes(CHAIN_SOON_IMAGE)) {
+    errors.push('zh: coming-soon placeholder poster not referenced');
+  }
+  if (!state.soonImage) errors.push('picks: coming-soon poster file missing from assets/');
 
   /* 1d-6. 加速器推荐：链游区下方两个工具卡，口令/邀请码与官网链接锁死 */
   if (!source.includes('id="picks-accelerators"')) errors.push('zh: accelerators anchor missing');
@@ -1087,6 +1116,27 @@ function verify(state) {
     if (!(nodes['picks.chain.notice'] || '').length) errors.push(lang + ': chain risk notice missing');
     if (!(nodes['picks.chain.credit'] || '').length) errors.push(lang + ': chain credit note missing');
     if (!page.includes('data-i18n="picks.chain.credit"')) errors.push(lang + ': chain credit node missing in page');
+    /* 占位卡：四语节点齐全、占位图引用正确、credit 在占位卡内 */
+    for (const key of ['label', 'title', 'desc', 'imageCredit']) {
+      if (!(nodes['picks.chain.soon.' + key] || '').length) {
+        errors.push(lang + ': coming-soon node missing -> ' + key);
+      }
+    }
+    if (!attrs['picks.chain.soon.imageAlt']) errors.push(lang + ': coming-soon imageAlt missing');
+    if (!assetRefs(page).includes('../' + CHAIN_SOON_IMAGE)) {
+      errors.push(lang + ': coming-soon poster not referenced');
+    }
+    const soonHtml = (page.match(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.chain\.soon\.label">([\s\S]*?)<\/article>/) || [])[1] || '';
+    if (!soonHtml) {
+      errors.push(lang + ': coming-soon placeholder card missing');
+    } else {
+      if (!soonHtml.includes('<div class="pick-poster-row">')) {
+        errors.push(lang + ': coming-soon card must use standard two-column row');
+      }
+      if (!/data-i18n="picks\.chain\.credit"/.test(soonHtml)) {
+        errors.push(lang + ': chain credit note must live inside the coming-soon card');
+      }
+    }
     for (const slug of CHAIN_SLUGS) {
       for (const key of ['label', 'title', 'desc', 'actions', 'note', 'imageCredit']) {
         if (!(nodes['picks.' + slug + '.' + key] || '').length) {
@@ -1285,6 +1335,7 @@ const state = {
     fs.existsSync(path.join(ROOT, GAME_IMAGE[slug]))])),
   chainImages: Object.fromEntries(CHAIN_SLUGS.map(slug => [slug,
     fs.existsSync(path.join(ROOT, CHAIN_IMAGE[slug]))])),
+  soonImage: fs.existsSync(path.join(ROOT, CHAIN_SOON_IMAGE)),
   accImages: Object.fromEntries(ACC_SLUGS.map(slug => [slug,
     fs.existsSync(path.join(ROOT, ACC_IMAGE[slug]))])),
   sitemap: fs.existsSync(path.join(ROOT, 'sitemap.xml')) ? fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8') : '',
@@ -1778,6 +1829,23 @@ const faults = [
   } },
   { name: 'chain fifth card missing from Chinese source', mutate: s => {
     s.source = s.source.replace(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.planetarium\.label">[\s\S]*?<\/article>/, '');
+  } },
+  { name: 'coming-soon placeholder card removed from Chinese source', mutate: s => {
+    s.source = s.source.replace(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.chain\.soon\.label">[\s\S]*?<\/article>/, '');
+  } },
+  { name: 'coming-soon poster marked missing', mutate: s => {
+    s.soonImage = false;
+  } },
+  { name: 'chain credit note moved out of coming-soon card', mutate: s => {
+    const creditNode = '      <p class="pick-note picks-chain-credit" data-i18n="picks.chain.credit">站长推荐，内容由 AI 生成</p>\n';
+    s.source = s.source.replace(creditNode, '');
+    s.source = s.source.replace('      </div>\n\n      <p class="picks-subhead picks-subhead-platform"',
+                                '      </div>\n' + creditNode + '\n      <p class="picks-subhead picks-subhead-platform"');
+  } },
+  { name: 'coming-soon dev wording scrubbed', mutate: s => {
+    s.source = s.source.split('更多项目 · 正在开发中').join('更多项目');
+    s.dict.en.html['picks.chain.soon.desc'] = 'A short note.';
+    s.dict.jp.html['picks.chain.soon.label'] = '近日公開';
   } },
   { name: 'Korean NFT restriction note reverted to generic', mutate: s => {
     s.dict.ko.html['picks.msu.note'] = '플랫폼만 소개하며 개별 게임은 다루지 않습니다.';
