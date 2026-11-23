@@ -213,7 +213,7 @@ const CHAIN_LINK = {
   planetarium: 'https://www.planetariumlabs.com/'
 };
 const CHAIN_KO_NFT_NOTE = '남한 IP에서는 NFT 접근이 제한될 수 있습니다.';
-const CHAIN_CREDIT_ZH = '站长推荐 + AI 自动生成';
+const CHAIN_CREDIT_ZH = '站长推荐，内容由 AI 生成';
 
 /* 加速器推荐（2026-11-23 站长指令）：链游区下方两个工具卡，带邀请码/口令。
    外星仔 = 50 小时萌新卡（口令 574567，官网 et001.com）；
@@ -421,6 +421,9 @@ function verify(state) {
   }
   if (!/\.pick-desc a\s*\{[^}]*font-weight:\s*700[^}]*color:\s*#C5221F/.test(state.css)) {
     errors.push('css: inline links in pick-desc must be red and bold');
+  }
+  if (!/\.picks-chain-credit\s*\{[^}]*font-weight:\s*700/.test(state.css)) {
+    errors.push('css: chain credit note must be bold');
   }
   for (const link of [...YOUTUBE_DOMAINS, FORBIDDEN_NETFLIX_LINK]) {
     if (source.includes(link)) errors.push('zh: 中文按港区，购买链接 forbidden -> ' + link);
@@ -1453,6 +1456,9 @@ const faults = [
   } },
   { name: 'YouTube purchase link reintroduced into US English page', mutate: s => {
     s.pages.en = s.pages.en.replace(AMAZON_LINK, YOUTUBE_LINK);
+  } },
+  { name: 'chain credit bold styling stripped', mutate: s => {
+    s.css = s.css.replace('.picks-chain-credit { font-weight: 700; }', '.picks-chain-credit { font-weight: 400; }');
   } },
   { name: 'Netflix red bold note styling stripped', mutate: s => {
     s.css = s.css.replace('color: #C5221F; font-weight: 700;', 'color: var(--ink-soft); font-weight: 400;');
