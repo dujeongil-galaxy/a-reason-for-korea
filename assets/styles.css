@@ -474,6 +474,10 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
   border-bottom: 2px solid var(--accent); color: var(--accent);
   font-family: var(--serif); font-size: 15px; font-weight: 700;
 }
+.picks-webnote {
+  margin: 2px 0 20px; color: var(--ink-faint);
+  font-size: 14px; font-weight: 700; line-height: 1.7;
+}
 /* K-pop / 游戏：先占位，等站长写入数据 */
 .picks-coming {
   margin-top: 18px; padding: 24px 28px; border: 1px dashed var(--line-strong);

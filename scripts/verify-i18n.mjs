@@ -180,6 +180,26 @@ const MUSIC_YTNOTE = {
 /* 游戏区（2026-11-23 站长指令）：端游 4 款（Steam 商店页链接）+ 手游 2 款
    （棕色尘埃 / NIKKE，各挂 App Store + Google Play + QooApp）。
    端游/手游拆成两个锚点两个子标题；六张卡全部沿用剧集卡标准两栏结构。 */
+/* K-POP 小众音乐卡（多卡）：中文页挂 QQ/网易云，外文页挂 YouTube。
+   与单卡 music1 分开校验，避免动 music1 的既有断言。 */
+const KPOP_SLUGS = ['minty', 'seoeve', 'ussoboy', 'sospecial', 'milksong', 'jjarappappa'];
+const KPOP_IMAGE = {
+  minty: 'assets/mv-minty.jpg', seoeve: 'assets/mv-seoeve.jpg', ussoboy: 'assets/mv-ussoboy.jpg',
+  sospecial: 'assets/mv-soSpecial.jpg', milksong: 'assets/mv-milksong.jpg', jjarappappa: 'assets/mv-jjarappappa.jpg'
+};
+const KPOP_ZH_LINK = {
+  minty: 'music.163.com/#/mv?id=10894437',
+  seoeve: 'y.qq.com/n/m/detail/mv/index.html?vid=004AWNv33sYmI4',
+  ussoboy: 'music.163.com/#/mv?id=34726420',
+  sospecial: 'y.qq.com/n/m/detail/mv/index.html?vid=s00256y3tzt',
+  milksong: 'y.qq.com/n/m/detail/mv/index.html?vid=g0013sfftjs',
+  jjarappappa: 'y.qq.com/n/m/detail/mv/index.html?vid=o00204lrds8'
+};
+const KPOP_YT_ID = {
+  minty: '6rzemizJoNQ', seoeve: 'dd9yeNZXWXg', ussoboy: 'CD7J5oCKH2Q',
+  sospecial: 'pzP_w8rpxHA', milksong: 'bpGZSJPq3pk', jjarappappa: 'clgGG_qWFww'
+};
+
 const PC_GAME_SLUGS = ['sololeveling', 'stellarblade', 'liesofp', 'blessunleashed', 'eternalreturn', 'pubg'];
 const MOBILE_GAME_SLUGS = ['browndust', 'nikke'];
 const GAME_SLUGS = [...PC_GAME_SLUGS, ...MOBILE_GAME_SLUGS];
@@ -1390,6 +1410,33 @@ function verify(state) {
   if (!/User-agent:\s*\*/.test(robots)) errors.push('robots.txt: missing User-agent rule');
   if (!robots.includes('Sitemap: ' + SITE + 'sitemap.xml')) errors.push('robots.txt: sitemap directive missing or wrong');
 
+  /* ---------- K-POP 小众音乐卡（多卡，按语言平台映射）---------- */
+  {
+    const zhNodesK = extractNodes(state.source);
+    if (!(zhNodesK['picks.headsub'] || '').length) errors.push('zh: picks.headsub（优先推荐韩国小众歌手行）missing');
+    for (const lang of LANGS) {
+      if (!(extractNodes(state.pages[lang] || '')['picks.headsub'] || '').length) errors.push(lang + ': picks.headsub missing');
+    }
+    for (const slug of KPOP_SLUGS) {
+      const card = state.source.match(new RegExp('<article class="pick-card">\\s*<p class="pick-card-label" data-i18n="picks\\.' + slug + '\\.label">[\\s\\S]*?<\\/article>'));
+      if (!card) { errors.push('zh: kpop card missing -> ' + slug); continue; }
+      const zhAct = zhNodesK['picks.' + slug + '.actions'] || '';
+      if (!zhAct.includes(KPOP_ZH_LINK[slug])) errors.push('zh: kpop ' + slug + ' 大陆通道链接缺失');
+      if (/youtu\.?be|youtube\.com/.test(zhAct)) errors.push('zh: kpop ' + slug + ' 中文页禁挂 YouTube');
+      if (!state.kpopImages[slug]) errors.push('kpop: ' + slug + ' 缩略图不在 assets/');
+      if (!assetRefs(state.source).includes(KPOP_IMAGE[slug])) errors.push('zh: kpop ' + slug + ' 缩略图未被引用');
+      for (const lang of LANGS) {
+        const nodes = extractNodes(state.pages[lang] || '');
+        const act = nodes['picks.' + slug + '.actions'] || '';
+        if (!act.includes('youtu.be/' + KPOP_YT_ID[slug])) errors.push(lang + ': kpop ' + slug + ' YouTube 链接错误/缺失');
+        if (/y\.qq\.com|music\.163\.com/.test(act)) errors.push(lang + ': kpop ' + slug + ' 大陆链接泄漏进 ' + lang);
+        for (const key of ['label', 'title', 'desc', 'actions', 'note', 'imageCredit']) {
+          if (!(nodes['picks.' + slug + '.' + key] || '').length) errors.push(lang + ': kpop ' + slug + ' 缺 ' + key);
+        }
+      }
+    }
+  }
+
   /* ---------- 仅中文卡片（data-zh-only）机制 ----------
      这些卡只在中文源页出现，build-i18n.mjs 生成 en/jp/ko 时整块剔除。
      不变量：① 卡内不得含任何 data-i18n（否则四语键位一致校验会失败）；
@@ -1427,6 +1474,7 @@ const state = {
   assetExists: fs.existsSync(path.join(ROOT, 'assets/clipping-hkcd.jpg')),
   picksImageExists: fs.existsSync(path.join(ROOT, 'assets/oh-my-gran-poster.jpg')),
   musicImageExists: fs.existsSync(path.join(ROOT, MUSIC_IMAGE)),
+  kpopImages: Object.fromEntries(KPOP_SLUGS.map(s => [s, fs.existsSync(path.join(ROOT, KPOP_IMAGE[s]))])),
   dramaImages: Object.fromEntries(DRAMA_SLUGS.map(slug => [slug,
     fs.existsSync(path.join(ROOT, DRAMA_IMAGE[slug]))])),
   gameImages: Object.fromEntries(GAME_SLUGS.map(slug => [slug,
@@ -2034,7 +2082,18 @@ const faults = [
   } },
   { name: 'zh-only game name leaked into Japanese page', mutate: s => {
     s.pages.jp = s.pages.jp.replace('</body>', '<div>劲舞团</div></body>');
-  } }
+  } },
+  { name: 'kpop card removed from Chinese source', mutate: s => {
+    s.source = s.source.replace(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.minty\.label">[\s\S]*?<\/article>/, '');
+  } },
+  { name: 'kpop Chinese page uses YouTube', mutate: s => {
+    s.source = s.source.replace(KPOP_ZH_LINK.minty, 'https://youtu.be/6rzemizJoNQ');
+  } },
+  { name: 'kpop foreign page uses QQ Music', mutate: s => {
+    s.dict.en.html['picks.seoeve.actions'] = '<a class="pick-link pick-link-featured" href="https://y.qq.com/n/m/detail/mv/index.html?vid=004AWNv33sYmI4" target="_blank" rel="noopener noreferrer">QQ</a>';
+  } },
+  { name: 'kpop thumbnail missing from assets', mutate: s => { s.kpopImages.ussoboy = false; } },
+  { name: 'kpop headsub line removed from English', mutate: s => { delete s.dict.en.html['picks.headsub']; } }
 ];
 
 let caught = 0;
