@@ -182,10 +182,11 @@ const MUSIC_YTNOTE = {
    端游/手游拆成两个锚点两个子标题；六张卡全部沿用剧集卡标准两栏结构。 */
 /* K-POP 小众音乐卡（多卡）：中文页挂 QQ/网易云，外文页挂 YouTube。
    与单卡 music1 分开校验，避免动 music1 的既有断言。 */
-const KPOP_SLUGS = ['minty', 'seoeve', 'ussoboy', 'sospecial', 'milksong', 'jjarappappa'];
+const KPOP_SLUGS = ['minty', 'seoeve', 'ussoboy', 'sospecial', 'milksong', 'jjarappappa', 'misskorea', 'study'];
 const KPOP_IMAGE = {
   minty: 'assets/mv-minty.jpg', seoeve: 'assets/mv-seoeve.jpg', ussoboy: 'assets/mv-ussoboy.jpg',
-  sospecial: 'assets/mv-soSpecial.jpg', milksong: 'assets/mv-milksong.jpg', jjarappappa: 'assets/mv-jjarappappa.jpg'
+  sospecial: 'assets/mv-soSpecial.jpg', milksong: 'assets/mv-milksong.jpg', jjarappappa: 'assets/mv-jjarappappa.jpg',
+  misskorea: 'assets/mv-misskorea.jpg', study: 'assets/mv-study.jpg'
 };
 const KPOP_ZH_LINK = {
   minty: 'music.163.com/#/mv?id=10894437',
@@ -193,12 +194,24 @@ const KPOP_ZH_LINK = {
   ussoboy: 'music.163.com/#/mv?id=34726420',
   sospecial: 'y.qq.com/n/m/detail/mv/index.html?vid=s00256y3tzt',
   milksong: 'y.qq.com/n/m/detail/mv/index.html?vid=g0013sfftjs',
-  jjarappappa: 'y.qq.com/n/m/detail/mv/index.html?vid=o00204lrds8'
+  jjarappappa: 'y.qq.com/n/m/detail/mv/index.html?vid=o00204lrds8',
+  misskorea: 'i.y.qq.com/v8/playsong.html?songid=204137216', study: 'y.qq.com/n/m/detail/mv/index.html?vid=q0012sypyu1'
 };
 const KPOP_YT_ID = {
   minty: '6rzemizJoNQ', seoeve: 'dd9yeNZXWXg', ussoboy: 'CD7J5oCKH2Q',
-  sospecial: 'pzP_w8rpxHA', milksong: 'bpGZSJPq3pk', jjarappappa: 'clgGG_qWFww'
+  sospecial: 'pzP_w8rpxHA', milksong: 'bpGZSJPq3pk', jjarappappa: 'clgGG_qWFww',
+  misskorea: 'iB0FLshLbLk', study: 'rS_k1DhhDy4'
 };
+
+/* 新增两首歌的发行日期（精确到日，防「只比年份」把同年顺序排错）。 */
+const MUSIC_DATE = { seoeve:'2024', minty:'2019', sospecial:'2018',
+  ussoboy:'2017-11-16', misskorea:'2017-09-20', music1:'2013-10-30',
+  study:'2013-07-11', jjarappappa:'2012', milksong:'2004' };
+const MUSIC_DATE_TEXT = { misskorea:'2017-09-20', study:'2013-07-11' };
+const MUSIC_DISAMBIG = { zh:'不是李孝利', en:'not Lee Hyori',
+  jp:'イ・ヒョリではありません', ko:'이효리가 아닙니다' };
+/* 站长红线：本站不推北韩相关资源，四语页面都不给这类线索。 */
+const FORBIDDEN_DPRK = ['북한','北韓','北朝鲜','DPRK','North Korea','조선민주주의인민공화국'];
 
 const PC_GAME_SLUGS = ['sololeveling', 'stellarblade', 'liesofp', 'blessunleashed', 'eternalreturn', 'pubg'];
 const MOBILE_GAME_SLUGS = ['browndust', 'nikke'];
@@ -229,9 +242,10 @@ const SORT_RULES = {
             drama11:2016, drama13:2016, drama2:2015, drama12:2015, drama3:2013,
             drama4:2013, drama6:2012, drama5:2003 } },
   music: { grid: 'picks-kpop',
-    order: ['seoeve','minty','sospecial','ussoboy','music1','jjarappappa','milksong'],
-    year: { seoeve:2024, minty:2019, sospecial:2018, ussoboy:2017, music1:2013,
-            jjarappappa:2012, milksong:2004 } },
+    order: ['seoeve','minty','sospecial','ussoboy','misskorea','music1','study','jjarappappa','milksong'],
+    year: { seoeve:2024, minty:2019, sospecial:2018, ussoboy:2017, misskorea:2017,
+            music1:2013, study:2013, jjarappappa:2012, milksong:2004 },
+    date: MUSIC_DATE },
   pc: { grid: 'picks-pc-games',
     order: ['sololeveling','stellarblade','liesofp','rbeat','blessunleashed',
             'eternalreturn','pubg','kart','audition','bnb'],
@@ -1575,6 +1589,13 @@ function verify(state) {
       if (!(rule.year[prev] >= rule.year[cur]))
         errors.push(tag + ': ' + grid + ' year not descending at ' + prev + '(' + rule.year[prev] + ') -> ' + cur + '(' + rule.year[cur] + ')');
     }
+    if (rule.date) {
+      for (let i = 1; i < found.length; i++) {
+        const prev = found[i-1], cur = found[i];
+        if (rule.date[prev] && rule.date[cur] && !(rule.date[prev] >= rule.date[cur]))
+          errors.push(tag + ': ' + grid + ' release date not descending at ' + prev + '(' + rule.date[prev] + ') -> ' + cur + '(' + rule.date[cur] + ')');
+      }
+    }
     for (const slug of rule.order) {
       const ly = rule.year[slug];
       if (!new RegExp('picks\.' + slug + '\.label"[^>]*>[^<]*' + ly).test(page))
@@ -1591,7 +1612,72 @@ function verify(state) {
     checkDescending(p, 'picks-kpop', SORT_RULES.music, lang);
     checkDescending(p, 'picks-pc-games', SORT_RULES.pc, lang);
     checkDescending(p, 'picks-mobile-games', SORT_RULES.mobile, lang);
-  }  /* ---------- 影片档案：不得照抄线索站「只写剧情片」的说法 ---------- */
+  }  /* ---------- 2026-11-24 新增两歌：임효라《미스코리아》+ Stellar《공부하세요》 ----------
+     站长明确：前者无 MV，中文只能挂 QQ 歌曲页；三语挂指定 YouTube 现场演出。
+     歌名易混李孝利 → 四语必须写明「不是李孝利」。后者按 2013-07-11 精确发行日排。
+     两条都不给任何北韩相关资源线索。 */
+  {
+    const newSlugs = ['misskorea','study'];
+    const zhNewNodes = extractNodes(state.source);
+    for (const slug of newSlugs) {
+      const card = state.source.match(new RegExp('<article class="pick-card">\\s*<p class="pick-card-label" data-i18n="picks\\.' + slug + '\\.label">([\\s\\S]*?)<\\/article>'));
+      if (!card) { errors.push('zh: new music card missing -> ' + slug); continue; }
+      const body = card[1];
+      if (!body.includes('<div class="pick-poster-row">') ||
+          !body.includes('class="pick-image pick-image-poster"') ||
+          /pick-poster-row-feature|pick-card-feature|pick-figure-still/.test(body))
+        errors.push('zh: ' + slug + ' new card must use standard poster layout');
+      if (!assetRefs(state.source).includes(KPOP_IMAGE[slug])) errors.push('zh: ' + slug + ' new poster not referenced');
+      if (!state.kpopImages[slug]) errors.push('music: ' + slug + ' poster file missing');
+      for (const key of ['label','title','desc','actions','note','imageCredit']) {
+        if (!(zhNewNodes['picks.' + slug + '.' + key] || '').length)
+          errors.push('zh: new song missing key -> ' + slug + '.' + key);
+      }
+      for (const lang of LANGS) {
+        const p = state.pages[lang] || '';
+        const nd = extractNodes(p);
+        for (const key of ['label','title','desc','actions','note','imageCredit']) {
+          const v = state.dict[lang].html['picks.' + slug + '.' + key];
+          if (!v) errors.push(lang + ': new song key missing -> ' + slug + '.' + key);
+          else if (!(nd['picks.' + slug + '.' + key] || '').includes(v))
+            errors.push(lang + ': new song text not rendered -> ' + slug + '.' + key);
+        }
+        const alt = state.dict[lang].attr['picks.' + slug + '.imageAlt'];
+        if (!alt || !p.includes(alt)) errors.push(lang + ': new song imageAlt missing -> ' + slug);
+      }
+    }
+    const zhMiss = zhNewNodes['picks.misskorea.actions'] || '';
+    if (!zhMiss.includes('i.y.qq.com/v8/playsong.html?songid=204137216'))
+      errors.push('zh: misskorea must link QQ song page');
+    if (/youtu\.?be|youtube\.com/.test(zhMiss)) errors.push('zh: misskorea actions must not carry YouTube');
+    if (!/QQ 音乐只有歌曲页/.test(zhNewNodes['picks.misskorea.note'] || ''))
+      errors.push('zh: misskorea must state QQ Music has no MV');
+    for (const lang of LANGS) {
+      const act = extractNodes(state.pages[lang] || '')['picks.misskorea.actions'] || '';
+      if (!act.includes('https://youtu.be/iB0FLshLbLk')) errors.push(lang + ': misskorea YouTube link wrong');
+      if (/y\.qq\.com|music\.163\.com/.test(act)) errors.push(lang + ': misskorea mainland link leaked');
+    }
+    for (const lang of ['zh', ...LANGS]) {
+      const page = lang === 'zh' ? state.source : (state.pages[lang] || '');
+      if (!page.replace(/<[^>]+>/g, ' ').includes(MUSIC_DISAMBIG[lang]))
+        errors.push(lang + ': misskorea lost the not-Lee-Hyori disambiguation');
+    }
+    for (const slug of Object.keys(MUSIC_DATE_TEXT)) {
+      for (const lang of ['zh', ...LANGS]) {
+        const page = lang === 'zh' ? state.source : (state.pages[lang] || '');
+        if (!page.includes(MUSIC_DATE_TEXT[slug]))
+          errors.push(lang + ': ' + slug + ' exact release date ' + MUSIC_DATE_TEXT[slug] + ' missing');
+      }
+    }
+    for (const lang of ['zh', ...LANGS]) {
+      const page = lang === 'zh' ? state.source : (state.pages[lang] || '');
+      for (const token of FORBIDDEN_DPRK) {
+        if (page.includes(token)) errors.push(lang + ': forbidden DPRK resource token -> ' + token);
+      }
+    }
+  }
+
+  /* ---------- 影片档案：不得照抄线索站「只写剧情片」的说法 ---------- */
   if (!source.includes(FILM_SECTION)) errors.push('zh: film-note section missing');
   if (!source.includes('<a href="#film-note" data-i18n="nav.film">')) errors.push('zh: nav film link missing');
   for (const link of FILM_SOURCE_LINKS) {
@@ -2305,6 +2391,29 @@ const faults = [
     s.source = s.source.replace('data-i18n="picks.kart.label">韩国 · Nexon · 2006<', 'data-i18n="picks.kart.label">韩国 · Nexon · 2016<');
   } }
 ,
+  { name: 'misskorea Chinese link swapped to YouTube', mutate: s => {
+    s.source = s.source.replace('https://i.y.qq.com/v8/playsong.html?songid=204137216#webchat_redirect', 'https://youtu.be/iB0FLshLbLk');
+  } },
+  { name: 'misskorea English link leaked back to QQ Music', mutate: s => {
+    s.pages.en = s.pages.en.replace('href="https://youtu.be/iB0FLshLbLk"', 'href="https://y.qq.com/n/m/detail/mv/index.html?vid=204137216"');
+  } },
+  { name: 'study card moved before Open the Door (release order drift)', mutate: s => {
+    const re = /(<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.music1\.label">[\s\S]*?<\/article>)(\s*)(<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.study\.label">[\s\S]*?<\/article>)/;
+    if (re.test(s.source)) s.source = s.source.replace(re, (_m, a, sp, b) => b + sp + a);
+  } },
+  { name: 'not-Lee-Hyori disambiguation scrubbed from Korean page', mutate: s => {
+    s.pages.ko = s.pages.ko.replace('이효리가 아닙니다', '다른 가수입니다');
+  } },
+  { name: 'exact 2013-07-11 release date scrubbed from all four pages', mutate: s => {
+    s.source = s.source.replace('2013-07-11', '2013-07-10');
+    for (const l of ['en','jp','ko']) s.pages[l] = s.pages[l].replace('2013-07-11', '2013-07-10');
+  } },
+  { name: 'DPRK resource clue injected into Chinese study card', mutate: s => {
+    s.source = s.source.replace('data-i18n="picks.study.note">', 'data-i18n="picks.study.note">북한 ');
+  } },
+  { name: 'new study poster marked missing', mutate: s => {
+    s.kpopImages.study = false;
+  } },
   { name: 'film-note section removed from Chinese source', mutate: s => {
     s.source = s.source.replace(FILM_SECTION, '');
   } },
