@@ -461,8 +461,8 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
 
 /* ---------- webmaster picks ---------- */
 .picks-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
-/* 音乐区单卡：沿用同一套卡片结构，网格列宽与剧集区一致，只把这一列收到与剧集卡同宽 */
-.picks-grid-music { grid-template-columns: minmax(0, 1fr); max-width: calc(50% - 10px); }
+/* 音乐区多卡：与剧集区同一套两列网格，一行放 2 个 */
+.picks-grid-music { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .picks-subhead-music { margin-top: 26px; }
 .picks-yt-note { margin: 14px 0 0; }
 @media (max-width: 960px) {
@@ -655,7 +655,7 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
 @media (max-width: 960px) {
   .hero-inner { grid-template-columns: minmax(0, 1fr); gap: 30px; padding-bottom: 86px; }
   .hero-art { max-width: 460px; margin-inline: auto; }
-  .origin-grid, .lamp-grid, .archive-body, .picks-grid { grid-template-columns: 1fr; }
+  .origin-grid, .lamp-grid, .archive-body, .picks-grid, .picks-grid-music { grid-template-columns: 1fr; }
   .lamp-art { max-width: 480px; }
   .header-inner { gap: 14px; }
   .site-nav { gap: 14px; }
