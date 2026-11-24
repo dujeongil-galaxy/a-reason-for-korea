@@ -2030,13 +2030,19 @@ function verify(state) {
     if (!source.includes('href="' + link + '"')) errors.push('zh: film licensed watch link missing -> ' + link);
   }
   if (/不提供(任何)?播放链接/.test(source)) errors.push('zh: film still says no playback links');
-  // film teaser 必须在玩游戏区内（链游 credit 之后、加速器标题之前）
+  // film teaser 必须在玩游戏区内、加速器卡片网格之后、影片档案区块之前
   {
     const teaserAt = source.indexOf('data-i18n="film.teaser"');
     const accelAt = source.indexOf('data-i18n="nav.picks.game.accelerator"');
     const kpopAt = source.indexOf('data-i18n="nav.picks.kpop"');
-    if (teaserAt < 0 || accelAt < 0 || kpopAt < 0 || teaserAt < kpopAt || teaserAt > accelAt) {
-      errors.push('zh: film teaser must sit inside games section (after kpop, before accelerator)');
+    const accelGridAt = source.indexOf('id="picks-accelerators"');
+    const lastAccelCardAt = source.indexOf('data-i18n="picks.geili.actions"');
+    const archiveAt = source.indexOf('id="archive"');
+    const filmNoteAt = source.indexOf(FILM_SECTION);
+    if (teaserAt < 0 || accelAt < 0 || kpopAt < 0 || accelGridAt < 0 || lastAccelCardAt < 0 || archiveAt < 0 || filmNoteAt < 0
+      || teaserAt < kpopAt || teaserAt < accelAt || teaserAt < accelGridAt || teaserAt < lastAccelCardAt
+      || teaserAt > archiveAt || teaserAt > filmNoteAt) {
+      errors.push('zh: film teaser must sit inside games section, after accelerator card grid and before film-note');
     }
   }
   for (const lang of LANGS) {
@@ -2053,6 +2059,16 @@ function verify(state) {
     const noteAt = p.indexOf('id="1thek-note"');
     const pcAt = p.indexOf('data-i18n="nav.picks.game.pc"');
     if (noteAt < 0 || pcAt < 0 || noteAt > pcAt) errors.push(lang + ': 1theK appendix must sit before PC games');
+    // film teaser 在四语页面里同样必须在加速器卡片网格之后、影片档案区块之前
+    {
+      const tAt = p.indexOf('data-i18n="film.teaser"');
+      const gAt = p.indexOf('id="picks-accelerators"');
+      const lastCardAt = p.indexOf('data-i18n="picks.geili.actions"');
+      const fAt = p.indexOf(FILM_SECTION);
+      if (tAt < 0 || gAt < 0 || lastCardAt < 0 || fAt < 0 || tAt < gAt || tAt < lastCardAt || tAt > fAt) {
+        errors.push(lang + ': film teaser must sit after accelerator card grid and before film-note');
+      }
+    }
   }
   checkOfficialPCGames(state, errors);
   return errors;
@@ -2793,6 +2809,16 @@ const faults = [
   } },
   { name: 'film teaser removed from Chinese picks', mutate: s => {
     s.source = s.source.replace('data-i18n="film.teaser"', 'data-i18n="x"');
+  } },
+  { name: 'film teaser moved back above accelerator heading', mutate: s => {
+    const line = s.source.split('\n').find(l => l.includes('data-i18n="film.teaser"'));
+    s.source = s.source.replace(line + '\n', '');
+    s.source = s.source.replace('<p class="picks-subhead picks-subhead-platform" data-i18n="nav.picks.game.accelerator">', line + '\n      <p class="picks-subhead picks-subhead-platform" data-i18n="nav.picks.game.accelerator">');
+  } },
+  { name: 'film teaser pushed below film-note on English page', mutate: s => {
+    const line = s.pages.en.split('\n').find(l => l.includes('data-i18n="film.teaser"'));
+    s.pages.en = s.pages.en.split(line + '\n').join('');
+    s.pages.en = s.pages.en.replace('</body>', line + '\n</body>');
   } },
   { name: 'film licensed watch links removed from Chinese film record', mutate: s => {
     s.source = s.source.replace('data-i18n="film.watchLinks"', 'data-i18n="x"');
