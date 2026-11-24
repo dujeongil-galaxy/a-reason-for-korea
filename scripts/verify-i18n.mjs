@@ -431,6 +431,24 @@ const DRAMA_SUB_EXTRA = {
   'en/drama11': { url: 'https://tubitv.com/series/300009794/bring-it-on-ghost-subbed', label: 'Watch free on Tubi (with ads)' },
   'en/drama13': { url: 'https://tubitv.com/series/300010014/dear-my-friends', label: 'Watch free on Tubi (with ads)' }
 };
+/* 2026-11-24 站长：中文按港区、港区没有退台湾区；英/日/韩按本区，正规正版订阅平台都可挂。
+   给原本无订阅按钮但本区有正版的卡补齐（JustWatch 五区实查 + URL 逐条 curl 200 验证，
+   排除 HBO Max 404 / Viki 死链 / Tencent onelink 跳转）。AFF 全部保留。写死防回归。 */
+const LICENSED_SUB_EXTRA = {
+  'zh/drama10': { url: 'https://app.primevideo.com/detail?gti=amzn1.dv.gti.a3b03bc3-0b7d-49e5-8eb1-6d80ac89dd13', label: '在 Prime Video 观看（订阅）' },
+  'zh/film': { url: 'https://www.catchplay.com/tw/video/3ec4e52d-46b6-4b5e-aca4-f06ff0b46d45', label: '在 Catchplay 观看（订阅·中国台湾地区）' },
+  'jp/drama6': { url: 'https://video.unext.jp/episode/SID0003538/ED00032550', label: 'U-NEXT で見る（定額制）' },
+  'jp/drama10': { url: 'https://watch.amazon.co.jp/detail?gti=amzn1.dv.gti.a3b03bc3-0b7d-49e5-8eb1-6d80ac89dd13', label: 'Prime Video で見る（定額制）' },
+  'jp/drama11': { url: 'https://watch.amazon.co.jp/detail?gti=amzn1.dv.gti.63df4c98-3660-43f4-8225-5159e6364658', label: 'Prime Video で見る（定額制）' },
+  'jp/drama12': { url: 'https://video.unext.jp/episode/SID0026887/ED00139519', label: 'U-NEXT で見る（定額制）' },
+  'jp/drama13': { url: 'https://watch.amazon.co.jp/detail?gti=amzn1.dv.gti.bf528ebf-b037-45b2-8287-a86a55defa5e', label: 'Prime Video で見る（定額制）' },
+  'ko/drama6': { url: 'https://www.wavve.com/player/vod?contentid=M_EP201611284940.1', label: 'wavve에서 보기 (정액제)' },
+  'ko/drama10': { url: 'https://www.wavve.com/player/vod?contentid=J4401_J44000000012_01_0001.1', label: 'wavve에서 보기 (정액제)' },
+  'ko/drama11': { url: 'https://www.tving.com/contents/P000298133', label: 'TVING에서 보기 (정액제)' },
+  'ko/drama12': { url: 'https://www.wavve.com/player/vod?contentid=J3801_J38000000154_01_0001.1', label: 'wavve에서 보기 (정액제)' },
+  'ko/drama13': { url: 'https://www.tving.com/contents/P000275500', label: 'TVING에서 보기 (정액제)' },
+};
+
 /* 订阅渠道链接前缀白名单：境外持牌平台；netflix.com 与盗版域都不在内 */
 /* 2026-11-24 站长：视频区逐条检查，查不到可用正版就写提示，不许挂死链。
    四语提示文案逐语手写，含义一致：本站未检索到正版资源，可能已下架。 */
@@ -460,7 +478,9 @@ const SUB_DOMAINS = [
   'https://www.tving.com/contents/',
   'https://www.wavve.com/player/vod?contentid=',
   'https://watcha.com/contents/',
-  'https://www.netflix.com/title/'
+  'https://www.netflix.com/title/',
+  'https://www.catchplay.com/tw/video/',
+  'https://app.primevideo.com/detail?gti='
 ];
 /* SEO（2026-11-22 站长指令：按推荐执行 A+C+D 长尾）。
    title / description 关键词前置、金句后置；旧文艺标题不得回退。
@@ -1589,6 +1609,26 @@ function verify(state) {
       const nfAt = actions.indexOf(NETFLIX_TITLE_PREFIX + id);
       const redAt = actions.indexOf('pick-netflix-note');
       if (nfAt < 0 || redAt < 0 || nfAt > redAt) errors.push(lang + ': ' + slug + ' Netflix button must sit above the aff note');
+    }
+    /* 2026-11-24 新增正版订阅按钮专项断言：不在 DRAMA_SLUGS 的卡（drama6/10-13/film）也要锁死。 */
+    for (const [key, want] of Object.entries(LICENSED_SUB_EXTRA)) {
+      const lang = key.slice(0, 2);
+      const slug = key.slice(3);
+      const nodes = extractNodes(lang === 'zh' ? state.source : (state.pages[lang] || ''));
+      const actions = nodes['picks.' + slug + '.actions'] || '';
+      if (!actions.includes('class="pick-link pick-link-sub" href="' + want.url + '"')) {
+        errors.push(lang + ': ' + slug + ' licensed subscription link missing -> ' + want.url);
+      }
+      if (!actions.includes(want.label)) errors.push(lang + ': ' + slug + ' licensed subscription label drift');
+      if (!SUB_DOMAINS.some(prefix => want.url.startsWith(prefix))) {
+        errors.push(lang + ': ' + slug + ' licensed platform outside allowlist');
+      }
+      const subAt = actions.indexOf(want.url);
+      const redAt = actions.indexOf('pick-netflix-note');
+      if (subAt < 0 || redAt < 0 || subAt > redAt) {
+        errors.push(lang + ': ' + slug + ' licensed subscription button must sit above the aff note');
+      }
+      if (!actions.includes(AFF_LINK)) errors.push(lang + ': ' + slug + ' aff entry must be preserved');
     }
   }
 
@@ -2741,6 +2781,21 @@ const faults = [
   { name: 'en Netflix button moved below aff note', mutate: s => {
     s.pages.en = s.pages.en.replace('data-i18n="picks.drama6.actions"><a class="pick-link pick-link-sub" href="https://www.netflix.com/title/80031790" target="_blank" rel="noopener noreferrer">Watch on Netflix (subscription)</a>', 'data-i18n="picks.drama6.actions">');
     s.dict.en.html['picks.drama6.actions'] = s.dict.en.html['picks.drama6.actions'].replace('<a class="pick-link pick-link-sub" href="https://www.netflix.com/title/80031790" target="_blank" rel="noopener noreferrer">Watch on Netflix (subscription)</a>', '');
+  } },
+  { name: 'zh film Catchplay subscription button removed', mutate: s => {
+    const u = 'https://www.catchplay.com/tw/video/3ec4e52d-46b6-4b5e-aca4-f06ff0b46d45';
+    s.source = s.source.replace('<a class="pick-link pick-link-sub" href="' + u + '" target="_blank" rel="noopener noreferrer">在 Catchplay 观看（订阅·中国台湾地区）</a>', '');
+  } },
+  { name: 'zh film Catchplay URL tampered', mutate: s => {
+    s.source = s.source.replace('https://www.catchplay.com/tw/video/3ec4e52d-46b6-4b5e-aca4-f06ff0b46d45', 'https://www.catchplay.com/tw/video/00000000');
+  } },
+  { name: 'jp drama6 U-NEXT button removed', mutate: s => {
+    s.pages.jp = s.pages.jp.replace('<a class="pick-link pick-link-sub" href="https://video.unext.jp/episode/SID0003538/ED00032550" target="_blank" rel="noopener noreferrer">U-NEXT で見る（定額制）</a>', '');
+    s.dict.jp.html['picks.drama6.actions'] = s.dict.jp.html['picks.drama6.actions'].replace('<a class="pick-link pick-link-sub" href="https://video.unext.jp/episode/SID0003538/ED00032550" target="_blank" rel="noopener noreferrer">U-NEXT で見る（定額制）</a>', '');
+  } },
+  { name: 'ko drama13 TVING label drifted', mutate: s => {
+    s.pages.ko = s.pages.ko.replace('TVING에서 보기 (정액제)', 'TVING에서 찾기');
+    s.dict.ko.html['picks.drama13.actions'] = s.dict.ko.html['picks.drama13.actions'].replace('TVING에서 보기 (정액제)', 'TVING에서 찾기');
   } },
 ];
 let caught = 0;
