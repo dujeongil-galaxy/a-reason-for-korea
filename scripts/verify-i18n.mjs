@@ -1443,11 +1443,12 @@ function verify(state) {
      每张卡的 label/title/desc/imageCredit/imageAlt/actions/note 七键四语齐全；
      四语页面均引用对应海报文件。 */
   const FIXED_SLUGS = ['drama6','drama7','drama8','drama9','drama10','drama11',
-    'bnb','kart','audition','rbeat'];
+    'drama12','drama13','bnb','kart','audition','rbeat'];
   const FIXED_IMAGE = {
     drama6: 'moon-embracing-sun-poster.jpg', drama7: 'mr-queen-poster.jpg',
     drama8: 'hi-bye-mama-poster.jpg', drama9: 'tyrants-chef-poster.jpg',
     drama10: 'deaths-game-poster.jpg', drama11: 'fight-ghost-poster.jpg',
+    drama12: 'beloved-eundong-poster.jpg', drama13: 'dear-my-friends-poster.jpg',
     bnb: 'bnb-poster.jpg', kart: 'kart-poster.jpg',
     audition: 'audition-poster.jpg', rbeat: 'rbeat-poster.jpg' };
   if (/data-zh-only/.test(state.source)) errors.push('zh: 源页仍有 data-zh-only 残留');
@@ -2104,6 +2105,12 @@ const faults = [
   } },
   { name: 'a fixed card poster missing from English page', mutate: s => {
     s.pages.en = s.pages.en.replace('assets/rbeat-poster.jpg', 'assets/gone.jpg');
+  } },
+  { name: 'beloved eundong poster removed from Korean page', mutate: s => {
+    s.pages.ko = s.pages.ko.replace('assets/beloved-eundong-poster.jpg', 'assets/gone.jpg');
+  } },
+  { name: 'dear my friends title removed from dictionary', mutate: s => {
+    delete s.dict.en.html['picks.drama13.title'];
   } },
   { name: 'kpop card removed from Chinese source', mutate: s => {
     s.source = s.source.replace(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.minty\.label">[\s\S]*?<\/article>/, '');
