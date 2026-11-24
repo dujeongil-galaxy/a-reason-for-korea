@@ -437,6 +437,7 @@ const DRAMA_SUB_EXTRA = {
 const LICENSED_SUB_EXTRA = {
   'zh/drama10': { url: 'https://app.primevideo.com/detail?gti=amzn1.dv.gti.a3b03bc3-0b7d-49e5-8eb1-6d80ac89dd13', label: '在 Prime Video 观看（订阅）' },
   'zh/film': { url: 'https://www.catchplay.com/tw/video/3ec4e52d-46b6-4b5e-aca4-f06ff0b46d45', label: '在 Catchplay 观看（订阅·台湾）' },
+  'zh/drama11': { url: 'https://www.primevideo.com/-/zh_TW/detail/%E6%89%93%E6%9E%B6%E5%90%A7%EF%BC%8C%E9%AC%BC%E7%A5%9E/0HVE4CVQNSBVA7YGU5OYIR2H51', label: '在 Prime Video 观看（订阅）' },
   'jp/drama6': { url: 'https://video.unext.jp/episode/SID0003538/ED00032550', label: 'U-NEXT で見る（定額制）' },
   'jp/drama10': { url: 'https://watch.amazon.co.jp/detail?gti=amzn1.dv.gti.a3b03bc3-0b7d-49e5-8eb1-6d80ac89dd13', label: 'Prime Video で見る（定額制）' },
   'jp/drama11': { url: 'https://watch.amazon.co.jp/detail?gti=amzn1.dv.gti.63df4c98-3660-43f4-8225-5159e6364658', label: 'Prime Video で見る（定額制）' },
@@ -480,6 +481,7 @@ const SUB_DOMAINS = [
   'https://watcha.com/contents/',
   'https://www.netflix.com/title/',
   'https://www.catchplay.com/tw/video/',
+  'https://www.primevideo.com/-/zh_TW/detail/',
   'https://app.primevideo.com/detail?gti='
 ];
 /* SEO（2026-11-22 站长指令：按推荐执行 A+C+D 长尾）。
@@ -2785,6 +2787,13 @@ const faults = [
   { name: 'zh film Catchplay subscription button removed', mutate: s => {
     const u = 'https://www.catchplay.com/tw/video/3ec4e52d-46b6-4b5e-aca4-f06ff0b46d45';
     s.source = s.source.replace('<a class="pick-link pick-link-sub" href="' + u + '" target="_blank" rel="noopener noreferrer">在 Catchplay 观看（订阅·台湾）</a>', '');
+  } },
+  { name: 'zh drama11 Prime Video subscription button removed', mutate: s => {
+    const u = 'https://www.primevideo.com/-/zh_TW/detail/%E6%89%93%E6%9E%B6%E5%90%A7%EF%BC%8C%E9%AC%BC%E7%A5%9E/0HVE4CVQNSBVA7YGU5OYIR2H51';
+    s.source = s.source.replace('<a class="pick-link pick-link-sub" href="' + u + '" target="_blank" rel="noopener noreferrer">在 Prime Video 观看（订阅）</a>', '');
+  } },
+  { name: 'zh drama11 Prime Video URL tampered', mutate: s => {
+    s.source = s.source.replace('0HVE4CVQNSBVA7YGU5OYIR2H51', '0HVE4CVQNSBVA7YGU5OYIR2H52');
   } },
   { name: 'zh film Catchplay URL tampered', mutate: s => {
     s.source = s.source.replace('https://www.catchplay.com/tw/video/3ec4e52d-46b6-4b5e-aca4-f06ff0b46d45', 'https://www.catchplay.com/tw/video/00000000');
