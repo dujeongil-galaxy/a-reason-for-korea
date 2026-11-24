@@ -423,3 +423,7 @@
 - **规则**：① 历史/政治题材影片档案不是「回避理由」，按区查到正版就必须挂——Netflix title 80200945（KR/JP 有）、Prime Video（US）、Catchplay（TW）都查到就都挂；「本站不提供播放链接」这类自我设限的措辞一律不许出现在影片档案。② Netflix title ID 跨区通用，是否可看由地区+账号决定，文案里要写明「按所在地区」。③ 判断某片 Netflix 某区有无版权用 findmyvideos/netflix-movies.info 的地区列表 + Netflix 官方条目交叉，别信聚合站搜索摘要。
 - **坑（断言反转）**：把导航里的「影片档案」链接撤掉、改放到玩游戏区后，旧的「nav film link must exist」断言必须**反转**成「禁出现 film 链接 + 必须在玩游戏区有 teaser」，否则校验直接 FAIL；同时 `FILM_KEYS` 要移除 `nav.film` 并加新 key，否则字典 key 集与页面 key 集不等（`html key set != index.html key set`）。旧的「nav film drifted」故障注入失效会被 self-test 报 missed，要换成新的有效注入（如删 teaser/删 watchLinks/篡改 Netflix ID）。
 - **另（措辞正则误判）**：新增的 sourcesNote 写「不链接任何盗版播放资源」，含「播放资源/播放链接」字样，若 noPlay 正则写宽（如 `/不提供[任何]*播放链接/`）会误判——jp/ko 的新文案「海賊版の再生リンクも掲載しません」「불법 복제 재생 링크도 게시하지 않습니다」同样含「再生リンク/게시하지」，正则只锁精确旧措辞，别用宽泛子串。
+## 60. 删一条死链会连带打红「反向依赖」它的断言与故障注入
+- 现象：删掉日文《哦！文姬》已 404 的 Apple TV 按钮后，`PICKS_ACTIONS_EXPECT.jp.primary='apple'` 立刻判「primary link missing」；两条故障注入（把 Apple TV 换成 YouTube / 换成港区 AFF）因为 `.replace()` 源串不存在而变成空操作，注入无效自然也不会判红。英文 drama6 的 Netflix 按钮移除同理，原来的「Netflix 挪位」注入直接失效。
+- 规则：改按钮前先 `grep` 该 URL 的全部反向依赖——常量映射（`NETFLIX_TITLE_ID` / `PICKS_ACTIONS_EXPECT`）、mutation 里的 `.replace()` 源串、数量断言，一处不改就会「脚本全绿但断言已死」。无渠道区要显式建模（本仓 `primary: null` + 「整卡禁挂租买/YouTube」分支），不要留占位按钮蒙混。
+- 顺带：订阅按钮从「恰好一个」放开成「同区可多平台」时，数量断言必须改成「与登记数组长度相等」，否则多挂一个照样全绿、少挂一个也不会红。

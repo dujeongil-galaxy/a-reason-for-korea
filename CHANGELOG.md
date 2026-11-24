@@ -2,6 +2,14 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-25 · 按站长「中文找不到就推英文、尽可能补齐」补齐正版订阅 + 修两条死链
+
+- `dbd680e` — 站长看《大长今》后定调：「中文没有、英文倒是有，中文实在找不到就去推英文，反正尽可能补齐」。本轮按 JustWatch 港/台/日/韩/美四区实查 + 逐条 `curl` 验 URL 200，只挂订阅制持牌平台，报 404 的一律不挂。
+- **修死链（2 条）**：① drama6《拥抱太阳的月亮》`netflix.com/title/80031790` 已 404（该剧已从港区/美区下架）→ 中英文页均移除该 Netflix 按钮，`NETFLIX_TITLE_ID` 同步删 `zh/drama6`、`en/drama6`，英文卡改挂美区 OnDemandKorea（`contentId=707960`）；② 日文页《哦！文姬》Apple TV `id1691528206` 已 404 → 移除该按钮，日区实查无该片持牌租买/订阅渠道，整卡只留 AFF 红字。
+- **补格（10 处，全部订阅制、URL 已验 200）**：en drama2 OnDemandKorea `contentId=1609890`；en drama3 OnDemandKorea `735544`；en drama6 OnDemandKorea `707960`；jp drama5《大长今》FOD（`fod.fujitv.co.jp/title/4e07/4e07120001/`，文案「FOD で見る（定額制）」）；ko drama5《大长今》wavve（`M_EP201703035422.1`，文案「wavve에서 보기 (정액제)」）；ko drama7 / drama8 / drama9 / drama10 各挂 TVING（`P001443981` / `P001158358` / `P001781079` / `P001754712`）；ko drama12 Watcha（`watcha.com/contents/tPVXJ4E`，文案「왓챠에서 보기 (정액제)」）；en film YouTube 免费带广告（`watch?v=Ck9onnQBStU`，文案「Watch free on YouTube (with ads)」）。新按钮一律排在 AFF 红字之上，AFF 邀请码与红字原样保留。
+- **不挂（保持原状）**：大长今 / 我亲爱的朋友们 / 亲爱的恩东啊 / 无理的前进 港区实查无持牌渠道，中文页维持只挂 AFF 红字；Viki 全站不挂（本机打开 `viki.com/videos/1069131v-...` 即返回「该地区无法使用 Viki」，站长此前已判死链）；en/jp/ko 不新增 `netflix.com` 直链，仍由 `NETFLIX_TITLE_ID` 统一管理。
+- **校验**：`DRAMA_SUB` / `DRAMA_SUB_EXTRA` / `LICENSED_SUB_EXTRA` 由「单平台」升级为「数组多平台」，逐条锁 URL + 文案 + 顺序，并用「订阅按钮数量 == 登记条目数」替代原来的「恰好一个」；`SUB_DOMAINS` 白名单加 `https://www.ondemandkorea.com/player/`、`https://fod.fujitv.co.jp/title/`、`https://www.youtube.com/watch?`；`PICKS_ACTIONS_EXPECT.jp.primary` 改为 `null`（无渠道区禁挂任何租买按钮与 YouTube，只留红字）；两条依赖已删 Apple TV 的故障注入改为「硬塞按钮」，Netflix 删除用例改用 en/drama1。`VERIFY OK` **404 节点 / 63 属性 / 4 语**，自检 **245/245**。
+
 ## 2026-11-24 · 影片档案挂正版 + 1theK 附页 + 影片档案按钮移入玩游戏区
 
 - `37e2f38` — 站长怒指「影片档案故意不挂视频链接，一说政治就回避」。认账：film-note 区原文写着「本站不提供影片播放资源 / 不提供任何播放链接」，与已定的按区补挂正版规则冲突，属回避。核实外网：《出租车司机》Netflix title **80200945**（KR/JP 有，HK/TW/US 无；findmyvideos + netflix-movies.info + Netflix 官方条目交叉），美区 Prime Video、台区 Catchplay。

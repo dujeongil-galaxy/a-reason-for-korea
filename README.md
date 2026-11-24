@@ -121,3 +121,5 @@ python -m http.server 8000
 ## 记账
 
 改动与真实提交号见 [CHANGELOG.md](CHANGELOG.md)，踩过的坑见 [PITFALLS.md](PITFALLS.md)。
+
+最近一笔：`dbd680e`（2026-11-25）按站长「中文找不到就推英文、尽可能补齐」补齐 10 处正版订阅（OnDemandKorea / FOD / wavve / TVING ×4 / Watcha / YouTube），并修掉 drama6 Netflix 与日文《哦！文姬》Apple TV 两条死链；`node scripts/build-i18n.mjs` + `node scripts/verify-i18n.mjs` 全绿（404 节点 / 63 属性 / 自检 245/245）。
