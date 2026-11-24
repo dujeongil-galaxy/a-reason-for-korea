@@ -2,6 +2,15 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-24 · 新增剑灵与天堂2四语卡：中文台服、英文美服
+
+- `24f4fef` — 站长要求新增剑灵（中文挂台服、英文按美服算）与天堂2（中文台服、英文优先美服/国际服）。
+- **官网核实**：剑灵台服 `tw.ncsoft.com/bns/`（页面标题「劍靈-台灣官方網站」，2026-11-18 仍有活动）、美服 `bladeandsoul.com` → `bladeandsoul.plaync.com/en-us/`（Blade & Soul NEO）、韩服 `bns.plaync.com`；`bns.tw` 虽返回 200 但实为玩家门派站，不可挂。天堂2台服 `tw.ncsoft.com/lineage2/`（新天堂II，2026-11-18 仍在更新）、美服 `lineage2.com` → `na-lineage2.plaync.com/en-us/`、韩服 `lineage2.plaync.com`（不是 l2.plaync.com）。剑灵日服原版与 NEO 已于 2026-03-11 停服、天堂2未找到活跃日服，故日语页也挂台服。
+- **发行日与排序**：剑灵韩国首发 2012-06-30、天堂2韩国首发 2003-10-01（英文维基交叉核对）。卡片按韩国首发年降序插入 pubg 之后、kart 之前与 audition 之后、bnb 之前；天堂2(2003-10) 与泡泡堂(2003-04) 同年，新增 `PC_GAME_DATE` 精确到日，并把旧版 `PC_GAME_YEAR` 循环的严格 `>` 改成 `>=`。
+- **图片**：`assets/bladeandsoul-poster.jpg`、`assets/lineage2-poster.jpg` 取自各自台服官网官方主视觉（og:image / meta 图），裁成 460×215；两作无主机版，不挂 PS/Xbox/Steam 按钮，只挂地区官网按钮。
+- **校验**：`PC_OFFICIAL_SLUGS` / `PC_OFFICIAL_LINK` 写死四语地区链接，新增地区串链、无主机按钮、图片引用、四语节点断言；7 组故障注入（中文挂美服、英文挂台服、韩文挂美服、注入 Xbox、海报引用破坏、天堂2挪到泡泡堂之后、日语 note 删除）。`VERIFY OK` **396 节点 / 63 属性**，自检 **224/224**。
+- **验收**：Edge CDP 四语桌面/移动 **8/8** 全过，逐卡验链接、按钮文案、图片 naturalWidth、顺序、无横向溢出；截图 `D:/WorkBuddy-Cache/shots/mmorpg-20261124/`。
+
 ## 2026-11-24 · 全站视频订阅体检：三条 Viki 死链换正版 + 劲舞团地区入口
 
 - `aba2389` — 站长指出截图中三条 Viki 是死链、要求「对视频做一次全站检查，有正版的就挂正版，没有的写『本站未检索到正版资源，可能已下架』（自己写这句话，不要改变原意）」；劲舞团英文版挂台服 `https://landing.mangot5.com/`，日韩找对应服务器，找不到也用台服。
