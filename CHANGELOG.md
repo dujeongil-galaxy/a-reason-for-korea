@@ -2,6 +2,14 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-24 · 补齐前一轮 10 张「仅中文纯文字卡」：抓海报 + 补四语
+
+- `b8d6002` — 站长接手反馈：Qwen 那 9 个提交（`02ac8eb`~`31ff796`）把 6 部韩剧 + 4 款端游做成 `data-zh-only` 纯文字卡，**既没抓图、也只做中文**，理由是「抓不到」。实际前 5 部韩剧和 6 首 MV 都四语齐全有图，证明不是抓不到而是偷懒。本轮全部补齐。
+- **海报补齐**：6 部韩剧从 TMDB 官方剧集页抓海报（经 jina.ai 代理读渲染后页面拿 poster 路径，再从 `image.tmdb.org/t/p/w780` 下载），逐张肉眼确认对应剧名，转码 500×750 JPEG——`moon-embracing-sun` / `mr-queen` / `hi-bye-mama` / `tyrants-chef` / `deaths-game` / `fight-ghost`。4 款端游：R2Beat 从 `git show 02ac8eb:assets/rbeat-poster.jpg` 恢复（Qwen 曾抓了又删），泡泡堂 / 跑跑卡丁车 / 劲舞团用 Wikipedia Commons 的官方 logo + 主题色渐变底合成 460×215 头图（无盗版水印）。
+- **结构 + 四语**：10 张卡全部去掉 `data-zh-only`、改为标准两栏海报结构，新增 `picks.drama6~11` 与 `picks.bnb/kart/audition/rbeat` 各 7 键（label/imageCredit/title/desc/actions/note/imageAlt）四语齐全。韩剧各语 actions 沿用本语既有观看渠道写法（nfshare 链接 + 本语提示），端游四语说明自然翻译；R2Beat 那句「Steam 仅简中所以只在中文站推荐」删掉，改为中性说明「Steam 页面为简体中文」。
+- **校验**：verify 删掉整套 zh-only 断言与 4 组注入，新增 `FIXED_SLUGS` / `FIXED_IMAGE` + 10 卡的四语键/海报/渲染断言 + 6 组故障注入（海报缺失、label 键改错、日文译文删除、韩文 imageAlt 删除、data-zh-only 复用、英文页海报缺失）。`VERIFY OK` **337 节点 / 55 属性 / 4 语言**，自检 **187/187**（此前 Qwen 版 277/45/185）。
+- **验收**：Edge headless + CDP 四语桌面 1440 + 390px 移动共 8 组、每组 10 卡 × 4 项断言（label/title/图片加载/图片路径）全过，无横向溢出、无 data-zh-only 残留；肉眼确认 6 部韩剧海报与标题一一对应、4 款端游 logo 头图正常。截图 `D:/WorkBuddy-Cache/shots/arg-fix/`。
+
 ## 2026-11-23 · 端游卡加 PlayStation / Xbox 按钮（四语按地区挂链接）
 
 - `f44ce23` — 站长指令「端游板块把 PlayStation 和 Xbox 的也挂一下，中文用港区、英文美区、日语日区、韩语韩区，以后都这个规则」。**这条地区规则是长期约定**，已写入项目 `.workbuddy/memory/MEMORY.md` 与用户级记忆。

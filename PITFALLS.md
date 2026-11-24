@@ -322,3 +322,20 @@
 - **现象**：新增「有 PS 版本的卡漏挂 PS 按钮」故障注入，self-test 报 `175/176 missed`。正则 `/href="https:////store/.playstation/.com[^"]*">PlayStation<//a>/` 漏了 `target="_blank" rel="noopener noreferrer"`，实际锚点里 `">` 不紧跟 URL，正则没匹配 → mutate 什么都没改 → 校验当然不报错。
 - **规则**：`mutate` 必须**自证真的改到了**——注入后对比 mutate 前后 state 是否不同（或断言目标子串存在），否则「missed」可能只是注入本身是空操作。修法：用完整精确锚点字符串替换（含 target/rel），并同时改 `s.dict[lang].html[key]` 与 `s.pages[lang]`，让节点同步检查不抢先报错，确保判红来自目标断言本身。
 - **另**：四语页校验读的是 `s.pages[lang]` 提取的 `nodes`，不是 `s.dict`；只改 dict 会被 `node out of sync` 先拦下，测不到目标断言。故障注入要改对数据流。
+
+## 44. i18n 字典插入用「语言段固定边界」会偏移：改用唯一锚点字符串
+
+- **现象**：写脚本给 en/jp/ko 三段插新键，先按 `^  (en|jp|ko): \{` 算出各段起止位置，再在段内找 drama5.note 插入 html 键。接着想插 attr 键时，用同一套（基于**原文**算出的）边界去切——但 html 插入已经让 en 段长度变了，切出来的 en 段尾部其实是别的语言，`no drama5.imageAlt anchor for en` 直接报错。
+- **规则**：一次脚本里做多处插入，**不要缓存基于原文的偏移边界**。改用**唯一锚点字符串**——每个语言的锚点行值不同（如各语 `picks.rbeat.note` 的译文内容不同），每次 `s.index(anchor)` 现算位置，插入后锚点本身仍在、下次还能定位。本轮用「先插 4 款端游、再以 rbeat 行作锚插 6 部韩剧」的两段式，全部用唯一值锚点，避免撞车。
+- **另**：`data-i18n-alt` 也在 zh 字典 attr 段要有对应键，否则 `dictionary attr out of sync` 判红——源页加了图就必须同步 zh 的 imageAlt。
+
+## 45. TMDB 详情页是 JS 渲染，curl 拿不到静态海报路径；jina.ai 代理可读渲染后文本
+
+- **现象**：`curl https://www.themoviedb.org/tv/{id}` 返回的 HTML 里 grep 不到任何 `/xxxx.jpg` 海报路径（海报由前端 JS 注入）。
+- **解法**：用 `https://r.jina.ai/https://www.themoviedb.org/tv/{id}` 拿渲染后的 markdown，里面形如 `/zr6XJUtT61gWhWwjPIraY13SkAE.jpg` 的就是 poster 路径，拼 `https://image.tmdb.org/t/p/w780/{路径}` 下载。剧名歧义时（如《暴君的厨师》= "Bon Appétit, Your Majesty"），先用 jina 读 `search/tv?query=` 拿 TMDB ID，再读详情页标题确认，别凭中文名猜。下载后**逐张肉眼确认**海报与剧名对应（本轮 6 张全部 ViewImage 抽查）。
+- **另**：Wikipedia 的老游戏条目只有 logo 没有宣传图；Nexon/官站抓不到 og:image。解法：拿 Wikipedia Commons 的官方 logo + PIL 主题色渐变底 + 中文标签合成 460×215 头图，注明「官方标识（经 Wikipedia Commons 收录）」，既不盗版也不空着。R2Beat 的图 Qwen 曾抓了又 `git rm`，用 `git show <commit>:assets/xxx.jpg` 可从历史直接恢复。
+
+## 46. CDP 浏览器验收脚本别硬编码 `assets/` 相对路径：生成页在子目录
+
+- **现象**：验收断言写死 `imgSrc === 'assets/xxx.jpg'`，中文源页过、但 en/jp/ko 生成页全 FAIL——因为 build-i18n 会自动把图片路径改写成 `../assets/xxx.jpg`，图片其实加载正常。改成 `endsWith('assets/xxx.jpg')` 即可。
+- **另**：懒加载图（`loading="lazy"`）在 1440 桌面偶发一张未加载、重跑就好，是滚动触发时序抖动，不是真 bug；验收脚本滚动全页后等 ≥1.8s 更稳。
