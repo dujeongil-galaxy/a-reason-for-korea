@@ -400,6 +400,29 @@ const SEO_SITEMAP_URLS = [
 ];
 const SEO_HREFLANG = ['zh', 'en', 'ja', 'ko', 'x-default'];
 
+/* ---------- 影片档案（站长 2026-11-24）：光州事件必须写明，只挂外网来源 ---------- */
+const FILM_SECTION = '<section class="section archive film-record" id="film-note">';
+const FILM_SOURCE_LINKS = [
+  'https://en.wikipedia.org/wiki/A_Taxi_Driver',
+  'https://ko.wikipedia.org/wiki/%ED%83%9D%EC%8B%9C%EC%9A%B4%EC%A0%84%EC%82%AC_(%EC%98%81%ED%99%94)',
+  'https://en.wikipedia.org/wiki/Gwangju_Uprising',
+  'https://ko.wikipedia.org/wiki/5%C2%B718_%EA%B4%91%EC%A3%BC_%EB%AF%BC%EC%A3%BC%ED%99%94_%EC%9A%B4%EB%8F%99',
+  'https://ja.wikipedia.org/wiki/%E5%85%89%E5%B7%9E%E4%BA%8B%E4%BB%B6'
+];
+const FILM_MARKERS = {
+  zh: ['光州事件', '1980 年 5 月 18 日', '2,500', 'Kim Sa-bok', '698,090'],
+  en: ['Gwangju Uprising', '18 to 27 May 1980', '2,500', 'Kim Sa-bok', '698,090'],
+  jp: ['光州事件', '1980年5月18日', '2,500', 'Kim Sa-bok', '698,090'],
+  ko: ['5·18 광주 민주화 운동', '1980년 5월 18일', '2,500', 'Kim Sa-bok', '698,090']
+};
+const FILM_KEYS = [
+  'nav.film', 'film.kicker', 'film.head', 'film.intro',
+  'film.fact1.k', 'film.fact1.v', 'film.fact2.k', 'film.fact2.v',
+  'film.fact3.k', 'film.fact3.v', 'film.history.head', 'film.history.p1',
+  'film.history.p2', 'film.caveat.head', 'film.caveat.p1',
+  'film.sourcesLabel', 'film.src1', 'film.src2', 'film.src3', 'film.src4',
+  'film.src5', 'film.sourcesNote'
+];
 /* ---------- extraction helpers ---------- */
 function extractNodes(html) {
   const out = {};
@@ -1568,7 +1591,36 @@ function verify(state) {
     checkDescending(p, 'picks-kpop', SORT_RULES.music, lang);
     checkDescending(p, 'picks-pc-games', SORT_RULES.pc, lang);
     checkDescending(p, 'picks-mobile-games', SORT_RULES.mobile, lang);
-  }  return errors;
+  }  /* ---------- 影片档案：不得照抄线索站「只写剧情片」的说法 ---------- */
+  if (!source.includes(FILM_SECTION)) errors.push('zh: film-note section missing');
+  if (!source.includes('<a href="#film-note" data-i18n="nav.film">')) errors.push('zh: nav film link missing');
+  for (const link of FILM_SOURCE_LINKS) {
+    if (!source.includes('href="' + link + '"')) errors.push('zh: film source link missing -> ' + link);
+  }
+  {
+    const filmText = source.replace(/<[^>]+>/g, ' ');
+    for (const marker of FILM_MARKERS.zh) {
+      if (!filmText.includes(marker)) errors.push('zh: film record lost the Gwangju fact -> ' + marker);
+    }
+  }
+  for (const key of FILM_KEYS) {
+    if (!(zhNodes[key] || '').length) errors.push('zh: film key missing/empty -> ' + key);
+  }
+  for (const lang of LANGS) {
+    const p = state.pages[lang] || '';
+    if (!p.includes(FILM_SECTION)) errors.push(lang + ': film-note section missing');
+    if (!/<a href="#film-note"[^>]*data-i18n="nav\.film"/.test(p)) errors.push(lang + ': nav film link missing');
+    for (const link of FILM_SOURCE_LINKS) {
+      if (!p.includes('href="' + link + '"')) errors.push(lang + ': film source link missing -> ' + link);
+    }
+    for (const marker of FILM_MARKERS[lang]) {
+      if (!p.includes(marker)) errors.push(lang + ': film record lost the Gwangju fact -> ' + marker);
+    }
+    for (const key of FILM_KEYS) {
+      if (!(state.dict[lang].html[key] || '').length) errors.push(lang + ': film key missing/empty -> ' + key);
+    }
+  }
+  return errors;
 }
 
 /* ---------- load real state ---------- */
@@ -2252,7 +2304,34 @@ const faults = [
   { name: 'a PC game label year drifted to wrong year', mutate: s => {
     s.source = s.source.replace('data-i18n="picks.kart.label">韩国 · Nexon · 2006<', 'data-i18n="picks.kart.label">韩国 · Nexon · 2016<');
   } }
-];
+,
+  { name: 'film-note section removed from Chinese source', mutate: s => {
+    s.source = s.source.replace(FILM_SECTION, '');
+  } },
+  { name: 'Gwangju history scrubbed from English film record', mutate: s => {
+    const old = s.dict.en.html['film.history.p1'];
+    s.dict.en.html['film.history.p1'] = 'A film about a long journey.';
+    s.pages.en = s.pages.en.replace(old, 'A film about a long journey.');
+  } },
+  { name: 'Gwangju marker removed from Japanese film record', mutate: s => {
+    s.pages.jp = s.pages.jp.replace('1980年5月18日', 'その頃');
+  } },
+  { name: 'Korean death-toll estimate deleted', mutate: s => {
+    s.dict.ko.html['film.history.p1'] = s.dict.ko.html['film.history.p1'].split('2,500').join('');
+    s.pages.ko = s.pages.ko.split('2,500').join('');
+  } },
+  { name: 'one external source link dropped from Japanese page', mutate: s => {
+    s.pages.jp = s.pages.jp.replace('href="' + FILM_SOURCE_LINKS[2] + '"', 'href="#"');
+  } },
+  { name: 'nav film link drifted on Korean page', mutate: s => {
+    s.pages.ko = s.pages.ko.replace('<a href="#film-note"', '<a href="#picks"');
+  } },
+  { name: 'pirate listing domain injected into Chinese film record', mutate: s => {
+    s.source = s.source.replace('data-i18n="film.sourcesNote">', 'data-i18n="film.sourcesNote">ncat30.com ');
+  } },
+  { name: 'film source key deleted from English dictionary', mutate: s => {
+    delete s.dict.en.html['film.src5'];
+  } },];
 
 let caught = 0;
 for (const fault of faults) {
