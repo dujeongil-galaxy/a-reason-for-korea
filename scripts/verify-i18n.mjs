@@ -96,6 +96,13 @@ const YOUTUBE_LINK = 'https://youtu.be/cflWf3XKeFI?si=pZ-WkU6w5wYkh4Wq';
 const YOUTUBE_DOMAINS = ['https://youtu.be/', 'youtube.com/watch'];
 const PRIMARY_LINK = { aff: AFF_LINK, amazon: AMAZON_LINK, apple: APPLE_TV_LINK, youtube: YOUTUBE_LINK };
 const FORBIDDEN_NETFLIX_LINK = 'https://www.netflix.com/';
+/* 2026-11-24 站长问「英文版那么多无版权，奈飞也没有吗」。JustWatch 美区实查：多数剧有 Netflix 正版。
+   英文页允许挂 Netflix 官方条目深链（title/ID），仍禁止 netflix.com 首页/搜索页这类泛链；中文源一律禁。 */
+const NETFLIX_TITLE_PREFIX = 'https://www.netflix.com/title/';
+const NETFLIX_TITLE_ID = {
+  'en/drama1': '81682438', 'en/drama6': '80031790', 'en/drama7': '81422314',
+  'en/drama8': '81243996', 'en/drama9': '82024852'
+};
 /* 外文页按钮文案禁止直译中文语境的「港区」划分；中文源保留原始口径不受此限 */
 const FORBIDDEN_REGION_CALQUES = ['Hong Kong, China', '중국 홍콩', '香港地区', '香港地域'];
 const PICKS_HEAD = {
@@ -391,6 +398,12 @@ const DRAMA_SUB = {
   'en/drama3': { url: 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.b8608d49-3ed5-4ed9-9655-fbd806b49fce', label: 'Watch on Kocowa via Prime Video (subscription)' },
   'en/drama4': { url: 'https://tubitv.com/series/300001259/the-heirs', label: 'Watch free on Tubi (with ads)' },
   'en/drama5': { url: 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.e409f09d-a4d5-4c1a-b092-1f58faa85fb4', label: 'Watch on Kocowa via Prime Video (subscription)' },
+  /* 2026-11-24 Netflix 正版深链：美区 JustWatch 逐条实查，有则挂，无则只有 aff 红字。 */
+  'en/drama1': { url: 'https://www.netflix.com/title/81682438', label: 'Watch on Netflix (subscription)' },
+  'en/drama6': { url: 'https://www.netflix.com/title/80031790', label: 'Watch on Netflix (subscription)' },
+  'en/drama7': { url: 'https://www.netflix.com/title/81422314', label: 'Watch on Netflix (subscription)' },
+  'en/drama8': { url: 'https://www.netflix.com/title/81243996', label: 'Watch on Netflix (subscription)' },
+  'en/drama9': { url: 'https://www.netflix.com/title/82024852', label: 'Watch on Netflix (subscription)' },
   'jp/drama3': { url: 'https://video.unext.jp/episode/SID0003058/ED00073535', label: 'U-NEXT で見る（定額制）' },
   'jp/drama4': { url: 'https://video.unext.jp/episode/SID0017711/ED00046626', label: 'U-NEXT で見る（定額制）' },
   'jp/drama5': { url: 'https://video.unext.jp/episode/SID0020374/ED00094308', label: 'U-NEXT で見る（定額制）' },
@@ -403,14 +416,20 @@ const DRAMA_SUB = {
   'ko/drama4': { url: 'https://watcha.com/contents/tRW31aR', label: '왓챠에서 보기 (정액제)' },
   'ko/drama5': { url: 'https://www.tving.com/contents/P001790390', label: 'TVING에서 보기 (정액제)' }
 };
+/* 英文区非 Netflix 正版（2026-11-24 JustWatch 美区实查），drama10/11/13 不在 DRAMA_SLUGS 内，单独写死。 */
+const DRAMA_SUB_EXTRA = {
+  'en/drama10': { url: 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.a3b03bc3-0b7d-49e5-8eb1-6d80ac89dd13', label: 'Watch on Prime Video (subscription)' },
+  'en/drama11': { url: 'https://tubitv.com/series/300009794/bring-it-on-ghost-subbed', label: 'Watch free on Tubi (with ads)' },
+  'en/drama13': { url: 'https://tubitv.com/series/300010014/dear-my-friends', label: 'Watch free on Tubi (with ads)' }
+};
 /* 订阅渠道链接前缀白名单：境外持牌平台；netflix.com 与盗版域都不在内 */
 /* 2026-11-24 站长：视频区逐条检查，查不到可用正版就写提示，不许挂死链。
    四语提示文案逐语手写，含义一致：本站未检索到正版资源，可能已下架。 */
 const SUB_UNAVAILABLE = {
   zh: '本站未检索到正版资源，可能已下架。',
-  en: 'No licensed streaming source is listed for this title; it may have been delisted.',
-  jp: '正版の配信元は確認できませんでした。配信終了の可能性があります。',
-  ko: '정식 스트리밍 서비스를 확인하지 못했습니다. 서비스가 종료되었을 수 있습니다.'
+  en: 'Where no watch button is listed, no licensed source was found for this title and it may have been delisted.',
+  jp: '視聴ボタンのない作品は、正版の配信元が確認できず、配信終了の可能性があります。',
+  ko: '시청 버튼이 없는 작품은 정식 스트리밍 서비스를 확인하지 못했으며 서비스가 종료되었을 수 있습니다.'
 };
 /* 已确认失效的订阅平台：Viki 三条剧集页实测打不开，四语一律禁挂。 */
 const DEAD_SUB_PLATFORMS = ['www.viki.com/tv/'];
@@ -431,7 +450,8 @@ const SUB_DOMAINS = [
   'https://video.unext.jp/episode/',
   'https://www.tving.com/contents/',
   'https://www.wavve.com/player/vod?contentid=',
-  'https://watcha.com/contents/'
+  'https://watcha.com/contents/',
+  'https://www.netflix.com/title/'
 ];
 /* SEO（2026-11-22 站长指令：按推荐执行 A+C+D 长尾）。
    title / description 关键词前置、金句后置；旧文艺标题不得回退。
@@ -1264,7 +1284,12 @@ function verify(state) {
     for (const calque of FORBIDDEN_REGION_CALQUES) {
       if (actions.includes(calque)) errors.push(lang + ': Hong Kong region must not be translated into foreign copy -> ' + calque);
     }
-    if (page.includes(FORBIDDEN_NETFLIX_LINK)) errors.push(lang + ': Netflix link forbidden -> ' + FORBIDDEN_NETFLIX_LINK);
+    if (lang !== 'en' && page.includes(FORBIDDEN_NETFLIX_LINK)) errors.push(lang + ': Netflix link forbidden -> ' + FORBIDDEN_NETFLIX_LINK);
+    if (lang === 'en') {
+      for (const m of page.matchAll(/https:\/\/www\.netflix\.com\/[^\s"'<>]*/g)) {
+        if (!m[0].startsWith(NETFLIX_TITLE_PREFIX)) errors.push('en: Netflix link must be a title deep link -> ' + m[0]);
+      }
+    }
     for (const dom of FORBIDDEN_PIRATE_DOMAINS) {
       if (page.includes(dom)) errors.push(lang + ': 盗版站域名不得出现 -> ' + dom);
     }
@@ -1439,7 +1464,15 @@ function verify(state) {
       const actions = nodes['picks.' + slug + '.actions'] || '';
       if (!actions.includes(note)) errors.push(lang + ': ' + slug + ' Netflix note drift');
       if (!actions.includes(AFF_LINK)) errors.push(lang + ': ' + slug + ' aff entry missing in note');
-      if (actions.includes(FORBIDDEN_NETFLIX_LINK)) errors.push(lang + ': ' + slug + ' Netflix link forbidden');
+      if (lang !== 'en' && actions.includes(FORBIDDEN_NETFLIX_LINK)) errors.push(lang + ': ' + slug + ' Netflix link forbidden');
+      if (lang === 'en') {
+        for (const m of actions.matchAll(/https:\/\/www\.netflix\.com\/[^\s"'<>]*/g)) {
+          if (!m[0].startsWith(NETFLIX_TITLE_PREFIX)) errors.push(lang + ': ' + slug + ' Netflix link must be a title deep link -> ' + m[0]);
+        }
+        const wantNf = NETFLIX_TITLE_ID[lang + '/' + slug];
+        if (wantNf && !actions.includes(NETFLIX_TITLE_PREFIX + wantNf)) errors.push(lang + ': ' + slug + ' Netflix title ID drift');
+        if (!wantNf && actions.includes(NETFLIX_TITLE_PREFIX)) errors.push(lang + ': ' + slug + ' Netflix deep link forbidden (no US Netflix license verified)');
+      }
       for (const dom of FORBIDDEN_PIRATE_DOMAINS) {
         if (actions.includes(dom)) errors.push(lang + ': ' + slug + ' pirate domain forbidden');
       }
@@ -1499,6 +1532,28 @@ function verify(state) {
         errors.push(lang + ': ' + slug + ' subscription button forbidden where the region has no licensed subscription channel');
       }
     }
+
+  /* 英文区 drama10/11/13 正版按钮写死：链接、文案、位置（红字之前）。 */
+  {
+    const enNodes = extractNodes(state.pages.en || '');
+    for (const [key, want] of Object.entries(DRAMA_SUB_EXTRA)) {
+      if (!key.startsWith('en/')) continue;
+      const slug = key.slice(3);
+      const actions = enNodes['picks.' + slug + '.actions'] || '';
+      if (!actions.includes(want.url)) errors.push('en: ' + slug + ' licensed subscription link missing');
+      if (!actions.includes(want.label)) errors.push('en: ' + slug + ' licensed subscription label drift');
+      const subAt = actions.indexOf(want.url);
+      const redAt = actions.indexOf('pick-netflix-note');
+      if (subAt < 0 || redAt < 0 || subAt > redAt) errors.push('en: ' + slug + ' subscription button must sit above the aff note');
+    }
+    /* 英文 Netflix 五剧的条目 ID 写死（drama6-9 不在 DRAMA_SLUGS，需在此单独断言）。 */
+    for (const [key, id] of Object.entries(NETFLIX_TITLE_ID)) {
+      const slug = key.slice(3);
+      const actions = enNodes['picks.' + slug + '.actions'] || '';
+      if (!actions.includes(NETFLIX_TITLE_PREFIX + id)) errors.push('en: ' + slug + ' Netflix title ID drift -> ' + id);
+      if (!actions.includes('Watch on Netflix (subscription)')) errors.push('en: ' + slug + ' Netflix subscription label drift');
+    }
+  }
 
     /* 2026-11-24 查无正版提示四语齐全；视频区不得出现已失效的 Viki 剧集页。 */
   for (const lang of LANGS) {
@@ -2565,6 +2620,19 @@ const faults = [
     s.dict.en.html['picks.drama3.actions'] = s.dict.en.html['picks.drama3.actions']
       .replace('https://watch.amazon.com/detail?gti=amzn1.dv.gti.b8608d49-3ed5-4ed9-9655-fbd806b49fce', 'https://www.viki.com/tv/20503c-my-love-from-the-star');
     s.pages.en = s.pages.en.replace('https://watch.amazon.com/detail?gti=amzn1.dv.gti.b8608d49-3ed5-4ed9-9655-fbd806b49fce', 'https://www.viki.com/tv/20503c-my-love-from-the-star');
+  } },
+  { name: 'Netflix deep link swapped to netflix homepage on English page', mutate: s => {
+    s.pages.en = s.pages.en.replace('https://www.netflix.com/title/82024852', 'https://www.netflix.com/');
+  } },
+  { name: 'Netflix title ID tampered on English drama9', mutate: s => {
+    s.pages.en = s.pages.en.replace('https://www.netflix.com/title/82024852', 'https://www.netflix.com/title/00000000');
+    s.dict.en.html['picks.drama9.actions'] = s.dict.en.html['picks.drama9.actions'].replace('https://www.netflix.com/title/82024852', 'https://www.netflix.com/title/00000000');
+  } },
+  { name: 'Netflix deep link injected into Japanese drama card', mutate: s => {
+    s.pages.jp = s.pages.jp.replace('data-i18n="picks.drama1.actions">', 'data-i18n="picks.drama1.actions"><a class="pick-link pick-link-sub" href="https://www.netflix.com/title/81682438">x</a>');
+  } },
+  { name: 'English Death Game Prime subscription button removed', mutate: s => {
+    s.pages.en = s.pages.en.replace('https://watch.amazon.com/detail?gti=amzn1.dv.gti.a3b03bc3-0b7d-49e5-8eb1-6d80ac89dd13', 'https://www.netflix.com/title/99999999');
   } },
   { name: 'no-licensed-source wording scrubbed from Korean page', mutate: s => {
     s.pages.ko = s.pages.ko.replace(SUB_UNAVAILABLE.ko, '');
