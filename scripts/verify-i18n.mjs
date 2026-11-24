@@ -2440,6 +2440,14 @@ const faults = [
   } },
   { name: 'film source key deleted from English dictionary', mutate: s => {
     delete s.dict.en.html['film.src5'];
+  } },
+  /* 2026-11-24 站长质疑《拥抱太阳的月亮》2012 年份来自盗版站，要求以 Netflix 为准。
+     真浏览器打开 Netflix 官方条目 title/80031790：中文界面「拥抱太阳的月亮 2012 TV-14」，
+     英文界面「The Moon Embracing the Sun 2012 20 Episodes」；维基/MBC 首播 2012-01-04。
+     结论：2012 正确且与盗版站无关。故障注入确认改成别的年份会判红。 */
+  { name: 'Moon Embracing the Sun year tampered from Netflix-verified 2012', mutate: s => {
+    s.source = s.source.replace('data-i18n="picks.drama6.label">剧集 · 2012', 'data-i18n="picks.drama6.label">剧集 · 2013');
+    s.pages.en = s.pages.en.replace('picks.drama6.label">TV series · 2012', 'picks.drama6.label">TV series · 2013');
   } },];
 
 let caught = 0;
