@@ -157,4 +157,47 @@
       });
     });
   }
+
+  /* ---- 分区搜索（看韩剧 / 听K-POP / 游戏）；中文支持拼音与首字母模糊 ---- */
+  (function () {
+    var PY = window.SXG_PINYIN || {};
+    var isZh = (lang === 'zh');
+    function pyOf(s) {
+      var full = '', ini = '';
+      for (var i = 0; i < s.length; i++) {
+        var ch = s.charAt(i), p = PY[ch];
+        if (p) { full += p; ini += p.charAt(0); }
+        else { var lc = ch.toLowerCase(); if ((lc >= 'a' && lc <= 'z') || (lc >= '0' && lc <= '9')) { full += lc; ini += lc; } }
+      }
+      return { full: full, ini: ini };
+    }
+    var SCOPES = [
+      { box: 'searchDrama', containers: ['picks-dramas'] },
+      { box: 'searchKpop', containers: ['picks-kpop'] },
+      { box: 'searchGame', containers: ['picks-pc-games', 'picks-mobile-games', 'picks-chain-games', 'picks-accelerators'] }
+    ];
+    SCOPES.forEach(function (sc) {
+      var inp = document.getElementById(sc.box);
+      if (!inp) return;
+      var cards = [];
+      sc.containers.forEach(function (id) {
+        var c = document.getElementById(id);
+        if (c) cards = cards.concat(Array.prototype.slice.call(c.querySelectorAll('.pick-card')));
+      });
+      var meta = cards.map(function (card) {
+        var text = card.textContent || '';
+        var raw = text.toLowerCase().replace(/\s+/g, '');
+        var p = isZh ? pyOf(text) : null;
+        return { card: card, raw: raw, full: p ? p.full : '', ini: p ? p.ini : '' };
+      });
+      inp.addEventListener('input', function () {
+        var q = inp.value.trim().toLowerCase();
+        var qn = q.replace(/[^a-z0-9\u4e00-\u9fff]/g, '');
+        meta.forEach(function (o) {
+          var hit = !qn || o.raw.indexOf(qn) >= 0 || (isZh && (o.full.indexOf(qn) >= 0 || o.ini.indexOf(qn) >= 0));
+          o.card.style.display = hit ? '' : 'none';
+        });
+      });
+    });
+  })();
 })();

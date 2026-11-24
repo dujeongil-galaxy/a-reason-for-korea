@@ -398,7 +398,8 @@
       </div>
       <p class="picks-webnote" data-i18n="picks.headsub">マイナーな韓国アーティストを優先的におすすめ</p>
       <p class="picks-subhead" data-i18n="picks.subhead">韓国ドラマを見る</p>
-      <div class="picks-grid reveal">
+      <input class="picks-search" id="searchDrama" type="search" placeholder="タイトルでドラマを検索" data-i18n-placeholder="picks.search.drama.ph" aria-label="ドラマを検索" data-i18n-aria-label="picks.search.drama.aria">
+      <div class="picks-grid reveal" id="picks-dramas">
         <article class="pick-card">
           <p class="pick-card-label" data-i18n="picks.drama1.label">ドラマ · 2023</p>
           <div class="pick-poster-row">
@@ -497,6 +498,7 @@
 
       </div>
       <p class="picks-subhead picks-subhead-music" data-i18n="nav.picks.kpop">K-popを聴く</p>
+      <input class="picks-search" id="searchKpop" type="search" placeholder="アーティストや曲名で検索" data-i18n-placeholder="picks.search.kpop.ph" aria-label="音楽を検索" data-i18n-aria-label="picks.search.kpop.aria">
       <div class="picks-grid picks-grid-music reveal" id="picks-kpop">
         <article class="pick-card">
           <p class="pick-card-label" data-i18n="picks.music1.label">韓国音楽 · 2013</p>
@@ -628,6 +630,7 @@
         </div>
       </article>
       
+      <input class="picks-search" id="searchGame" type="search" placeholder="ゲーム名で検索" data-i18n-placeholder="picks.search.game.ph" aria-label="ゲームを検索" data-i18n-aria-label="picks.search.game.aria">
       <p class="picks-subhead picks-subhead-platform" data-i18n="nav.picks.game.pc">PC ゲーム</p>
       <div class="picks-grid picks-grid-platform reveal" id="picks-pc-games">
         <article class="pick-card">
@@ -973,6 +976,7 @@
 </footer>
 
 <script src="../assets/i18n.js" defer></script>
+<script src="../assets/pinyin.js" defer></script>
 <script src="../assets/app.js" defer></script>
 </body>
 </html>

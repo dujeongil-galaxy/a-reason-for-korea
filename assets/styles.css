@@ -478,6 +478,14 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
   margin: 2px 0 20px; color: var(--ink-faint);
   font-size: 14px; font-weight: 700; line-height: 1.7;
 }
+.picks-search {
+  display: block; width: 100%; max-width: 440px;
+  margin: 0 0 18px; padding: 9px 13px;
+  font: inherit; font-size: 14px; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--line-strong);
+  border-radius: 9px;
+}
+.picks-search:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
 /* K-pop / 游戏：先占位，等站长写入数据 */
 .picks-coming {
   margin-top: 18px; padding: 24px 28px; border: 1px dashed var(--line-strong);
