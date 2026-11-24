@@ -729,3 +729,9 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   .js .reveal, .js .reveal.pending { opacity: 1; transform: none; }
 }
+.picks-sub-unavailable {
+  margin: 0.6rem 0 1.4rem;
+  color: var(--muted, #8a7f73);
+  font-size: 0.86rem;
+  font-style: italic;
+}

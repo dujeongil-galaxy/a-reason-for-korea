@@ -85,6 +85,7 @@ window.SITE_I18N = {
 
   en: {
     html: {
+'picks.subUnavailable': 'No licensed streaming source is listed for this title; it may have been delisted.',
       'meta.title': 'Why I Like Korea: Cats, Kindness and K-pop | One Good Reason',
       'meta.jsonld': '{"@context":"https://schema.org","@type":"WebSite","name":"One Good Reason","alternateName":"Why I Like Korea","url":"https://dujeongil-galaxy.github.io/a-reason-for-korea/en/","inLanguage":"en","description":"Why do people like Korea? One TikTok share about cats, kindness and K-pop, answered in four reasons — from the corner cat water bowl to the film Oh! My Gran.","keywords":["why I like Korea","K-pop","cats","kindness","Oh! My Gran"],"author":{"@type":"Organization","name":"One Good Reason"}}',
       'skip': 'Skip to content',
@@ -186,19 +187,19 @@ window.SITE_I18N = {
       'picks.drama3.imageCredit': 'Poster: SBS My Love from the Star official material (via TMDB)',
       'picks.drama3.title': 'My Love from the Star (2013)',
       'picks.drama3.desc': 'An alien who landed in Joseon four hundred years ago lives on as professor Do Min-joon, and falls for top actress Cheon Song-yi. A 2013 SBS drama starring Kim Soo-hyun and Jun Ji-hyun.',
-      'picks.drama3.actions': '<a class="pick-link pick-link-sub" href="https://www.viki.com/tv/20503c-my-love-from-the-star" target="_blank" rel="noopener noreferrer">Watch on Viki (subscription)</a><p class="pick-netflix-note">Viewers in mainland China: <a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">click here</a> to access Netflix.</p>',
+      'picks.drama3.actions': '<a class="pick-link pick-link-sub" href="https://watch.amazon.com/detail?gti=amzn1.dv.gti.b8608d49-3ed5-4ed9-9655-fbd806b49fce" target="_blank" rel="noopener noreferrer">Watch on Kocowa via Prime Video (subscription)</a><p class="pick-netflix-note">Viewers in mainland China: <a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">click here</a> to access Netflix.</p>',
       'picks.drama3.note': 'This site neither hosts nor links to pirated copies.',
       'picks.drama4.label': 'TV series · 2013',
       'picks.drama4.imageCredit': 'Poster: SBS The Heirs official material (via TMDB)',
       'picks.drama4.title': 'The Heirs (2013)',
       'picks.drama4.desc': 'Hard-up but proud Cha Eun-sang reunites at school with Kim Tan, heir to an empire returned from the US, as the teenagers weigh the weight of the crown. A 2013 SBS drama starring Lee Min-ho and Park Shin-hye.',
-      'picks.drama4.actions': '<a class="pick-link pick-link-sub" href="https://www.viki.com/tv/12699c-heirs" target="_blank" rel="noopener noreferrer">Watch on Viki (subscription)</a><a class="pick-link pick-link-featured" href="https://watch.amazon.com/detail?gti=amzn1.dv.gti.48bbb40c-29e6-73ba-eafe-e8d48570412f" target="_blank" rel="noopener noreferrer">Buy the season on Prime Video</a><p class="pick-netflix-note">Viewers in mainland China: <a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">click here</a> to access Netflix.</p>',
+      'picks.drama4.actions': '<a class="pick-link pick-link-sub" href="https://tubitv.com/series/300001259/the-heirs" target="_blank" rel="noopener noreferrer">Watch free on Tubi (with ads)</a><a class="pick-link pick-link-featured" href="https://watch.amazon.com/detail?gti=amzn1.dv.gti.48bbb40c-29e6-73ba-eafe-e8d48570412f" target="_blank" rel="noopener noreferrer">Buy the season on Prime Video</a><p class="pick-netflix-note">Viewers in mainland China: <a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">click here</a> to access Netflix.</p>',
       'picks.drama4.note': 'This site neither hosts nor links to pirated copies.',
       'picks.drama5.label': 'TV series · 2003',
       'picks.drama5.imageCredit': 'Poster: MBC Jewel in the Palace official programme page',
       'picks.drama5.title': 'Jewel in the Palace (2003)',
       'picks.drama5.desc': 'A palace lady rises past the prejudices of rank through cooking and medicine, becoming the king’s first female physician. A 2003 MBC historical drama starring Lee Young-ae and Ji Jin-hee.',
-      'picks.drama5.actions': '<a class="pick-link pick-link-sub" href="https://www.viki.com/tv/614c-jewel-in-the-palace" target="_blank" rel="noopener noreferrer">Watch on Viki (subscription)</a><p class="pick-netflix-note">Viewers in mainland China: <a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">click here</a> to access Netflix.</p>',
+      'picks.drama5.actions': '<a class="pick-link pick-link-sub" href="https://watch.amazon.com/detail?gti=amzn1.dv.gti.e409f09d-a4d5-4c1a-b092-1f58faa85fb4" target="_blank" rel="noopener noreferrer">Watch on Kocowa via Prime Video (subscription)</a><p class="pick-netflix-note">Viewers in mainland China: <a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">click here</a> to access Netflix.</p>',
       'picks.drama5.note': 'This site neither hosts nor links to pirated copies.',
       'picks.rbeat.label': 'Korea · VALOFE · 2022',
       'picks.rbeat.imageCredit': 'Image: official header from the Steam store page',
@@ -258,8 +259,8 @@ window.SITE_I18N = {
       'picks.audition.imageCredit': 'Image: T3 Entertainment official logo (via Wikipedia Commons)',
       'picks.audition.title': 'Audition',
       'picks.audition.desc': 'A music-and-dance PC game from T3 Entertainment where players hit keys in time with the beat to perform dance moves. Once hugely popular across Asia and even featured in esports, it is still published in mainland China by 9you.',
-      'picks.audition.actions': '<a class="pick-link pick-link-featured" href="https://au.9you.com/" target="_blank" rel="noopener noreferrer">Official CN site</a>',
-      'picks.audition.note': 'Mainland China server at au.9you.com; the Korean server closed in 2019 and the Taiwan server status is unverified, so only the mainland link is listed.',
+      'picks.audition.actions': '<a class="pick-link pick-link-featured" href="https://landing.mangot5.com/" target="_blank" rel="noopener noreferrer">Official Taiwan server</a>',
+      'picks.audition.note': 'Mainland China uses the 9you server; the English and Japanese editions link to the Taiwan server (MangoT5), because Japans X-BEAT ended in 2016. The Korean edition links to the active HanbitOn server.',
       'picks.kart.label': 'Korea · Nexon · 2006',
       'picks.kart.imageCredit': 'Image: Nexon official logo (via Wikipedia Commons)',
       'picks.kart.title': 'KartRider',
@@ -542,6 +543,7 @@ window.SITE_I18N = {
 
   jp: {
     html: {
+'picks.subUnavailable': '正版の配信元は確認できませんでした。配信終了の可能性があります。',
       'meta.title': '韓国が好きな理由｜猫と善意、K-POPと映画「オ！ムニ」',
       'meta.jsonld': '{"@context":"https://schema.org","@type":"WebSite","name":"韓国が好きなら、理由も欲しい","alternateName":"韓国が好きな理由","url":"https://dujeongil-galaxy.github.io/a-reason-for-korea/jp/","inLanguage":"ja","description":"なぜ韓国が好きなのか。猫と善意とK-POPについてのTikTok投稿から、街角の猫の水入れや韓国映画「オ！ムニ」まで、四つの理由をやさしく考えました。","keywords":["韓国が好きな理由","K-POP","猫","善意","オ！ムニ"],"author":{"@type":"Organization","name":"韓国が好きなら、理由も欲しい"}}',
       'skip': '本文へスキップ',
@@ -715,8 +717,8 @@ window.SITE_I18N = {
       'picks.audition.imageCredit': '画像：T3 Entertainment 公式ロゴ（Wikipedia Commons 収載）',
       'picks.audition.title': '勁舞団（Audition）',
       'picks.audition.desc': 'T3 Entertainment が開発した音楽ダンスゲーム。ビートに合わせてキーを叩きダンスを披露する。アジア全域で大ヒットし e スポーツにも採用された。中国大陸では久游網が現在も運営している。',
-      'picks.audition.actions': '<a class="pick-link pick-link-featured" href="https://au.9you.com/" target="_blank" rel="noopener noreferrer">中国公式サイト</a>',
-      'picks.audition.note': '中国サーバーは au.9you.com。韓国サーバーは 2019 年に終了、台湾サーバーの状況は未確認のため中国リンクのみ掲載。',
+      'picks.audition.actions': '<a class="pick-link pick-link-featured" href="https://landing.mangot5.com/" target="_blank" rel="noopener noreferrer">台湾公式サイト</a>',
+      'picks.audition.note': '中国大陸は久游のサーバー、英語版と日本語版は台湾サーバー（MangoT5）を掲載。日本の X-BEAT は 2016 年に終了したためです。韓国語版は現在も更新中の HanbitOn サーバーを掲載。',
       'picks.kart.label': '韓国 · Nexon · 2006',
       'picks.kart.imageCredit': '画像：Nexon 公式ロゴ（Wikipedia Commons 収載）',
       'picks.kart.title': '跑跑卡丁車（KartRider）',
@@ -999,6 +1001,7 @@ window.SITE_I18N = {
 
   ko: {
     html: {
+'picks.subUnavailable': '정식 스트리밍 서비스를 확인하지 못했습니다. 서비스가 종료되었을 수 있습니다.',
       'meta.title': '한국을 좋아하는 이유｜고양이와 선의, K-POP, 영화 「오 문희」',
       'meta.jsonld': '{"@context":"https://schema.org","@type":"WebSite","name":"한국을 좋아하는 데도 이유는 필요하다","alternateName":"한국을 좋아하는 이유","url":"https://dujeongil-galaxy.github.io/a-reason-for-korea/ko/","inLanguage":"ko","description":"한국을 좋아하는 이유는 무엇일까. 고양이와 선의와 K-POP에 관한 TikTok 공유 글과 그 뒤의 네 가지 이유. 길모퉁이 고양이의 물 그릇부터 영화 「오 문희」까지.","keywords":["한국을 좋아하는 이유","K-POP","고양이","선의","오 문희"],"author":{"@type":"Organization","name":"한국을 좋아하는 데도 이유는 필요하다"}}',
       'skip': '본문으로 건너뛰기',
@@ -1172,8 +1175,8 @@ window.SITE_I18N = {
       'picks.audition.imageCredit': '이미지: T3 Entertainment 공식 로고 (Wikipedia Commons 수록)',
       'picks.audition.title': '오디션 (Audition)',
       'picks.audition.desc': 'T3 Entertainment가 개발한 음악 댄스 게임으로, 비트에 맞춰 키를 눌러 춤을 추는 방식이다. 아시아 전역에서 인기를 끌고 e스포츠 무대에도 올랐으며, 중국 본토는 여우게임(久游网)이 지금도 서비스하고 있다.',
-      'picks.audition.actions': '<a class="pick-link pick-link-featured" href="https://au.9you.com/" target="_blank" rel="noopener noreferrer">중국 공식 사이트</a>',
-      'picks.audition.note': '중국 서버는 au.9you.com. 한국 서버는 2019년 종료했고 대만 서버 현황은 확인되지 않아 중국 링크만 게시한다.',
+      'picks.audition.actions': '<a class="pick-link pick-link-featured" href="https://audition.hanbiton.com/" target="_blank" rel="noopener noreferrer">한국 공식 서버</a>',
+      'picks.audition.note': '중국 본토는 여우(久游) 서버를 쓴다. 영문판과 일문판은 일본 X-BEAT가 2016년 종료되어 대만 서버(MangoT5)를 게시하고, 한국어판은 지금도 업데이트되는 한빛온 서버를 게시한다.',
       'picks.kart.label': '한국 · Nexon · 2006',
       'picks.kart.imageCredit': '이미지: Nexon 공식 로고 (Wikipedia Commons 수록)',
       'picks.kart.title': '카트라이더 (KartRider)',

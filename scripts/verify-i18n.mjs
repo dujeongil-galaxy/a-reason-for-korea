@@ -366,9 +366,13 @@ const DRAMA_SUB = {
     url: 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.7498e914-8cdf-4f9c-ad95-4342e43e3c90',
     label: 'Watch on Kocowa via Prime Video (subscription)'
   },
-  'en/drama3': { url: 'https://www.viki.com/tv/20503c-my-love-from-the-star', label: 'Watch on Viki (subscription)' },
-  'en/drama4': { url: 'https://www.viki.com/tv/12699c-heirs', label: 'Watch on Viki (subscription)' },
-  'en/drama5': { url: 'https://www.viki.com/tv/614c-jewel-in-the-palace', label: 'Watch on Viki (subscription)' },
+  /* 2026-11-24 站长指出三条 Viki 为死链（页面打不开/内容不可用）。
+     按 JustWatch 美区逐条实查并真浏览器验证：星你 → Kocowa via Prime Video；
+     继承者们 → Tubi 免费带广告（美区无 Viki 以外的订阅平台，已有 Prime 购买按钮）；
+     大长今 → Kocowa via Prime Video。三条原文案「Watch on Viki (subscription)」一并改。 */
+  'en/drama3': { url: 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.b8608d49-3ed5-4ed9-9655-fbd806b49fce', label: 'Watch on Kocowa via Prime Video (subscription)' },
+  'en/drama4': { url: 'https://tubitv.com/series/300001259/the-heirs', label: 'Watch free on Tubi (with ads)' },
+  'en/drama5': { url: 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.e409f09d-a4d5-4c1a-b092-1f58faa85fb4', label: 'Watch on Kocowa via Prime Video (subscription)' },
   'jp/drama3': { url: 'https://video.unext.jp/episode/SID0003058/ED00073535', label: 'U-NEXT で見る（定額制）' },
   'jp/drama4': { url: 'https://video.unext.jp/episode/SID0017711/ED00046626', label: 'U-NEXT で見る（定額制）' },
   'jp/drama5': { url: 'https://video.unext.jp/episode/SID0020374/ED00094308', label: 'U-NEXT で見る（定額制）' },
@@ -382,8 +386,28 @@ const DRAMA_SUB = {
   'ko/drama5': { url: 'https://www.tving.com/contents/P001790390', label: 'TVING에서 보기 (정액제)' }
 };
 /* 订阅渠道链接前缀白名单：境外持牌平台；netflix.com 与盗版域都不在内 */
+/* 2026-11-24 站长：视频区逐条检查，查不到可用正版就写提示，不许挂死链。
+   四语提示文案逐语手写，含义一致：本站未检索到正版资源，可能已下架。 */
+const SUB_UNAVAILABLE = {
+  zh: '本站未检索到正版资源，可能已下架。',
+  en: 'No licensed streaming source is listed for this title; it may have been delisted.',
+  jp: '正版の配信元は確認できませんでした。配信終了の可能性があります。',
+  ko: '정식 스트리밍 서비스를 확인하지 못했습니다. 서비스가 종료되었을 수 있습니다.'
+};
+/* 已确认失效的订阅平台：Viki 三条剧集页实测打不开，四语一律禁挂。 */
+const DEAD_SUB_PLATFORMS = ['www.viki.com/tv/'];
+/* 劲舞团服务器入口（2026-11-24 站长指定 + 外网核实）：
+   zh=大陆国服；en/jp=台服（日服 X-BEAT 2016 关服）；ko=韩服 audition.hanbiton.com（仍在更新）。 */
+const AUDITION_SERVER = {
+  zh: 'https://au.9you.com/',
+  en: 'https://landing.mangot5.com/',
+  jp: 'https://landing.mangot5.com/',
+  ko: 'https://audition.hanbiton.com/'
+};
+const AUDITION_FOREIGN = ['en', 'jp', 'ko'];
 const SUB_DOMAINS = [
   'https://www.viki.com/tv/',
+  'https://tubitv.com/series/',
   'https://watch.amazon.com/detail?gti=',
   'https://watch.amazon.co.jp/detail?gti=',
   'https://video.unext.jp/episode/',
@@ -1388,6 +1412,9 @@ function verify(state) {
           if (!SUB_DOMAINS.some(prefix => subAnchor.startsWith(prefix))) {
             errors.push(lang + ': ' + slug + ' subscription link outside the licensed-platform allowlist');
           }
+          for (const dead of DEAD_SUB_PLATFORMS) {
+            if (subAnchor.includes(dead)) errors.push(lang + ': ' + slug + ' dead subscription platform -> ' + dead);
+          }
         }
         if (!actions.includes(subWant.label)) {
           errors.push(lang + ': ' + slug + ' subscription label drift');
@@ -1409,7 +1436,33 @@ function verify(state) {
       }
     }
 
-    /* no Chinese body copy left behind */
+    /* 2026-11-24 查无正版提示四语齐全；视频区不得出现已失效的 Viki 剧集页。 */
+  for (const lang of LANGS) {
+    const p = state.pages[lang] || '';
+    if (!p.includes(SUB_UNAVAILABLE[lang])) errors.push(lang + ': no-licensed-source wording missing');
+    for (const dead of DEAD_SUB_PLATFORMS) {
+      if (p.includes(dead)) errors.push(lang + ': dead Viki title page still linked -> ' + dead);
+    }
+  }
+  /* 劲舞团四语服务器：zh 国服 / en+jp 台服 / ko 韩服，串区判红。 */
+  {
+    const zhAct = extractNodes(state.source)['picks.audition.actions'] || '';
+    if (!zhAct.includes(AUDITION_SERVER.zh)) errors.push('zh: audition CN server link missing');
+    for (const lang of AUDITION_FOREIGN) {
+      const p = state.pages[lang] || '';
+      const act = extractNodes(p)['picks.audition.actions'] || '';
+      if (!act.includes(AUDITION_SERVER[lang])) errors.push(lang + ': audition server link drift -> ' + AUDITION_SERVER[lang]);
+      for (const other of ['zh','en','jp','ko']) {
+        if (other === lang) continue;
+        if (other === 'jp' && lang === 'en') continue;
+        if (other === 'en' && lang === 'jp') continue;
+        if (AUDITION_SERVER[other] !== AUDITION_SERVER[lang] && act.includes(AUDITION_SERVER[other])) {
+          errors.push(lang + ': audition server leaked from ' + other);
+        }
+      }
+    }
+  }
+  /* no Chinese body copy left behind */
     for (const marker of CHINESE_MARKERS) {
       if (page.includes(marker)) errors.push(lang + ': untranslated Chinese left in page -> ' + marker);
     }
@@ -2100,8 +2153,8 @@ const faults = [
     s.css = s.css.replace('aspect-ratio: auto; object-fit: cover;', 'aspect-ratio: 16 / 9; object-fit: cover;');
   } },
   /* 订阅制渠道（2026-11-22）：漂移 / 指向 Netflix / 重复 / 挂到无渠道区 / 被挤到购买按钮下面 */
-  { name: 'drama EN subscription link drifted off Viki', mutate: s => {
-    s.pages.en = s.pages.en.replace('https://www.viki.com/tv/20503c-my-love-from-the-star', 'https://www.viki.com/');
+  { name: 'drama EN subscription link drifted off Kocowa', mutate: s => {
+    s.pages.en = s.pages.en.replace('https://watch.amazon.com/detail?gti=amzn1.dv.gti.b8608d49-3ed5-4ed9-9655-fbd806b49fce', 'https://www.viki.com/');
   } },
   { name: 'drama JP subscription button pointed at Netflix', mutate: s => {
     s.pages.jp = s.pages.jp.replace('https://video.unext.jp/episode/SID0003058/ED00073535', 'https://www.netflix.com/title/81682438');
@@ -2440,6 +2493,20 @@ const faults = [
   } },
   { name: 'film source key deleted from English dictionary', mutate: s => {
     delete s.dict.en.html['film.src5'];
+  } },
+  { name: 'dead Viki link restored on English drama card', mutate: s => {
+    s.dict.en.html['picks.drama3.actions'] = s.dict.en.html['picks.drama3.actions']
+      .replace('https://watch.amazon.com/detail?gti=amzn1.dv.gti.b8608d49-3ed5-4ed9-9655-fbd806b49fce', 'https://www.viki.com/tv/20503c-my-love-from-the-star');
+    s.pages.en = s.pages.en.replace('https://watch.amazon.com/detail?gti=amzn1.dv.gti.b8608d49-3ed5-4ed9-9655-fbd806b49fce', 'https://www.viki.com/tv/20503c-my-love-from-the-star');
+  } },
+  { name: 'no-licensed-source wording scrubbed from Korean page', mutate: s => {
+    s.pages.ko = s.pages.ko.replace(SUB_UNAVAILABLE.ko, '');
+  } },
+  { name: 'Audition English page switched to CN server', mutate: s => {
+    s.pages.en = s.pages.en.replace(AUDITION_SERVER.en, AUDITION_SERVER.zh);
+  } },
+  { name: 'Audition Korean page switched to TW server', mutate: s => {
+    s.pages.ko = s.pages.ko.replace(AUDITION_SERVER.ko, AUDITION_SERVER.en);
   } },
   /* 2026-11-24 站长质疑《拥抱太阳的月亮》2012 年份来自盗版站，要求以 Netflix 为准。
      真浏览器打开 Netflix 官方条目 title/80031790：中文界面「拥抱太阳的月亮 2012 TV-14」，
