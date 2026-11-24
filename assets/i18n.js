@@ -12,6 +12,8 @@
 window.SITE_I18N = {
   zh: {
     attr: {
+      'picks.bladeandsoul.imageAlt': '《剑灵》官方主视觉：白发角色跃于山峦之间',
+      'picks.lineage2.imageAlt': '《天堂2》官方主视觉：两名角色与中央标题',
       'meta.description': '一条关于猫、善意与韩国的抖音分享，回答「为什么喜欢韩国」：从街角的猫到韩国电影《哦！文姬》。喜欢一个地方，可以有一个像样的理由，也可以保持清醒。',
       'meta.ogTitle': '哈韩，也要有一个理由',
       'meta.ogDescription': '不是因为舞台有多亮，是因为街角那只猫，有人给它留了一碗水。',
@@ -85,6 +87,18 @@ window.SITE_I18N = {
 
   en: {
     html: {
+      'picks.bladeandsoul.label': 'South Korea · NCSOFT · 2012',
+      'picks.bladeandsoul.title': 'Blade & Soul',
+      'picks.bladeandsoul.desc': 'An Eastern-fantasy MMORPG from NCSOFT, known for martial-arts combat, wall-running movement and detailed character customization. The North American service is live and now centers on Blade & Soul NEO.',
+      'picks.bladeandsoul.actions': '<a class="pick-link pick-link-featured" href="https://www.bladeandsoul.com/" target="_blank" rel="noopener noreferrer">NA official site</a>',
+      'picks.bladeandsoul.note': 'English readers are pointed to the North American site. The Japanese servers (original and NEO) closed on March 11, 2026, so no Japan link is listed.',
+      'picks.bladeandsoul.imageCredit': 'Image: official key art from the Taiwanese site',
+      'picks.lineage2.label': 'South Korea · NCSOFT · 2003',
+      'picks.lineage2.title': 'Lineage II',
+      'picks.lineage2.desc': 'A fantasy MMORPG launched by NCSOFT in 2003, built around clan sieges, a player-driven economy and a transformation-based class system. It remains one of the defining titles of the early online-gaming era.',
+      'picks.lineage2.actions': '<a class="pick-link pick-link-featured" href="https://www.lineage2.com/" target="_blank" rel="noopener noreferrer">NA official site</a>',
+      'picks.lineage2.note': 'English readers get the North American / international site; the Taiwanese service is listed on the Chinese page.',
+      'picks.lineage2.imageCredit': 'Image: official key art from the Taiwanese site',
 'picks.subUnavailable': 'No licensed streaming source is listed for this title; it may have been delisted.',
       'meta.title': 'Why I Like Korea: Cats, Kindness and K-pop | One Good Reason',
       'meta.jsonld': '{"@context":"https://schema.org","@type":"WebSite","name":"One Good Reason","alternateName":"Why I Like Korea","url":"https://dujeongil-galaxy.github.io/a-reason-for-korea/en/","inLanguage":"en","description":"Why do people like Korea? One TikTok share about cats, kindness and K-pop, answered in four reasons — from the corner cat water bowl to the film Oh! My Gran.","keywords":["why I like Korea","K-pop","cats","kindness","Oh! My Gran"],"author":{"@type":"Organization","name":"One Good Reason"}}',
@@ -470,6 +484,8 @@ window.SITE_I18N = {
       'film.sourcesNote': 'All five links returned HTTP 200 when checked on 2026-11-24. This record is compiled from those public entries; the original pages govern their own wording. We neither cite the movie listing that led us here nor provide any playback link.',
     },
     attr: {
+      'picks.bladeandsoul.imageAlt': 'Blade & Soul key art - a white-haired fighter leaping between cliffs',
+      'picks.lineage2.imageAlt': 'Lineage II key art - two armored characters flanking the title',
       'meta.description': 'Why do people like Korea? One TikTok share about cats, kindness and K-pop, answered in four reasons — from the corner cat water bowl to the film Oh! My Gran. Liking a place can have a real reason, and still keep its judgment.',
       'meta.ogTitle': 'Liking Korea Needs a Reason',
       'meta.ogDescription': 'Not because the stages are bright, but because someone left a bowl of water for a cat on the corner.',
@@ -543,6 +559,18 @@ window.SITE_I18N = {
 
   jp: {
     html: {
+      'picks.bladeandsoul.label': '韓国 · NCSOFT · 2012',
+      'picks.bladeandsoul.title': 'ブレイド アンド ソウル（剣霊）',
+      'picks.bladeandsoul.desc': 'NCSOFT が開発した東洋武侠風 MMORPG。軽功による移動とロックオンしない戦闘、華麗な武術演出が特徴です。台湾サーバーは現在 NEO 版へ更新されています。',
+      'picks.bladeandsoul.actions': '<a class="pick-link pick-link-featured" href="https://tw.ncsoft.com/bns/" target="_blank" rel="noopener noreferrer">台湾公式サイト</a>',
+      'picks.bladeandsoul.note': '日本サーバー（原版・NEO）は 2026 年 3 月 11 日にサービスを終了したため、ここでは台湾公式サイトを案内します。',
+      'picks.bladeandsoul.imageCredit': '画像：台湾公式サイトの公式キービジュアル',
+      'picks.lineage2.label': '韓国 · NCSOFT · 2003',
+      'picks.lineage2.title': 'リネージュII',
+      'picks.lineage2.desc': 'NCSOFT が 2003 年に発売したファンタジー MMORPG。血盟による攻城戦やプレイヤー主導の経済、転生クラスシステムで知られ、オンラインゲーム初期の代表作です。',
+      'picks.lineage2.actions': '<a class="pick-link pick-link-featured" href="https://tw.ncsoft.com/lineage2/" target="_blank" rel="noopener noreferrer">台湾公式サイト</a>',
+      'picks.lineage2.note': '稼働中の日本語版サーバーは確認できなかったため、台湾公式サイトを案内します。',
+      'picks.lineage2.imageCredit': '画像：台湾公式サイトの公式キービジュアル',
 'picks.subUnavailable': '正版の配信元は確認できませんでした。配信終了の可能性があります。',
       'meta.title': '韓国が好きな理由｜猫と善意、K-POPと映画「オ！ムニ」',
       'meta.jsonld': '{"@context":"https://schema.org","@type":"WebSite","name":"韓国が好きなら、理由も欲しい","alternateName":"韓国が好きな理由","url":"https://dujeongil-galaxy.github.io/a-reason-for-korea/jp/","inLanguage":"ja","description":"なぜ韓国が好きなのか。猫と善意とK-POPについてのTikTok投稿から、街角の猫の水入れや韓国映画「オ！ムニ」まで、四つの理由をやさしく考えました。","keywords":["韓国が好きな理由","K-POP","猫","善意","オ！ムニ"],"author":{"@type":"Organization","name":"韓国が好きなら、理由も欲しい"}}',
@@ -928,6 +956,8 @@ window.SITE_I18N = {
       'film.sourcesNote': '上記5件は2026年11月24日の確認時にいずれもHTTP 200でアクセスできました。本記録はこれらの公開項目にもとづき、記述の詳細は元ページに準じます。手がかりとなった映画紹介サイトは引用せず、再生リンクも掲載しません。',
     },
     attr: {
+      'picks.bladeandsoul.imageAlt': 'ブレイド アンド ソウルのキービジュアル。白髪のキャラクターが山岳間を跳躍',
+      'picks.lineage2.imageAlt': 'リネージュII のキービジュアル。二人の戦士と中央のタイトル',
       'meta.description': 'なぜ韓国が好きなのか。猫と善意とK-POPについてのTikTok投稿から、街角の猫の水入れや韓国映画「オ！ムニ」まで、四つの理由をやさしく考えました。好きな気持ちには、きちんとした理由があっていい。しかも冷静さも手放さない。',
       'meta.ogTitle': '韓国が好きなら、理由も欲しい',
       'meta.ogDescription': 'ステージがまぶしいからじゃない。街角の猫のために、誰かが水を置いていったから。',
@@ -1001,6 +1031,18 @@ window.SITE_I18N = {
 
   ko: {
     html: {
+      'picks.bladeandsoul.label': '한국 · NCSOFT · 2012',
+      'picks.bladeandsoul.title': '블레이드 앤 소울',
+      'picks.bladeandsoul.desc': 'NCSOFT가 개발한 동양 무협풍 MMORPG. 경공 이동과 논타겟 전투, 화려한 무술 연출이 특징입니다. 한국 서버는 현재 NEO 버전으로 운영되고 있습니다.',
+      'picks.bladeandsoul.actions': '<a class="pick-link pick-link-featured" href="https://bns.plaync.com/" target="_blank" rel="noopener noreferrer">한국 공식 서버</a>',
+      'picks.bladeandsoul.note': '한국 공식 서버(bns.plaync.com)를 안내합니다. 일본 서버는 2026년 3월 11일에 종료되었습니다.',
+      'picks.bladeandsoul.imageCredit': '이미지: 대만 공식 사이트 공식 키비주얼',
+      'picks.lineage2.label': '한국 · NCSOFT · 2003',
+      'picks.lineage2.title': '리니지2',
+      'picks.lineage2.desc': 'NCSOFT가 2003년에 선보인 판타지 MMORPG. 혈맹 공성전, 유저 주도 경제, 전직 클래스 체계로 유명하며 초기 온라인 게임의 대표작입니다.',
+      'picks.lineage2.actions': '<a class="pick-link pick-link-featured" href="https://lineage2.plaync.com/" target="_blank" rel="noopener noreferrer">한국 공식 서버</a>',
+      'picks.lineage2.note': '한국 공식 서버(lineage2.plaync.com)를 안내합니다.',
+      'picks.lineage2.imageCredit': '이미지: 대만 공식 사이트 공식 키비주얼',
 'picks.subUnavailable': '정식 스트리밍 서비스를 확인하지 못했습니다. 서비스가 종료되었을 수 있습니다.',
       'meta.title': '한국을 좋아하는 이유｜고양이와 선의, K-POP, 영화 「오 문희」',
       'meta.jsonld': '{"@context":"https://schema.org","@type":"WebSite","name":"한국을 좋아하는 데도 이유는 필요하다","alternateName":"한국을 좋아하는 이유","url":"https://dujeongil-galaxy.github.io/a-reason-for-korea/ko/","inLanguage":"ko","description":"한국을 좋아하는 이유는 무엇일까. 고양이와 선의와 K-POP에 관한 TikTok 공유 글과 그 뒤의 네 가지 이유. 길모퉁이 고양이의 물 그릇부터 영화 「오 문희」까지.","keywords":["한국을 좋아하는 이유","K-POP","고양이","선의","오 문희"],"author":{"@type":"Organization","name":"한국을 좋아하는 데도 이유는 필요하다"}}',
@@ -1386,6 +1428,8 @@ window.SITE_I18N = {
       'film.sourcesNote': '위 다섯 링크는 2026년 11월 24일 확인 당시 모두 HTTP 200으로 접속됐습니다. 본 기록은 이 공개 항목들을 근거로 정리했으며, 서술의 자세한 내용은 원문에 따릅니다. 단서가 된 영화 사이트는 인용하지 않으며 재생 링크도 게시하지 않습니다.',
     },
     attr: {
+      'picks.bladeandsoul.imageAlt': '블레이드 앤 소울 공식 키비주얼 - 흰 머리 캐릭터가 산봉우리 사이를 도약',
+      'picks.lineage2.imageAlt': '리니지2 공식 키비주얼 - 중앙 제목과 두 전사',
       'meta.description': '한국을 좋아하는 이유는 무엇일까. 고양이와 선의와 K-POP에 관한 TikTok 공유 글과 그 뒤의 네 가지 이유. 길모퉁이 고양이의 물 그릇부터 영화 「오 문희」까지. 어떤 곳을 좋아하는 데는 이유가 있어도 좋고, 판단력을 유지해도 좋다.',
       'meta.ogTitle': '한국을 좋아하는 데도 이유는 필요하다',
       'meta.ogDescription': '무대가 밝아서가 아니라, 길모퉁이 고양이를 위해 누군가 물 한 그릇을 놓아두었기 때문이다.',

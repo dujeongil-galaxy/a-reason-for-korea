@@ -231,7 +231,24 @@ const GAME_IMAGE = {
 const STEAM_LINK = 'store.steampowered.com/app/';
 /* 端游发行年份（按 Steam 商店页 release date），用于校验「最新靠前」的排序 */
 const PC_GAME_YEAR = { sololeveling: 2025, stellarblade: 2024, liesofp: 2023, rbeat: 2022,
-  blessunleashed: 2021, eternalreturn: 2020, pubg: 2017, kart: 2006, audition: 2005, bnb: 2003 };
+  blessunleashed: 2021, eternalreturn: 2020, pubg: 2017, bladeandsoul: 2012, kart: 2006, audition: 2005, lineage2: 2003, bnb: 2003 };
+
+/* 2026-11-24 站长新增两款韩系端游：中文挂台服官网、英文挂美服/国际服。
+   剑灵日服原版与 NEO 于 2026-03-11 停服，日语改挂台服；天堂2未找到活跃日服，日语同样挂台服；
+   韩语一律挂韩服官网。两作均无主机版，禁止出现 PS/Xbox/Steam 按钮。 */
+const PC_OFFICIAL_SLUGS = ['bladeandsoul', 'lineage2'];
+const PC_OFFICIAL_LINK = {
+  bladeandsoul: {
+    zh: 'https://tw.ncsoft.com/bns/', en: 'https://www.bladeandsoul.com/',
+    jp: 'https://tw.ncsoft.com/bns/', ko: 'https://bns.plaync.com/'
+  },
+  lineage2: {
+    zh: 'https://tw.ncsoft.com/lineage2/', en: 'https://www.lineage2.com/',
+    jp: 'https://tw.ncsoft.com/lineage2/', ko: 'https://lineage2.plaync.com/'
+  }
+};
+/* 天堂2(2003-10-01) 晚于泡泡堂(2003-04)，同年也要按日排序 */
+const PC_GAME_DATE = { lineage2: '2003-10-01', bnb: '2003-04-01' };
 /* 站长 2026-11-24 定：视频 / 音乐 / 游戏三区一律按上映发行时间降序（最新在前），写死进校验。
    每区按 label 节点在 DOM 出现顺序比对年份，缺年/倒序/串位一律判红。 */
 const SORT_RULES = {
@@ -248,8 +265,9 @@ const SORT_RULES = {
     date: MUSIC_DATE },
   pc: { grid: 'picks-pc-games',
     order: ['sololeveling','stellarblade','liesofp','rbeat','blessunleashed',
-            'eternalreturn','pubg','kart','audition','bnb'],
-    year: PC_GAME_YEAR },
+            'eternalreturn','pubg','bladeandsoul','kart','audition','lineage2','bnb'],
+    year: PC_GAME_YEAR,
+    date: PC_GAME_DATE },
   mobile: { grid: 'picks-mobile-games', order: ['browndust','nikke'],
     year: { browndust:2023, nikke:2022 } }
 };
@@ -515,6 +533,52 @@ function sameKeys(a, b) {
 }
 
 /* ---------- pure verification ---------- */
+
+/* 官网直挂型端游（剑灵 / 天堂2）四语校验：中文台服、英文美服、日语台服（日服已停）、韩语韩服；
+   图片引用、四语节点、地区串链、主机/Steam 按钮全锁。 */
+function checkOfficialPCGames(state, errors) {
+  const keys = ['label','title','desc','actions','note','imageCredit'];
+  for (const slug of PC_OFFICIAL_SLUGS) {
+    const link = PC_OFFICIAL_LINK[slug];
+    if (!state.officialGameImages[slug]) errors.push('official pc: poster missing -> ' + slug);
+    const zhNodes = extractNodes(state.source);
+    if (!assetRefs(state.source).includes('assets/' + slug + '-poster.jpg'))
+      errors.push('zh: official pc poster not referenced -> ' + slug);
+    for (const key of keys) {
+      if (!(zhNodes['picks.' + slug + '.' + key] || '').length)
+        errors.push('zh: official pc missing key -> ' + slug + '.' + key);
+    }
+    const zhActions = zhNodes['picks.' + slug + '.actions'] || '';
+    if (!zhActions.includes(link.zh)) errors.push('zh: ' + slug + ' must link Taiwan official site');
+    if (/store\.steampowered|store\.playstation|xbox\.com/.test(zhActions))
+      errors.push('zh: ' + slug + ' must not carry Steam/console buttons');
+    for (const lang of LANGS) {
+      const page = state.pages[lang] || '';
+      const nodes = extractNodes(page);
+      if (!assetRefs(page).includes('../assets/' + slug + '-poster.jpg'))
+        errors.push(lang + ': official pc poster not referenced -> ' + slug);
+      for (const key of keys) {
+        const value = state.dict[lang].html['picks.' + slug + '.' + key];
+        if (!value) errors.push(lang + ': official pc key missing -> ' + slug + '.' + key);
+        else if (!(nodes['picks.' + slug + '.' + key] || '').includes(value))
+          errors.push(lang + ': official pc text not rendered -> ' + slug + '.' + key);
+      }
+      const alt = state.dict[lang].attr['picks.' + slug + '.imageAlt'];
+      if (!alt || !page.includes(alt)) errors.push(lang + ': official pc imageAlt missing -> ' + slug);
+      const actions = nodes['picks.' + slug + '.actions'] || '';
+      if (!actions.includes(link[lang]))
+        errors.push(lang + ': ' + slug + ' wrong official site -> expected ' + link[lang]);
+      if (/store\.steampowered|store\.playstation|www\.xbox\.com/.test(actions))
+        errors.push(lang + ': ' + slug + ' must not carry Steam/console buttons');
+      if (lang === 'en' && (actions.includes(link.zh) || actions.includes(link.ko)))
+        errors.push('en: ' + slug + ' leaked TW/KR official site');
+      if (lang === 'ko' && (actions.includes(link.zh) || actions.includes(link.en)))
+        errors.push('ko: ' + slug + ' leaked TW/NA official site');
+      if (lang === 'zh' && (actions.includes(link.en) || actions.includes(link.ko)))
+        errors.push('zh: ' + slug + ' leaked NA/KR official site');
+    }
+  }
+}
 function verify(state) {
   const errors = [];
   const { source, pages, dict } = state;
@@ -692,7 +756,7 @@ function verify(state) {
   }
   for (let oi = 1; oi < PC_GAME_SLUGS.length; oi++) {
     const prev = PC_GAME_SLUGS[oi - 1], cur = PC_GAME_SLUGS[oi];
-    if (!(PC_GAME_YEAR[prev] > PC_GAME_YEAR[cur])) {
+    if (!(PC_GAME_YEAR[prev] >= PC_GAME_YEAR[cur])) {
       errors.push('pc order year invalid: ' + prev + ' -> ' + cur);
     }
   }
@@ -1759,6 +1823,7 @@ function verify(state) {
       if (!(state.dict[lang].html[key] || '').length) errors.push(lang + ': film key missing/empty -> ' + key);
     }
   }
+  checkOfficialPCGames(state, errors);
   return errors;
 }
 
@@ -1779,6 +1844,8 @@ const state = {
     fs.existsSync(path.join(ROOT, DRAMA_IMAGE[slug]))])),
   gameImages: Object.fromEntries(GAME_SLUGS.map(slug => [slug,
     fs.existsSync(path.join(ROOT, GAME_IMAGE[slug]))])),
+  officialGameImages: Object.fromEntries(PC_OFFICIAL_SLUGS.map(slug => [slug,
+    fs.existsSync(path.join(ROOT, 'assets/' + slug + '-poster.jpg'))])),
   chainImages: Object.fromEntries(CHAIN_SLUGS.map(slug => [slug,
     fs.existsSync(path.join(ROOT, CHAIN_IMAGE[slug]))])),
   accImages: Object.fromEntries(ACC_SLUGS.map(slug => [slug,
@@ -2515,8 +2582,37 @@ const faults = [
   { name: 'Moon Embracing the Sun year tampered from Netflix-verified 2012', mutate: s => {
     s.source = s.source.replace('data-i18n="picks.drama6.label">剧集 · 2012', 'data-i18n="picks.drama6.label">剧集 · 2013');
     s.pages.en = s.pages.en.replace('picks.drama6.label">TV series · 2012', 'picks.drama6.label">TV series · 2013');
+  } },
+  /* 2026-11-24 剑灵/天堂2：地区官网与同年精确日期故障注入。 */
+  { name: 'Blade & Soul zh card switched from TW official site to NA site', mutate: s => {
+    s.source = s.source.replace('href="https://tw.ncsoft.com/bns/"', 'href="https://www.bladeandsoul.com/"');
+  } },
+  { name: 'Lineage II en card switched from NA site to TW site', mutate: s => {
+    s.pages.en = s.pages.en.replace('https://www.lineage2.com/', 'https://tw.ncsoft.com/lineage2/');
+  } },
+  { name: 'Blade & Soul ko card switched to NA site', mutate: s => {
+    s.pages.ko = s.pages.ko.replace('https://bns.plaync.com/', 'https://www.bladeandsoul.com/');
+  } },
+  { name: 'Blade & Soul console button injected', mutate: s => {
+    s.dict.en.html['picks.bladeandsoul.actions'] += '<a href="https://www.xbox.com/en-US/games/store/x/1">Xbox</a>';
+    s.pages.en = s.pages.en.replace('href="https://www.bladeandsoul.com/" target="_blank" rel="noopener noreferrer">NA official site</a>',
+      'href="https://www.bladeandsoul.com/" target="_blank" rel="noopener noreferrer">NA official site</a><a href="https://www.xbox.com/en-US/games/store/x/1">Xbox</a>');
+  } },
+  { name: 'Lineage II poster reference broken', mutate: s => {
+    s.source = s.source.replace('src="assets/lineage2-poster.jpg"', 'src="assets/missing-poster.jpg"');
+  } },
+  { name: 'Lineage II moved after Crazy Arcade despite later 2003 release', mutate: s => {
+    const re = /(<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.(lineage2|bnb)\.label">[\s\S]*?<\/article>)/g;
+    const blocks = [...s.source.matchAll(re)].map(m => m[1]);
+    if (blocks.length === 2) {
+      s.source = s.source.replace(blocks[0], '@@SWAP@@')
+        .replace(blocks[1], blocks[0])
+        .replace('@@SWAP@@', blocks[1]);
+    }
+  } },
+  { name: 'Lineage II note deleted from Japanese dictionary', mutate: s => {
+    delete s.dict.jp.html['picks.lineage2.note'];
   } },];
-
 let caught = 0;
 for (const fault of faults) {
   const broken = clone(state);
