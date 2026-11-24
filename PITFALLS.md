@@ -345,3 +345,14 @@
 - **现象**：给 en/jp/ko 三段插 `imageAlt`，按 en→jp→ko 循环，每次找"最后一个 `picks.drama11.imageAlt`"行作锚点。结果 en 插完后，jp 的锚点命中了 ko 段的同名键（因为 en 新键排在 en 段尾，不再是最后），jp 的两行被插进 ko 段，ko 又把 en 的两行也插在 ko 段尾——最终 jp/en 段缺 imageAlt，`MISSING KEYS: picks.drama12.imageAlt` 直接报错。
 - **规则**：跨语段插同键名的值，**锚点必须带语言唯一值**（如各语 `picks.drama11.imageAlt` 的译文文本本身不同），或**按段边界从后往前插**（ko→jp→en，避免前段插入让后段锚点失效）。本轮修复：按值精确匹配把 4 行错位 imageAlt 搬回正确语段。
 - **另**：TMDB 剧集英文名不能凭中文名猜——「亲爱的恩东啊」是 *My Love Eun Dong* 而非 *Dear My Sister*；先读详情页标题 + 首播年份核对再下载，避免挂错海报。
+
+## 48. 重排 HTML 网格时吃掉闭合 `</div>`：跨区嵌套污染 + 搜索作用域串区
+
+- **现象**：用 `rindex('      </div>', start, next_sibling)` 找网格结尾后，替换内容只补到 article 结束、**漏掉网格自己的闭合 div**。结果 `#picks-dramas` 把音乐/端游/手游全吞进后代——浏览器里 `getElementById('picks-dramas').querySelectorAll('.pick-card-label')` 返回 40 个（应 14 个），`searchPC` 输入关键词时手游卡也被隐藏（因为手游卡成了剧集 grid 后代，匹配串了）。校验脚本用「按 slug 过滤的 label 顺序」断言仍是绿的，没发现嵌套破坏。
+- **规则**：重排网格必须**保留闭合 div**——`block = text[cs:ce]`（ce 是闭合 div 起点），替换后 `text[:cs] + newblock + text[ce:]`，其中 `newblock` 末尾要补回 grid 的缩进闭合。更稳的是做**结构断言**：重排后立刻数该 grid 区间内 `<article>`/`</article>` 开合、以及 `div` 开合差（网格段应 close = open + 1，多出的就是网格自己的闭合）。浏览器验收也要按 `getElementById(grid).querySelectorAll('.pick-card')` 取真实 DOM 后代，不要只信源码正则。
+- **另**：排序断言的「降序」要用 `>=`（允许同年并列），用严格 `>` 会把 2023/2023、2020/2020 这种合理并列误判。站长说「最新在前」= 非递增，不是严格单调。
+
+## 49. 重做多处 HTML 改动宁可回退基线一次重来，不要连环打补丁
+
+- **现象**：先改导航、再拆搜索、再重排剧集、再重排音乐，每步用不同脚本各自定位 `</div>` 边界，第 3 步破坏了嵌套，第 4 步又在已破坏的 DOM 上继续定位，越改越乱（1theK 卡被误删、yt-note 丢失、孤立 `</article>` 残留）。
+- **规则**：当一次任务要同时改同一 HTML 文件的多个区块（≥3 处结构改动），**先 `git checkout -- file` 回到干净基线**（确认基线完整），再写一个统一脚本按固定顺序全部做完，每个区块用同一个 `grid_bounds()` 定位函数 + 每步结构断言。比连环补丁可靠得多。注意 `git checkout` 会按 autocrlf 恢复 CRLF，脚本要自动探测换行符。
