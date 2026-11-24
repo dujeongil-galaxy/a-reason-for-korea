@@ -2,6 +2,13 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-25 · 影片档案 teaser 移到加速器卡片下方（四语）+ 位置断言反转收紧
+
+- `ae20406` — 站长：「附页：影片档案，请放在加速器下方」。`index.html` 里 `<p class="archive-teaser picks-film-teaser reveal">` 从链游 credit 之后、加速器小标题之前，移到 `#picks-accelerators` 卡片网格闭合之后、picks 区块 `</section>` 之前；`node scripts/build-i18n.mjs` 重生成 `en/` `jp/` `ko/`，四语入口现在都在加速器下方、`#archive` 与 `#film-note` 之上。
+- **校验反转（强度只增不减）**：旧断言「teaser 必须在加速器标题之前」改为「必须在加速器小标题、`#picks-accelerators` 网格、最后一张加速器卡（`picks.geili.actions`）之后，且在 `#archive` / `#film-note` 之前」；四语循环里新增同序断言（网格后、film-note 前），以前只查中文 source，现在四语都锁。
+- **故障注入 +2**：「teaser 移回加速器标题上方」（中文 source）、「teaser 推到 film-note 之下」（en 页），自检 **245/245 → 247/247**；`VERIFY OK` 404 节点 / 63 属性 / 4 语。
+- **版权排查（结论：不挂）**：英文区《Beloved Eun-dong》(2015，JTBC《사랑하는 은동아》) 只有 Viki 收录（本站已判 Viki 地区不可用且不挂）、Netflix 授权互相矛盾，无可用持牌渠道；日语区《오! 문희》(Oh! My Gran, 2020) 在 U-NEXT / FOD / Amazon JP / Hulu / TSUTAYA / Rakuten 均无上架记录（此前 Apple TV 已 404），《チアアップ！》(발칙하게 고고, 2015，日文通行名《無理的前進》) 日本 VOD 无授权。宁可不挂，也不挂盗版与聚合站。
+
 ## 2026-11-25 · 按站长「中文找不到就推英文、尽可能补齐」补齐正版订阅 + 修两条死链
 
 - `dbd680e` — 站长看《大长今》后定调：「中文没有、英文倒是有，中文实在找不到就去推英文，反正尽可能补齐」。本轮按 JustWatch 港/台/日/韩/美四区实查 + 逐条 `curl` 验 URL 200，只挂订阅制持牌平台，报 404 的一律不挂。

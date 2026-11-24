@@ -427,3 +427,10 @@
 - 现象：删掉日文《哦！文姬》已 404 的 Apple TV 按钮后，`PICKS_ACTIONS_EXPECT.jp.primary='apple'` 立刻判「primary link missing」；两条故障注入（把 Apple TV 换成 YouTube / 换成港区 AFF）因为 `.replace()` 源串不存在而变成空操作，注入无效自然也不会判红。英文 drama6 的 Netflix 按钮移除同理，原来的「Netflix 挪位」注入直接失效。
 - 规则：改按钮前先 `grep` 该 URL 的全部反向依赖——常量映射（`NETFLIX_TITLE_ID` / `PICKS_ACTIONS_EXPECT`）、mutation 里的 `.replace()` 源串、数量断言，一处不改就会「脚本全绿但断言已死」。无渠道区要显式建模（本仓 `primary: null` + 「整卡禁挂租买/YouTube」分支），不要留占位按钮蒙混。
 - 顺带：订阅按钮从「恰好一个」放开成「同区可多平台」时，数量断言必须改成「与登记数组长度相等」，否则多挂一个照样全绿、少挂一个也不会红。
+
+## 61. 把一个入口块搬到别处，旧的位置断言会变成"反向断言"，不改就永远绿不了
+- 现象：站长要「附页：影片档案」从加速器小标题上方挪到加速器卡片网格下方。只搬 `index.html` 不动 `verify-i18n.mjs` 时，旧断言「teaser 必须在加速器标题之前」直接判红；而只把断言删掉或改成"存在即可"，则位置漂移再无防护——两种都是错的。
+- 规则：位置类断言要按"包围盒"重写，别只改比较方向。本轮把断言改成多重包围：`kpopAt < accelAt < accelGridAt < lastAccelCardAt < teaserAt < archiveAt / filmNoteAt`，其中 `lastAccelCardAt` 用最后一张卡里的 `data-i18n="picks.geili.actions"` 锁定，避免"挪到网格外但仍在区块内"漏判；结束边界同时挂 `#archive` 与 `FILM_SECTION` 两个锚，防止挪到下一个附页区之后。
+- 另一坑：旧断言只查中文 `source`，四语生成页没人管。位置断言要放进 `for (const lang of LANGS)` 循环对 `state.pages[lang]` 再查一遍，否则 `build-i18n.mjs` 模板变动导致某语言错位照样全绿。
+- 故障注入同步：新增两条才算真锁住——「teaser 移回加速器标题上方」（改 `s.source`）、「teaser 推到 film-note 之下」（改 `s.pages.en`，顺带覆盖四语分支）。自检数从 245 涨到 247，若仍是 245 说明新用例没进数组或 mutation 是空操作。
+- 排版：`.picks-film-teaser { margin-top: 22px; }` 在网格之后依然成立（原样式是按"块后留白"设计的），搬位置不需要改 CSS。

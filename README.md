@@ -122,4 +122,5 @@ python -m http.server 8000
 
 改动与真实提交号见 [CHANGELOG.md](CHANGELOG.md)，踩过的坑见 [PITFALLS.md](PITFALLS.md)。
 
-最近一笔：`dbd680e`（2026-11-25）按站长「中文找不到就推英文、尽可能补齐」补齐 10 处正版订阅（OnDemandKorea / FOD / wavve / TVING ×4 / Watcha / YouTube），并修掉 drama6 Netflix 与日文《哦！文姬》Apple TV 两条死链；`node scripts/build-i18n.mjs` + `node scripts/verify-i18n.mjs` 全绿（404 节点 / 63 属性 / 自检 245/245）。
+最近一笔：`ae20406`（2026-11-25）按站长「附页：影片档案，请放在加速器下方」把 `film.teaser` 从加速器小标题之前移到 `#picks-accelerators` 卡片网格之后（四语同步重生成），并把位置断言反转为「加速器网格之后、`#film-note` 之前」、四语各加一条同序断言，新增 2 条故障注入；`node scripts/build-i18n.mjs` + `node scripts/verify-i18n.mjs` 全绿（404 节点 / 63 属性 / 自检 247/247）。
+上一笔：`dbd680e`（2026-11-25）按站长「中文找不到就推英文、尽可能补齐」补齐 10 处正版订阅（OnDemandKorea / FOD / wavve / TVING ×4 / Watcha / YouTube），并修掉 drama6 Netflix 与日文《哦！文姬》Apple TV 两条死链（自检 245/245）。
