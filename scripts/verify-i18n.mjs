@@ -105,8 +105,8 @@ const NETFLIX_TITLE_PREFIX = 'https://www.netflix.com/title/';
    ko 按韩区（拥抱月亮/大长今等无）；en 沿用美区。查不到的区一律禁挂，aff 红字全部保留。 */
 const NETFLIX_TITLE_ID = {
   'zh/drama1': '81682438', 'zh/drama3': '80025266', 'zh/drama4': '81033650',
-  'zh/drama6': '80031790', 'zh/drama7': '81422314', 'zh/drama8': '81243996', 'zh/drama9': '82024852',
-  'en/drama1': '81682438', 'en/drama6': '80031790', 'en/drama7': '81422314',
+  'zh/drama7': '81422314', 'zh/drama8': '81243996', 'zh/drama9': '82024852',
+  'en/drama1': '81682438', 'en/drama7': '81422314',
   'en/drama8': '81243996', 'en/drama9': '82024852',
   'jp/drama1': '81682438', 'jp/drama4': '81033650', 'jp/drama7': '81422314',
   'jp/drama8': '81243996', 'jp/drama9': '82024852',
@@ -150,7 +150,7 @@ const MUSIC_FORBIDDEN = [
 const PICKS_ACTIONS_EXPECT = {
   zh: { primary: 'aff', note: '到 Netflix 搜索片名观看 · 请支持正版' },
   en: { primary: 'amazon', note: 'Viewers in mainland China: <a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">click here</a> to access Netflix.' },
-  jp: { primary: 'apple', note: '中国大陸からご覧になる場合は、<a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">こちら</a>から Netflix にアクセスできます。' },
+  jp: { primary: null, note: '中国大陸からご覧になる場合は、<a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">こちら</a>から Netflix にアクセスできます。' },
   ko: { primary: 'youtube', note: '중국 본토 시청자는 <a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">여기</a>를 눌러 Netflix에 접속하세요.' }
 };
 /* 按钮文案逐语本地化锁定：不直译、不机翻、不漂移 */
@@ -401,21 +401,33 @@ const DRAMA_NOTE = {
    只挂**非 Netflix** 的持牌订阅平台——Netflix 的入口就是那条红字 AFF，不许再挂 netflix.com 直链。
    表里没有的 lang/slug（该区只有 Netflix，或查无订阅渠道）一律禁挂订阅按钮。 */
 const DRAMA_SUB = {
-  'en/drama2': {
-    url: 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.7498e914-8cdf-4f9c-ad95-4342e43e3c90',
-    label: 'Watch on Kocowa via Prime Video (subscription)'
-  },
+  'en/drama2': [
+    {
+      url: 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.7498e914-8cdf-4f9c-ad95-4342e43e3c90',
+      label: 'Watch on Kocowa via Prime Video (subscription)'
+    },
+    {
+      url: 'https://www.ondemandkorea.com/player/vod/cheer-up-0-1?contentId=1609890',
+      label: 'Watch on OnDemandKorea (subscription)'
+    }
+  ],
   /* 2026-11-24 站长指出三条 Viki 为死链（页面打不开/内容不可用）。
      按 JustWatch 美区逐条实查并真浏览器验证：星你 → Kocowa via Prime Video；
      继承者们 → Tubi 免费带广告（美区无 Viki 以外的订阅平台，已有 Prime 购买按钮）；
      大长今 → Kocowa via Prime Video。三条原文案「Watch on Viki (subscription)」一并改。 */
-  'en/drama3': { url: 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.b8608d49-3ed5-4ed9-9655-fbd806b49fce', label: 'Watch on Kocowa via Prime Video (subscription)' },
+  'en/drama3': [
+    { url: 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.b8608d49-3ed5-4ed9-9655-fbd806b49fce', label: 'Watch on Kocowa via Prime Video (subscription)' },
+    { url: 'https://www.ondemandkorea.com/player/vod/my-love-from-the-star-1?contentId=735544', label: 'Watch on OnDemandKorea (subscription)' }
+  ],
   'en/drama4': { url: 'https://tubitv.com/series/300001259/the-heirs', label: 'Watch free on Tubi (with ads)' },
   'en/drama5': { url: 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.e409f09d-a4d5-4c1a-b092-1f58faa85fb4', label: 'Watch on Kocowa via Prime Video (subscription)' },
   /* Netflix 订阅按钮统一由 NETFLIX_TITLE_ID 管理（四语按区），不再列入 DRAMA_SUB。 */
   'jp/drama3': { url: 'https://video.unext.jp/episode/SID0003058/ED00073535', label: 'U-NEXT で見る（定額制）' },
   'jp/drama4': { url: 'https://video.unext.jp/episode/SID0017711/ED00046626', label: 'U-NEXT で見る（定額制）' },
-  'jp/drama5': { url: 'https://video.unext.jp/episode/SID0020374/ED00094308', label: 'U-NEXT で見る（定額制）' },
+  'jp/drama5': [
+    { url: 'https://video.unext.jp/episode/SID0020374/ED00094308', label: 'U-NEXT で見る（定額制）' },
+    { url: 'https://fod.fujitv.co.jp/title/4e07/4e07120001/', label: 'FOD で見る（定額制）' }
+  ],
   'ko/drama1': { url: 'https://www.tving.com/contents/P001710496', label: 'TVING에서 보기 (정액제)' },
   'ko/drama2': {
     url: 'https://www.wavve.com/player/vod?contentid=K02_PS-2015161154-01-000.1',
@@ -423,13 +435,20 @@ const DRAMA_SUB = {
   },
   'ko/drama3': { url: 'https://www.tving.com/contents/P001446333', label: 'TVING에서 보기 (정액제)' },
   'ko/drama4': { url: 'https://watcha.com/contents/tRW31aR', label: '왓챠에서 보기 (정액제)' },
-  'ko/drama5': { url: 'https://www.tving.com/contents/P001790390', label: 'TVING에서 보기 (정액제)' }
+  'ko/drama5': [
+    { url: 'https://www.tving.com/contents/P001790390', label: 'TVING에서 보기 (정액제)' },
+    { url: 'https://www.wavve.com/player/vod?contentid=M_EP201703035422.1', label: 'wavve에서 보기 (정액제)' }
+  ]
 };
 /* 英文区非 Netflix 正版（2026-11-24 JustWatch 美区实查），drama10/11/13 不在 DRAMA_SLUGS 内，单独写死。 */
 const DRAMA_SUB_EXTRA = {
   'en/drama10': { url: 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.a3b03bc3-0b7d-49e5-8eb1-6d80ac89dd13', label: 'Watch on Prime Video (subscription)' },
   'en/drama11': { url: 'https://tubitv.com/series/300009794/bring-it-on-ghost-subbed', label: 'Watch free on Tubi (with ads)' },
-  'en/drama13': { url: 'https://tubitv.com/series/300010014/dear-my-friends', label: 'Watch free on Tubi (with ads)' }
+  'en/drama13': { url: 'https://tubitv.com/series/300010014/dear-my-friends', label: 'Watch free on Tubi (with ads)' },
+  /* 2026-11-25 站长「尽可能补齐」：drama6 原挂的 Netflix 80031790 已 404，改挂美区 OnDemandKorea；
+     电影《哦！文姬》美区补 YouTube 免费带广告（与 Prime 租买并存）。 */
+  'en/drama6': { url: 'https://www.ondemandkorea.com/player/vod/the-moon-embracing-the-sun-1?contentId=707960', label: 'Watch on OnDemandKorea (subscription)' },
+  'en/film': { url: 'https://www.youtube.com/watch?v=Ck9onnQBStU', label: 'Watch free on YouTube (with ads)' }
 };
 /* 2026-11-24 站长：中文按港区、港区没有退台湾区；英/日/韩按本区，正规正版订阅平台都可挂。
    给原本无订阅按钮但本区有正版的卡补齐（JustWatch 五区实查 + URL 逐条 curl 200 验证，
@@ -444,9 +463,18 @@ const LICENSED_SUB_EXTRA = {
   'jp/drama12': { url: 'https://video.unext.jp/episode/SID0026887/ED00139519', label: 'U-NEXT で見る（定額制）' },
   'jp/drama13': { url: 'https://watch.amazon.co.jp/detail?gti=amzn1.dv.gti.bf528ebf-b037-45b2-8287-a86a55defa5e', label: 'Prime Video で見る（定額制）' },
   'ko/drama6': { url: 'https://www.wavve.com/player/vod?contentid=M_EP201611284940.1', label: 'wavve에서 보기 (정액제)' },
-  'ko/drama10': { url: 'https://www.wavve.com/player/vod?contentid=J4401_J44000000012_01_0001.1', label: 'wavve에서 보기 (정액제)' },
+  'ko/drama7': { url: 'https://www.tving.com/contents/P001443981', label: 'TVING에서 보기 (정액제)' },
+  'ko/drama8': { url: 'https://www.tving.com/contents/P001158358', label: 'TVING에서 보기 (정액제)' },
+  'ko/drama9': { url: 'https://www.tving.com/contents/P001781079', label: 'TVING에서 보기 (정액제)' },
+  'ko/drama10': [
+    { url: 'https://www.wavve.com/player/vod?contentid=J4401_J44000000012_01_0001.1', label: 'wavve에서 보기 (정액제)' },
+    { url: 'https://www.tving.com/contents/P001754712', label: 'TVING에서 보기 (정액제)' }
+  ],
   'ko/drama11': { url: 'https://www.tving.com/contents/P000298133', label: 'TVING에서 보기 (정액제)' },
-  'ko/drama12': { url: 'https://www.wavve.com/player/vod?contentid=J3801_J38000000154_01_0001.1', label: 'wavve에서 보기 (정액제)' },
+  'ko/drama12': [
+    { url: 'https://www.wavve.com/player/vod?contentid=J3801_J38000000154_01_0001.1', label: 'wavve에서 보기 (정액제)' },
+    { url: 'https://watcha.com/contents/tPVXJ4E', label: '왓챠에서 보기 (정액제)' }
+  ],
   'ko/drama13': { url: 'https://www.tving.com/contents/P000275500', label: 'TVING에서 보기 (정액제)' },
 };
 
@@ -482,7 +510,11 @@ const SUB_DOMAINS = [
   'https://www.netflix.com/title/',
   'https://www.catchplay.com/tw/video/',
   'https://www.primevideo.com/-/zh_TW/detail/',
-  'https://app.primevideo.com/detail?gti='
+  'https://app.primevideo.com/detail?gti=',
+  /* 2026-11-25 站长补齐：以下三个域已逐条 curl 200 验证（美区 OnDemandKorea / 日区 FOD / 美区 YouTube 免费带广告）。 */
+  'https://www.ondemandkorea.com/player/',
+  'https://fod.fujitv.co.jp/title/',
+  'https://www.youtube.com/watch?'
 ];
 /* SEO（2026-11-22 站长指令：按推荐执行 A+C+D 长尾）。
    title / description 关键词前置、金句后置；旧文艺标题不得回退。
@@ -1297,20 +1329,35 @@ function verify(state) {
     const actions = nodes['picks.film.actions'] || '';
     const want = PICKS_ACTIONS_EXPECT[lang];
     if (!actions.includes(want.note)) errors.push(lang + ': Netflix note wording drift');
-    if (!actions.includes(PICKS_PRIMARY_LABEL[lang])) errors.push(lang + ': primary button label drift');
     const featuredHref = (actions.match(/class="pick-link pick-link-featured"\s+href="([^"]+)"/) || [])[1] || '';
-    if (!featuredHref) errors.push(lang + ': featured button class missing');
-    if (!featuredHref.includes(PRIMARY_LINK[want.primary])) {
-      errors.push(lang + ': primary link missing -> ' + want.primary);
-    }
-    for (const [key, link] of Object.entries(PRIMARY_LINK)) {
-      if (key !== want.primary && featuredHref.includes(link)) {
-        errors.push(lang + ': wrong-region primary link -> ' + key);
+    if (want.primary) {
+      if (!actions.includes(PICKS_PRIMARY_LABEL[lang])) errors.push(lang + ': primary button label drift');
+      if (!featuredHref) errors.push(lang + ': featured button class missing');
+      if (!featuredHref.includes(PRIMARY_LINK[want.primary])) {
+        errors.push(lang + ': primary link missing -> ' + want.primary);
       }
-    }
-    for (const dom of YOUTUBE_DOMAINS) {
-      if (want.primary !== 'youtube' && actions.includes(dom)) {
-        errors.push(lang + ': YouTube link forbidden in this region -> ' + dom);
+      for (const [key, link] of Object.entries(PRIMARY_LINK)) {
+        if (key !== want.primary && featuredHref.includes(link)) {
+          errors.push(lang + ': wrong-region primary link -> ' + key);
+        }
+      }
+      /* 副按钮可挂 YouTube（英文页补了免费带广告），但主按钮仍必须是本区租买页。 */
+      for (const dom of YOUTUBE_DOMAINS) {
+        if (want.primary !== 'youtube' && featuredHref.includes(dom)) {
+          errors.push(lang + ': YouTube link cannot be the primary buy button -> ' + dom);
+        }
+      }
+    } else {
+      /* 该区实查无持牌渠道（2026-11-25：日区《哦！文姬》原 Apple TV 已 404）：
+         整卡禁挂任何租买/订阅外链与 YouTube，只留红字 aff。 */
+      if (featuredHref) errors.push(lang + ': buy button forbidden where no licensed rent/buy channel exists');
+      for (const key of ['amazon', 'apple', 'youtube']) {
+        if (actions.includes(PRIMARY_LINK[key])) {
+          errors.push(lang + ': regional buy link forbidden where no licensed channel exists -> ' + key);
+        }
+      }
+      for (const dom of YOUTUBE_DOMAINS) {
+        if (actions.includes(dom)) errors.push(lang + ': YouTube link forbidden where no licensed channel exists -> ' + dom);
       }
     }
     if (want.primary !== 'aff') {
@@ -1539,33 +1586,37 @@ function verify(state) {
         errors.push(lang + ': ' + slug + ' buy button forbidden where no rent/buy channel exists');
       }
       /* 订阅制渠道：按区实查到了才挂，且必须排在 featured 租买按钮与红字 AFF 之上；
-         查不到的区一律禁挂，避免「点进去没有这部片」的死链。 */
-      /* 跳过 Netflix 按钮，取第一个非 Netflix 订阅按钮作为 DRAMA_SUB 校验锚点（2026-11-24 并存规则）。 */
+         查不到的区一律禁挂，避免「点进去没有这部片」的死链。
+         2026-11-25 站长「尽可能补齐」：同一区可并列多个持牌订阅平台，登记值统一按数组处理。 */
+      /* 跳过 Netflix 按钮，取非 Netflix 订阅按钮序列作为 DRAMA_SUB 校验锚点（2026-11-24 并存规则）。 */
       const subHrefs = [...actions.matchAll(/class="pick-link pick-link-sub"\s+href="([^"]+)"/g)].map(m => m[1]);
-      const subAnchor = subHrefs.find(h => !h.startsWith(NETFLIX_TITLE_PREFIX)) || '';
-      const subWant = DRAMA_SUB[lang + '/' + slug] || null;
-      const subCount = (actions.match(/pick-link-sub/g) || []).length;
-      if (subWant) {
-        if (!subAnchor) errors.push(lang + ': ' + slug + ' subscription button missing');
-        else {
-          if (!subAnchor.startsWith(subWant.url)) {
-            errors.push(lang + ': ' + slug + ' subscription link drift -> ' + subAnchor);
+      const subNonNf = subHrefs.filter(h => !h.startsWith(NETFLIX_TITLE_PREFIX));
+      const subWants = DRAMA_SUB[lang + '/' + slug] ? [].concat(DRAMA_SUB[lang + '/' + slug]) : null;
+      if (subWants) {
+        if (!subNonNf.length) errors.push(lang + ': ' + slug + ' subscription button missing');
+        subWants.forEach((want, idx) => {
+          const got = subNonNf[idx] || '';
+          if (!got) {
+            errors.push(lang + ': ' + slug + ' subscription button missing -> ' + want.url);
+            return;
           }
-          if (!SUB_DOMAINS.some(prefix => subAnchor.startsWith(prefix))) {
+          if (!got.startsWith(want.url)) {
+            errors.push(lang + ': ' + slug + ' subscription link drift -> ' + got);
+          }
+          if (!SUB_DOMAINS.some(prefix => got.startsWith(prefix))) {
             errors.push(lang + ': ' + slug + ' subscription link outside the licensed-platform allowlist');
           }
           for (const dead of DEAD_SUB_PLATFORMS) {
-            if (subAnchor.includes(dead)) errors.push(lang + ': ' + slug + ' dead subscription platform -> ' + dead);
+            if (got.includes(dead)) errors.push(lang + ': ' + slug + ' dead subscription platform -> ' + dead);
           }
-        }
-        if (!actions.includes(subWant.label)) {
-          errors.push(lang + ': ' + slug + ' subscription label drift');
-        }
+          if (!actions.includes(want.label)) {
+            errors.push(lang + ': ' + slug + ' subscription label drift -> ' + want.label);
+          }
+        });
         /* Netflix 按钮可与非 Netflix 订阅按钮并存（2026-11-24 站长：有正版就多挂）；
-           非 Netflix 订阅按钮仍恰好一个。 */
-        const nfCount = (actions.match(/netflix\.com\/title\//g) || []).length;
-        if (subCount - nfCount !== 1) {
-          errors.push(lang + ': ' + slug + ' must carry exactly one non-Netflix subscription button (got ' + (subCount - nfCount) + ')');
+           非 Netflix 订阅按钮数量必须与登记表一致（同区允许多条，多挂少挂都判红）。 */
+        if (subNonNf.length !== subWants.length) {
+          errors.push(lang + ': ' + slug + ' non-Netflix subscription button count drift (want ' + subWants.length + ', got ' + subNonNf.length + ')');
         }
         const subAt = actions.indexOf('pick-link-sub');
         const featAt = actions.indexOf('pick-link-featured');
@@ -1580,7 +1631,7 @@ function verify(state) {
         /* 没有非 Netflix 渠道时，只允许该区已核实的 Netflix 按钮，其余订阅按钮禁挂。 */
         const nfCount = (actions.match(/netflix\.com\/title\//g) || []).length;
         const wantNfHere = NETFLIX_TITLE_ID[lang + '/' + slug];
-        if (subCount - nfCount > 0) {
+        if (subNonNf.length > 0) {
           errors.push(lang + ': ' + slug + ' subscription button forbidden where the region has no licensed subscription channel');
         }
         if (nfCount > (wantNfHere ? 1 : 0)) {
@@ -1592,15 +1643,17 @@ function verify(state) {
   /* 英文区 drama10/11/13 正版按钮写死：链接、文案、位置（红字之前）。 */
   {
     const enNodes = extractNodes(state.pages.en || '');
-    for (const [key, want] of Object.entries(DRAMA_SUB_EXTRA)) {
+    for (const [key, value] of Object.entries(DRAMA_SUB_EXTRA)) {
       if (!key.startsWith('en/')) continue;
       const slug = key.slice(3);
       const actions = enNodes['picks.' + slug + '.actions'] || '';
-      if (!actions.includes(want.url)) errors.push('en: ' + slug + ' licensed subscription link missing');
-      if (!actions.includes(want.label)) errors.push('en: ' + slug + ' licensed subscription label drift');
-      const subAt = actions.indexOf(want.url);
-      const redAt = actions.indexOf('pick-netflix-note');
-      if (subAt < 0 || redAt < 0 || subAt > redAt) errors.push('en: ' + slug + ' subscription button must sit above the aff note');
+      for (const want of [].concat(value)) {
+        if (!actions.includes(want.url)) errors.push('en: ' + slug + ' licensed subscription link missing -> ' + want.url);
+        if (!actions.includes(want.label)) errors.push('en: ' + slug + ' licensed subscription label drift -> ' + want.label);
+        const subAt = actions.indexOf(want.url);
+        const redAt = actions.indexOf('pick-netflix-note');
+        if (subAt < 0 || redAt < 0 || subAt > redAt) errors.push('en: ' + slug + ' subscription button must sit above the aff note');
+      }
     }
     /* 四区 Netflix 条目 ID / 文案写死（drama6-9 不在 DRAMA_SLUGS，需在此单独断言）。 */
     for (const [key, id] of Object.entries(NETFLIX_TITLE_ID)) {
@@ -1615,22 +1668,24 @@ function verify(state) {
       if (nfAt < 0 || redAt < 0 || nfAt > redAt) errors.push(lang + ': ' + slug + ' Netflix button must sit above the aff note');
     }
     /* 2026-11-24 新增正版订阅按钮专项断言：不在 DRAMA_SLUGS 的卡（drama6/10-13/film）也要锁死。 */
-    for (const [key, want] of Object.entries(LICENSED_SUB_EXTRA)) {
+    for (const [key, value] of Object.entries(LICENSED_SUB_EXTRA)) {
       const lang = key.slice(0, 2);
       const slug = key.slice(3);
       const nodes = extractNodes(lang === 'zh' ? state.source : (state.pages[lang] || ''));
       const actions = nodes['picks.' + slug + '.actions'] || '';
-      if (!actions.includes('class="pick-link pick-link-sub" href="' + want.url + '"')) {
-        errors.push(lang + ': ' + slug + ' licensed subscription link missing -> ' + want.url);
-      }
-      if (!actions.includes(want.label)) errors.push(lang + ': ' + slug + ' licensed subscription label drift');
-      if (!SUB_DOMAINS.some(prefix => want.url.startsWith(prefix))) {
-        errors.push(lang + ': ' + slug + ' licensed platform outside allowlist');
-      }
-      const subAt = actions.indexOf(want.url);
-      const redAt = actions.indexOf('pick-netflix-note');
-      if (subAt < 0 || redAt < 0 || subAt > redAt) {
-        errors.push(lang + ': ' + slug + ' licensed subscription button must sit above the aff note');
+      for (const want of [].concat(value)) {
+        if (!actions.includes('class="pick-link pick-link-sub" href="' + want.url + '"')) {
+          errors.push(lang + ': ' + slug + ' licensed subscription link missing -> ' + want.url);
+        }
+        if (!actions.includes(want.label)) errors.push(lang + ': ' + slug + ' licensed subscription label drift -> ' + want.label);
+        if (!SUB_DOMAINS.some(prefix => want.url.startsWith(prefix))) {
+          errors.push(lang + ': ' + slug + ' licensed platform outside allowlist');
+        }
+        const subAt = actions.indexOf(want.url);
+        const redAt = actions.indexOf('pick-netflix-note');
+        if (subAt < 0 || redAt < 0 || subAt > redAt) {
+          errors.push(lang + ': ' + slug + ' licensed subscription button must sit above the aff note');
+        }
       }
       if (!actions.includes(AFF_LINK)) errors.push(lang + ': ' + slug + ' aff entry must be preserved');
     }
@@ -2226,13 +2281,19 @@ const faults = [
     s.dict.en.html['picks.film.actions'] = s.dict.en.html['picks.film.actions']
       .replace('>Rent or buy on Prime Video', '>Hong Kong, China: rent or buy on Prime Video');
   } },
-  { name: 'JP page given a YouTube link (JP rent/buy is on Apple TV)', mutate: s => {
+  /* 2026-11-25：日区《哦！文姬》原 Apple TV（id1691528206）已 404 并移除，日文页无任何租买/订阅按钮；
+     故障注入改为「硬塞按钮」，验证无渠道区仍会被判红。 */
+  { name: 'JP page given a YouTube button where no licensed channel exists', mutate: s => {
+    const inject = '<a class="pick-link pick-link-sub" href="' + YOUTUBE_LINK + '" target="_blank" rel="noopener noreferrer">YouTube で見る</a>';
     s.dict.jp.html['picks.film.actions'] = s.dict.jp.html['picks.film.actions']
-      .replace(APPLE_TV_LINK, YOUTUBE_LINK);
+      .replace('<p class="pick-netflix-note">', inject + '<p class="pick-netflix-note">');
+    s.pages.jp = s.pages.jp.replace(/(<div class="pick-actions" data-i18n="picks\.film\.actions">)/, '$1' + inject);
   } },
-  { name: 'JP page switched back to the HK-region aff link', mutate: s => {
+  { name: 'JP page switched back to the HK-region aff buy button', mutate: s => {
+    const inject = '<a class="pick-link pick-link-featured" href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">' + PICKS_PRIMARY_LABEL.zh + '</a>';
     s.dict.jp.html['picks.film.actions'] = s.dict.jp.html['picks.film.actions']
-      .replace(APPLE_TV_LINK, AFF_LINK);
+      .replace('<p class="pick-netflix-note">', inject + '<p class="pick-netflix-note">');
+    s.pages.jp = s.pages.jp.replace(/(<div class="pick-actions" data-i18n="picks\.film\.actions">)/, '$1' + inject);
   } },
   { name: 'KO page switched to the US Prime Video link', mutate: s => {
     s.dict.ko.html['picks.film.actions'] = s.dict.en.html['picks.film.actions'];
@@ -2837,9 +2898,10 @@ const faults = [
   { name: 'zh Netflix button text drifted', mutate: s => {
     s.source = s.source.replace('在 Netflix 观看（订阅）', 'Netflix 搜索片名');
   } },
-  { name: 'en Netflix button moved below aff note', mutate: s => {
-    s.pages.en = s.pages.en.replace('data-i18n="picks.drama6.actions"><a class="pick-link pick-link-sub" href="https://www.netflix.com/title/80031790" target="_blank" rel="noopener noreferrer">Watch on Netflix (subscription)</a>', 'data-i18n="picks.drama6.actions">');
-    s.dict.en.html['picks.drama6.actions'] = s.dict.en.html['picks.drama6.actions'].replace('<a class="pick-link pick-link-sub" href="https://www.netflix.com/title/80031790" target="_blank" rel="noopener noreferrer">Watch on Netflix (subscription)</a>', '');
+  { name: 'en Netflix button removed from a licensed card', mutate: s => {
+    const btn = '<a class="pick-link pick-link-sub" href="https://www.netflix.com/title/81682438" target="_blank" rel="noopener noreferrer">Watch on Netflix (subscription)</a>';
+    s.pages.en = s.pages.en.replace('data-i18n="picks.drama1.actions">' + btn, 'data-i18n="picks.drama1.actions">');
+    s.dict.en.html['picks.drama1.actions'] = s.dict.en.html['picks.drama1.actions'].replace(btn, '');
   } },
   { name: 'zh film Catchplay subscription button removed', mutate: s => {
     const u = 'https://www.catchplay.com/tw/video/3ec4e52d-46b6-4b5e-aca4-f06ff0b46d45';
