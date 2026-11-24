@@ -2,6 +2,15 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-24 · 全站视频订阅体检：三条 Viki 死链换正版 + 劲舞团地区入口
+
+- `aba2389` — 站长指出截图中三条 Viki 是死链、要求「对视频做一次全站检查，有正版的就挂正版，没有的写『本站未检索到正版资源，可能已下架』（自己写这句话，不要改变原意）」；劲舞团英文版挂台服 `https://landing.mangot5.com/`，日韩找对应服务器，找不到也用台服。
+- **体检方法**：HTTP 状态 + Edge headless + CDP 真浏览器渲染逐条看页面标题/正文。HTTP 200 一律不等于有效——三条 Viki 返回 200 且能渲染剧集页，但按站长判定为死链（他的网络环境打不开），全部替换；U-NEXT 星你第一次抓到 U-NEXT 首页，延长等待后确认是「星から来たあなた 第1話」正常页；wavve 第一次 body 为空，延长后确认「발칙하게 고고」正常页，两条均保留。其余 TVING / Prime Video / watcha 均实测有内容。
+- **三条 Viki 替换**（JustWatch 美区 2026-11-24 逐条查 + 真浏览器验证页面标题）：《来自星星的你》→ Kocowa via Prime Video（`amzn1.dv.gti.b8608d49...`，页面标题 "Watch My Love From the Star | Prime Video"）；《继承者们》→ Tubi 免费带广告（`tubitv.com/series/300001259/the-heirs`，页面标题 "Watch The Heirs Streaming Online | Tubi Free TV"，美区除 Viki 外无订阅平台，Prime 购买按钮保留）；《大长今》→ Kocowa via Prime Video（`amzn1.dv.gti.e409f09d...`）。三语字典订阅按钮文字同步改，站长的「查不到就写提示」以 `SUB_UNAVAILABLE` 四语手写文案落地（zh/en/jp/ko 各写各的，含义一致），写进校验；`DEAD_SUB_PLATFORMS` 禁 Viki 剧集页复发。
+- **劲舞团**：zh 保持国服 au.9you.com；en/jp 挂台服 MangoT5（日服 X-BEAT 2016-03-31 关服，外网核实）；ko 挂韩服 audition.hanbiton.com（2026-11-18 仍有更新公告，活跃运营）。四语 note 全部重写，纠正旧文案「韩服 2019 年停运、台服未核实」的错误说法。校验 `AUDITION_SERVER` 按区写死 + 串区检测。
+- **校验**：`DRAMA_SUB` 三条替换、`SUB_DOMAINS` 加 Tubi、死链平台黑名单、四语提示文案断言、劲舞团地区断言；新增 5 组故障注入（Viki 复活、提示文案被删、英/韩串区、旧注入更新）。`VERIFY OK` **384 节点 / 61 属性**，自检 **217/217**（上轮 213）。
+- **验收**：Edge headless + CDP 四语桌面 1440 / 移动 390 共 **8/8**，逐组验提示文案、无 Viki 死链、订阅链接归属、劲舞团地区链接、图片 naturalWidth、无横向溢出；逐卡截图肉眼确认三剧按钮与劲舞团 note 渲染正常。截图 `D:/WorkBuddy-Cache/shots/sub-audition-20261124/`。
+
 ## 2026-11-24 · 复核《拥抱太阳的月亮》年份：以 Netflix 官方为准，确为 2012
 
 - `74ed794` — 站长提出「《拥抱太阳的月亮》不是 2012 年的，去 nf 查，盗版网站那个标记是错误数据，不可信」。按要求以 Netflix 官方为准核验，但结论与质疑相反：真浏览器（Edge headless + CDP）打开 `netflix.com/title/80031790`，中文界面显示「拥抱太阳的月亮 2012⁨TV-14⁩剧情片」，英文界面显示「The Moon Embracing the Sun 2012 20 Episodes」，zh/hu-en/tw-en 多地区一致。
