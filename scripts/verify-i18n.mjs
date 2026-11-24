@@ -1441,21 +1441,22 @@ function verify(state) {
      这些卡只在中文源页出现，build-i18n.mjs 生成 en/jp/ko 时整块剔除。
      不变量：① 卡内不得含任何 data-i18n（否则四语键位一致校验会失败）；
      ② 生成页里绝不能残留 data-zh-only 标记或该卡内容。 */
-  const ZH_ONLY_GAMES = ['泡泡堂', '跑跑卡丁车', '劲舞团', '音速觉醒'];
+  const ZH_ONLY_ITEMS = ['泡泡堂', '跑跑卡丁车', '劲舞团', '音速觉醒',
+    '拥抱太阳的月亮', '哲仁王后', '你好妈妈，再见', '暴君的厨师', '死期将至', '打架吧鬼神'];
   const zhOnlyCards = (state.source.match(/<article class="pick-card" data-zh-only>[\s\S]*?<\/article>/g) || []);
-  if (zhOnlyCards.length !== ZH_ONLY_GAMES.length) {
-    errors.push('zh-only: 仅中文卡数量应为 ' + ZH_ONLY_GAMES.length + '，实际 ' + zhOnlyCards.length);
+  if (zhOnlyCards.length !== ZH_ONLY_ITEMS.length) {
+    errors.push('zh-only: 仅中文卡数量应为 ' + ZH_ONLY_ITEMS.length + '，实际 ' + zhOnlyCards.length);
   }
   for (const card of zhOnlyCards) {
     if (/data-i18n/.test(card)) errors.push('zh-only: 仅中文卡内出现 data-i18n（应纯中文内联，保四语键位一致）');
   }
-  for (const name of ZH_ONLY_GAMES) {
-    if (!state.source.includes(name)) errors.push('zh: 缺少仅中文游戏 -> ' + name);
+  for (const name of ZH_ONLY_ITEMS) {
+    if (!state.source.includes(name)) errors.push('zh: 缺少仅中文条目 -> ' + name);
   }
   for (const lang of LANGS) {
     const page = state.pages[lang] || '';
     if (page.includes('data-zh-only')) errors.push(lang + ': 仅中文卡未被剔除（残留 data-zh-only 标记）');
-    for (const name of ZH_ONLY_GAMES) {
+    for (const name of ZH_ONLY_ITEMS) {
       if (page.includes(name)) errors.push(lang + ': 仅中文内容泄漏到外文页 -> ' + name);
     }
   }
