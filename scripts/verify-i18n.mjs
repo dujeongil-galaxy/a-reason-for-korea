@@ -115,7 +115,7 @@ const COMING_NOTE = {
   jp: '準備中です。運営者がデータを入力するのをお待ちください。',
   ko: '준비 중입니다. 운영자가 데이터를 입력할 때까지 기다려 주세요.'
 };
-const NAV_SUB_HREFS = ['#picks', '#picks-kpop', '#picks-pc-games'];
+const NAV_SUB_HREFS = ['#picks-dramas', '#picks-kpop', '#picks-pc-games'];
 const escRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 /* 韩国音乐专区已撤（站长 2026-11-22）：四语一律不得再出现占位卡与占位文案。 */
 const MUSIC_FORBIDDEN = [
@@ -217,8 +217,28 @@ const GAME_IMAGE = {
 /* 端游唯一商店 = Steam；手游三通道必须齐全（App Store / Google Play / QooApp） */
 const STEAM_LINK = 'store.steampowered.com/app/';
 /* 端游发行年份（按 Steam 商店页 release date），用于校验「最新靠前」的排序 */
-const PC_GAME_YEAR = { sololeveling: 2025, stellarblade: 2024, liesofp: 2023,
-  blessunleashed: 2021, eternalreturn: 2020, pubg: 2017 };
+const PC_GAME_YEAR = { sololeveling: 2025, stellarblade: 2024, liesofp: 2023, rbeat: 2022,
+  blessunleashed: 2021, eternalreturn: 2020, pubg: 2017, kart: 2006, audition: 2005, bnb: 2003 };
+/* 站长 2026-11-24 定：视频 / 音乐 / 游戏三区一律按上映发行时间降序（最新在前），写死进校验。
+   每区按 label 节点在 DOM 出现顺序比对年份，缺年/倒序/串位一律判红。 */
+const SORT_RULES = {
+  drama: { grid: 'picks-dramas',
+    order: ['drama9','drama1','drama10','film','drama7','drama8','drama11','drama13',
+            'drama2','drama12','drama3','drama4','drama6','drama5'],
+    year: { drama9:2025, drama1:2023, drama10:2023, film:2020, drama7:2020, drama8:2020,
+            drama11:2016, drama13:2016, drama2:2015, drama12:2015, drama3:2013,
+            drama4:2013, drama6:2012, drama5:2003 } },
+  music: { grid: 'picks-kpop',
+    order: ['seoeve','minty','sospecial','ussoboy','music1','jjarappappa','milksong'],
+    year: { seoeve:2024, minty:2019, sospecial:2018, ussoboy:2017, music1:2013,
+            jjarappappa:2012, milksong:2004 } },
+  pc: { grid: 'picks-pc-games',
+    order: ['sololeveling','stellarblade','liesofp','rbeat','blessunleashed',
+            'eternalreturn','pubg','kart','audition','bnb'],
+    year: PC_GAME_YEAR },
+  mobile: { grid: 'picks-mobile-games', order: ['browndust','nikke'],
+    year: { browndust:2023, nikke:2022 } }
+};
 
 /* 端游主机商店地区规则（站长 2026-11-23 定为长期规则）：
    zh=港区 / en=美区 / jp=日区 / ko=韩区。PS 用 concept 页（ID 跨区通用），
@@ -1478,7 +1498,77 @@ function verify(state) {
     }
   }
 
-  return errors;
+
+
+  /* ---------- 2026-11-24 站长写死规则：三区按上映时间降序 + 搜索框分区 + 导航锚点 ---------- */
+  if (!state.source.includes('<a href="#picks-dramas" data-i18n="nav.picks.drama">'))
+    errors.push('zh: nav drama anchor must point to #picks-dramas');
+  if (/<a href="#picks" data-i18n="nav\.picks\.drama"/.test(state.source))
+    errors.push('zh: nav drama still points to #picks (whole section)');
+  for (const lang of LANGS) {
+    const p = state.pages[lang] || '';
+    if (/<a href="#picks"[^>]*data-i18n="nav\.picks\.drama"/.test(p))
+      errors.push(lang + ': nav drama anchor drifted to #picks');
+    if (!/<a href="#picks-dramas"[^>]*data-i18n="nav\.picks\.drama"/.test(p))
+      errors.push(lang + ': nav drama anchor #picks-dramas missing');
+  }
+  /* 搜索框：端游/手游各一个、只搜自己容器；旧 searchGame 不得残留 */
+  for (const p of [state.source, ...LANGS.map(l => state.pages[l] || '')]) {
+    if (p.includes('searchGame')) errors.push('search: legacy searchGame box still present');
+  }
+  for (const [box, grid, subhead] of [['searchPC','picks-pc-games','nav.picks.game.pc'],
+                                      ['searchMobile','picks-mobile-games','nav.picks.game.mobile']]) {
+    if (!state.source.includes('id="' + box + '"')) errors.push('search: ' + box + ' input missing');
+    if (!state.source.includes('data-i18n-placeholder="picks.search.' + (box === 'searchPC' ? 'pc' : 'mobile') + '.ph"'))
+      errors.push('search: ' + box + ' placeholder key missing');
+    for (const lang of LANGS) {
+      const p = state.pages[lang] || '';
+      if (!p.includes('id="' + box + '"')) errors.push(lang + ': ' + box + ' input missing');
+      if (!p.includes('data-i18n="' + subhead + '"')) errors.push(lang + ': ' + subhead + ' subhead missing');
+    }
+  }
+  const appJs = state.appJs || '';
+  if (!appJs.includes("{ box: 'searchPC', containers: ['picks-pc-games'] }"))
+    errors.push('app.js: searchPC must scope to picks-pc-games only');
+  if (!appJs.includes("{ box: 'searchMobile', containers: ['picks-mobile-games'] }"))
+    errors.push('app.js: searchMobile must scope to picks-mobile-games only');
+  if (/searchGame/.test(appJs)) errors.push('app.js: legacy searchGame scope still present');
+  /* 三区降序：按 label 节点出现顺序取 slug，逐年比对 year[prev] > year[cur] */
+  function checkDescending(page, grid, rule, tag) {
+    const gi = page.indexOf('id="' + grid + '"');
+    if (gi < 0) { errors.push(tag + ': grid ' + grid + ' missing'); return; }
+    const after = page.slice(gi);
+    const found = [];
+    for (const m of after.matchAll(/data-i18n="picks\.([a-z0-9]+)\.label"/g)) {
+      if (rule.order.includes(m[1])) found.push(m[1]);
+      if (found.length === rule.order.length) break;
+    }
+    if (found.join(',') !== rule.order.join(',')) {
+      errors.push(tag + ': ' + grid + ' order drift -> ' + found.join(','));
+      return;
+    }
+    for (let i = 1; i < found.length; i++) {
+      const prev = found[i-1], cur = found[i];
+      if (!(rule.year[prev] >= rule.year[cur]))
+        errors.push(tag + ': ' + grid + ' year not descending at ' + prev + '(' + rule.year[prev] + ') -> ' + cur + '(' + rule.year[cur] + ')');
+    }
+    for (const slug of rule.order) {
+      const ly = rule.year[slug];
+      if (!new RegExp('picks\.' + slug + '\.label"[^>]*>[^<]*' + ly).test(page))
+        errors.push(tag + ': ' + slug + ' label missing year ' + ly);
+    }
+  }
+  checkDescending(state.source, 'picks-dramas', SORT_RULES.drama, 'zh');
+  checkDescending(state.source, 'picks-kpop', SORT_RULES.music, 'zh');
+  checkDescending(state.source, 'picks-pc-games', SORT_RULES.pc, 'zh');
+  checkDescending(state.source, 'picks-mobile-games', SORT_RULES.mobile, 'zh');
+  for (const lang of LANGS) {
+    const p = state.pages[lang] || '';
+    checkDescending(p, 'picks-dramas', SORT_RULES.drama, lang);
+    checkDescending(p, 'picks-kpop', SORT_RULES.music, lang);
+    checkDescending(p, 'picks-pc-games', SORT_RULES.pc, lang);
+    checkDescending(p, 'picks-mobile-games', SORT_RULES.mobile, lang);
+  }  return errors;
 }
 
 /* ---------- load real state ---------- */
@@ -1489,6 +1579,7 @@ const state = {
   pages: {},
   dict: sandbox.window.SITE_I18N,
   css: fs.readFileSync(path.join(ROOT, 'assets/styles.css'), 'utf8'),
+  appJs: fs.readFileSync(path.join(ROOT, 'assets/app.js'), 'utf8'),
   assetExists: fs.existsSync(path.join(ROOT, 'assets/clipping-hkcd.jpg')),
   picksImageExists: fs.existsSync(path.join(ROOT, 'assets/oh-my-gran-poster.jpg')),
   musicImageExists: fs.existsSync(path.join(ROOT, MUSIC_IMAGE)),
@@ -1729,7 +1820,7 @@ const faults = [
       .replace('中国大陸からご覧になる場合は、<a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">こちら</a>から Netflix にアクセスできます。', 'Netflix で作品名を検索してご覧ください。正版で応援しましょう');
   } },
   { name: 'invitation code stripped from Chinese page', mutate: s => {
-    s.source = s.source.replace('5rfpUarUEd', '');
+    s.source = s.source.replace(/5rfpUarUEd/g, '');
   } },
   { name: 'picks section removed from Chinese source', mutate: s => {
     s.source = s.source.replace(/<section class="section picks" id="picks">[\s\S]*?<\/section>/, '');
@@ -2122,7 +2213,45 @@ const faults = [
     s.dict.en.html['picks.seoeve.actions'] = '<a class="pick-link pick-link-featured" href="https://y.qq.com/n/m/detail/mv/index.html?vid=004AWNv33sYmI4" target="_blank" rel="noopener noreferrer">QQ</a>';
   } },
   { name: 'kpop thumbnail missing from assets', mutate: s => { s.kpopImages.ussoboy = false; } },
-  { name: 'kpop headsub line removed from English', mutate: s => { delete s.dict.en.html['picks.headsub']; } }
+  { name: 'kpop headsub line removed from English', mutate: s => { delete s.dict.en.html['picks.headsub']; } },
+  { name: 'nav drama anchor reverted to whole picks section', mutate: s => {
+    s.source = s.source.replace('<a href="#picks-dramas" data-i18n="nav.picks.drama">', '<a href="#picks" data-i18n="nav.picks.drama">');
+  } },
+  { name: 'nav drama anchor drifted on English page', mutate: s => {
+    s.pages.en = s.pages.en.replace('href="#picks-dramas" data-i18n="nav.picks.drama"', 'href="#picks" data-i18n="nav.picks.drama"');
+  } },
+  { name: 'legacy searchGame box reintroduced', mutate: s => {
+    s.source = s.source.replace('id="searchPC"', 'id="searchGame"');
+  } },
+  { name: 'searchPC scope widened to all game grids', mutate: s => {
+    s.appJs = s.appJs.replace("{ box: 'searchPC', containers: ['picks-pc-games'] }", "{ box: 'searchPC', containers: ['picks-pc-games', 'picks-mobile-games'] }");
+  } },
+  { name: 'searchMobile input missing from source', mutate: s => {
+    s.source = s.source.replace(/<input class="picks-search" id="searchMobile"[^>]*>/, '');
+  } },
+  { name: 'drama order reversed (oldest first)', mutate: s => {
+    const gi = s.source.indexOf('id="picks-dramas"');
+    const gEnd = s.source.indexOf('id="searchKpop"', gi);
+    const arts = [...s.source.slice(gi, gEnd).matchAll(/        <article class="pick-card">[\s\S]*?        <\/article>/g)].map(m => m[0]);
+    if (arts.length >= 2) {
+      const rev = arts.slice().reverse();
+      let k = 0;
+      s.source = s.source.slice(0, gi) + s.source.slice(gi, gEnd).replace(/        <article class="pick-card">[\s\S]*?        <\/article>/g, () => rev[k++]) + s.source.slice(gEnd);
+    }
+  } },
+  { name: 'music cards not in release-date order', mutate: s => {
+    const gi = s.source.indexOf('id="picks-kpop"');
+    const gEnd = s.source.indexOf('picks-yt-note', gi);
+    const arts = [...s.source.slice(gi, gEnd).matchAll(/        <article class="pick-card">[\s\S]*?        <\/article>/g)].map(m => m[0]);
+    if (arts.length >= 2) {
+      const rev = arts.slice().reverse();
+      let k = 0;
+      s.source = s.source.slice(0, gi) + s.source.slice(gi, gEnd).replace(/        <article class="pick-card">[\s\S]*?        <\/article>/g, () => rev[k++]) + s.source.slice(gEnd);
+    }
+  } },
+  { name: 'a PC game label year drifted to wrong year', mutate: s => {
+    s.source = s.source.replace('data-i18n="picks.kart.label">韩国 · Nexon · 2006<', 'data-i18n="picks.kart.label">韩国 · Nexon · 2016<');
+  } }
 ];
 
 let caught = 0;

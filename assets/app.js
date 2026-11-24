@@ -174,7 +174,8 @@
     var SCOPES = [
       { box: 'searchDrama', containers: ['picks-dramas'] },
       { box: 'searchKpop', containers: ['picks-kpop'] },
-      { box: 'searchGame', containers: ['picks-pc-games', 'picks-mobile-games', 'picks-chain-games', 'picks-accelerators'] }
+      { box: 'searchPC', containers: ['picks-pc-games'] },
+      { box: 'searchMobile', containers: ['picks-mobile-games'] }
     ];
     SCOPES.forEach(function (sc) {
       var inp = document.getElementById(sc.box);
