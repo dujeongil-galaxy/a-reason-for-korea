@@ -339,3 +339,9 @@
 
 - **现象**：验收断言写死 `imgSrc === 'assets/xxx.jpg'`，中文源页过、但 en/jp/ko 生成页全 FAIL——因为 build-i18n 会自动把图片路径改写成 `../assets/xxx.jpg`，图片其实加载正常。改成 `endsWith('assets/xxx.jpg')` 即可。
 - **另**：懒加载图（`loading="lazy"`）在 1440 桌面偶发一张未加载、重跑就好，是滚动触发时序抖动，不是真 bug；验收脚本滚动全页后等 ≥1.8s 更稳。
+
+## 47. 四语 attr 键插入用「最后一个某键行」作锚点会串到别的语段
+
+- **现象**：给 en/jp/ko 三段插 `imageAlt`，按 en→jp→ko 循环，每次找"最后一个 `picks.drama11.imageAlt`"行作锚点。结果 en 插完后，jp 的锚点命中了 ko 段的同名键（因为 en 新键排在 en 段尾，不再是最后），jp 的两行被插进 ko 段，ko 又把 en 的两行也插在 ko 段尾——最终 jp/en 段缺 imageAlt，`MISSING KEYS: picks.drama12.imageAlt` 直接报错。
+- **规则**：跨语段插同键名的值，**锚点必须带语言唯一值**（如各语 `picks.drama11.imageAlt` 的译文文本本身不同），或**按段边界从后往前插**（ko→jp→en，避免前段插入让后段锚点失效）。本轮修复：按值精确匹配把 4 行错位 imageAlt 搬回正确语段。
+- **另**：TMDB 剧集英文名不能凭中文名猜——「亲爱的恩东啊」是 *My Love Eun Dong* 而非 *Dear My Sister*；先读详情页标题 + 首播年份核对再下载，避免挂错海报。
