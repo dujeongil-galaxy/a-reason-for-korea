@@ -2,6 +2,13 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-24 · 影片档案挂正版 + 1theK 附页 + 影片档案按钮移入玩游戏区
+
+- `37e2f38` — 站长怒指「影片档案故意不挂视频链接，一说政治就回避」。认账：film-note 区原文写着「本站不提供影片播放资源 / 不提供任何播放链接」，与已定的按区补挂正版规则冲突，属回避。核实外网：《出租车司机》Netflix title **80200945**（KR/JP 有，HK/TW/US 无；findmyvideos + netflix-movies.info + Netflix 官方条目交叉），美区 Prime Video、台区 Catchplay。
+- **改动**：① film-note 新增「正版观看渠道 · 按所在地区」区块，四语各挂 Netflix 80200945（日/韩）+ Prime Video（美）+ Catchplay（台），删掉旧的「不提供播放链接」措辞；② 撤掉顶部导航的「影片档案」链接（四语），改在站长推荐「玩游戏」板块下（链游 credit 之后、加速器之前）新增「附页：影片档案」按钮跳 #film-note；③ 1theK 卡片 actions 内加「附页：1theK 是什么」按钮，新增独立 `#1thek-note` 介绍区块（CWAVE MEDIA 旗下平台、四语文案 + 中文站/YouTube 链接），位置在 1theK 卡片与端游区之间。
+- **校验**：`FILM_KEYS` 移除 nav.film、加 9 个新 key；nav 断言反转（禁出现 film 链接、必带 teaser/watchLinks）；新增专项断言（三条正版深链写死、teaser 必须在 kpop 与 accelerator 之间、1theK 附页按钮在 actions 内且区块在端游前、禁「不提供播放链接」旧措辞回归）+ 5 条故障注入（nav film 复活、teaser 删除、watchLinks 删除、Netflix ID 篡改、1theK 按钮/区块删除）。`VERIFY OK` **404 节点 / 63 属性**，自检 **245/245**。
+- **验收**：Edge CDP 四语桌面 **4/4**（导航无 film 链接、teaser 在玩游戏区、3 个正版按钮、1theK 附页按钮+区块、无溢出无坏图）；截图 `D:/WorkBuddy-Cache/shots/apx-20261124/`。
+
 ## 2026-11-24 · 中文《打架吧鬼神》补挂 Prime Video 正版
 
 - `da2f01a` — 站长问「`primevideo.com/servicerestricted` 不是打架吧鬼神吗，为什么不做」。核实：该 URL 是 Prime Video **通用服务地区限制页**（无作品 ID，任何链接从受限地区打开都跳这里），不能当作品页挂；但 Prime Video 确实有《打架吧鬼神》真实详情页（`zh_TW/detail/打架吧,鬼神/0HVE4CVQNSBVA7YGU5OYIR2H51`，繁中简介吻合金所炫+玉泽演版）。JustWatch 港/台只收录 HBO Max（404 死链）故上一轮漏挂。按「港区没有退台湾」规则给中文卡补挂 Prime Video（台区 zh_TW 详情页），AFF 邀请码+红字原样保留。

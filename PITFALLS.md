@@ -416,3 +416,10 @@
 - **现象**：站长给 `https://www.primevideo.com/servicerestricted` 问「这不是打架吧鬼神吗，为什么不做」。该 URL 实测（curl + WebFetch 境外节点）正文只有「Prime Video 及其内容因地区而异……我们无法为您当前所在地区提供服务」，**无任何作品 ID**——这是 Amazon 对受限 IP 的通用拦截页，任何 primevideo.com 链接从受限地区打开都会被跳到这里，挂上去对哪部剧都无意义。
 - **规则**：① 从受限 IP 访问 `primevideo.com` 会 302 到 `servicerestricted`，curl 拿到的最终 URL 是这个不代表原链接失效（跟 Netflix 深链从大陆打不开同理）；判断是否真有正版要靠 WebSearch 找官方详情页 + 交叉核对片名/导演/简介，而不是 curl 状态码。② 《打架吧鬼神》Prime Video 真实详情页是 `primevideo.com/-/zh_TW/detail/{url编码中文名}/{ASIN}`（`0HVE4CVQNSBVA7YGU5OYIR2H51`），繁中 zh_TW = 台区，符合中文「港区没有退台湾」规则。③ JustWatch 港/台对这部剧只收录 HBO Max（实测 404 死链），**没收录 Prime**——别因为 JustWatch 查不到就断定没有，Prime 的收录不全，要外网补查。
 - **坑**：Edge headless CDP 在此环境截图偶发空白/截错区块（clip 坐标基于文档还是视口不稳定），但 `Runtime.evaluate` 读 DOM 的断言稳定可靠——验收以程序化 DOM 检查为准，截图仅作辅助肉眼确认。
+
+## 59. 「不提供播放链接」= 回避，影片档案必须按区挂正版；附页按钮位置改动要同步反转旧断言
+
+- **现象**：站长怒指「影片档案故意不挂视频链接，一说政治就回避」。film-note 区（《出租车司机》）原文写着「本站不提供影片播放资源 / 不提供任何播放链接」——与已定的「按区补挂正规正版」规则冲突，等于用「不提供」掩盖没查证。
+- **规则**：① 历史/政治题材影片档案不是「回避理由」，按区查到正版就必须挂——Netflix title 80200945（KR/JP 有）、Prime Video（US）、Catchplay（TW）都查到就都挂；「本站不提供播放链接」这类自我设限的措辞一律不许出现在影片档案。② Netflix title ID 跨区通用，是否可看由地区+账号决定，文案里要写明「按所在地区」。③ 判断某片 Netflix 某区有无版权用 findmyvideos/netflix-movies.info 的地区列表 + Netflix 官方条目交叉，别信聚合站搜索摘要。
+- **坑（断言反转）**：把导航里的「影片档案」链接撤掉、改放到玩游戏区后，旧的「nav film link must exist」断言必须**反转**成「禁出现 film 链接 + 必须在玩游戏区有 teaser」，否则校验直接 FAIL；同时 `FILM_KEYS` 要移除 `nav.film` 并加新 key，否则字典 key 集与页面 key 集不等（`html key set != index.html key set`）。旧的「nav film drifted」故障注入失效会被 self-test 报 missed，要换成新的有效注入（如删 teaser/删 watchLinks/篡改 Netflix ID）。
+- **另（措辞正则误判）**：新增的 sourcesNote 写「不链接任何盗版播放资源」，含「播放资源/播放链接」字样，若 noPlay 正则写宽（如 `/不提供[任何]*播放链接/`）会误判——jp/ko 的新文案「海賊版の再生リンクも掲載しません」「불법 복제 재생 링크도 게시하지 않습니다」同样含「再生リンク/게시하지」，正则只锁精确旧措辞，别用宽泛子串。
