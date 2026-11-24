@@ -99,9 +99,23 @@ const FORBIDDEN_NETFLIX_LINK = 'https://www.netflix.com/';
 /* 2026-11-24 站长问「英文版那么多无版权，奈飞也没有吗」。JustWatch 美区实查：多数剧有 Netflix 正版。
    英文页允许挂 Netflix 官方条目深链（title/ID），仍禁止 netflix.com 首页/搜索页这类泛链；中文源一律禁。 */
 const NETFLIX_TITLE_PREFIX = 'https://www.netflix.com/title/';
+/* 2026-11-24 站长要求日韩也挂 Netflix、中文按港区（港区没有再看台湾）。
+   JustWatch 港/台/日/韩/美五区逐条实查：title ID 跨区通用，链接统一 netflix.com/title/ID。
+   zh 按港区（与台湾一致）；jp 按日区（星你/拥抱月亮/大长今/死亡游戏/鬼神/恩东啊/朋友们无 Netflix）；
+   ko 按韩区（拥抱月亮/大长今等无）；en 沿用美区。查不到的区一律禁挂，aff 红字全部保留。 */
 const NETFLIX_TITLE_ID = {
+  'zh/drama1': '81682438', 'zh/drama3': '80025266', 'zh/drama4': '81033650',
+  'zh/drama6': '80031790', 'zh/drama7': '81422314', 'zh/drama8': '81243996', 'zh/drama9': '82024852',
   'en/drama1': '81682438', 'en/drama6': '80031790', 'en/drama7': '81422314',
-  'en/drama8': '81243996', 'en/drama9': '82024852'
+  'en/drama8': '81243996', 'en/drama9': '82024852',
+  'jp/drama1': '81682438', 'jp/drama4': '81033650', 'jp/drama7': '81422314',
+  'jp/drama8': '81243996', 'jp/drama9': '82024852',
+  'ko/drama1': '81682438', 'ko/drama3': '80025266', 'ko/drama4': '81033650',
+  'ko/drama7': '81422314', 'ko/drama8': '81243996', 'ko/drama9': '82024852'
+};
+const NETFLIX_LABEL = {
+  zh: '在 Netflix 观看（订阅）', en: 'Watch on Netflix (subscription)',
+  jp: 'Netflix で見る（定額制）', ko: 'Netflix에서 보기 (정액제)'
 };
 /* 外文页按钮文案禁止直译中文语境的「港区」划分；中文源保留原始口径不受此限 */
 const FORBIDDEN_REGION_CALQUES = ['Hong Kong, China', '중국 홍콩', '香港地区', '香港地域'];
@@ -398,12 +412,7 @@ const DRAMA_SUB = {
   'en/drama3': { url: 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.b8608d49-3ed5-4ed9-9655-fbd806b49fce', label: 'Watch on Kocowa via Prime Video (subscription)' },
   'en/drama4': { url: 'https://tubitv.com/series/300001259/the-heirs', label: 'Watch free on Tubi (with ads)' },
   'en/drama5': { url: 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.e409f09d-a4d5-4c1a-b092-1f58faa85fb4', label: 'Watch on Kocowa via Prime Video (subscription)' },
-  /* 2026-11-24 Netflix 正版深链：美区 JustWatch 逐条实查，有则挂，无则只有 aff 红字。 */
-  'en/drama1': { url: 'https://www.netflix.com/title/81682438', label: 'Watch on Netflix (subscription)' },
-  'en/drama6': { url: 'https://www.netflix.com/title/80031790', label: 'Watch on Netflix (subscription)' },
-  'en/drama7': { url: 'https://www.netflix.com/title/81422314', label: 'Watch on Netflix (subscription)' },
-  'en/drama8': { url: 'https://www.netflix.com/title/81243996', label: 'Watch on Netflix (subscription)' },
-  'en/drama9': { url: 'https://www.netflix.com/title/82024852', label: 'Watch on Netflix (subscription)' },
+  /* Netflix 订阅按钮统一由 NETFLIX_TITLE_ID 管理（四语按区），不再列入 DRAMA_SUB。 */
   'jp/drama3': { url: 'https://video.unext.jp/episode/SID0003058/ED00073535', label: 'U-NEXT で見る（定額制）' },
   'jp/drama4': { url: 'https://video.unext.jp/episode/SID0017711/ED00046626', label: 'U-NEXT で見る（定額制）' },
   'jp/drama5': { url: 'https://video.unext.jp/episode/SID0020374/ED00094308', label: 'U-NEXT で見る（定額制）' },
@@ -666,8 +675,12 @@ function verify(state) {
     if (!state.css.includes(cssCls)) errors.push('css: missing health badge style ' + cssCls);
   }
   if (!state.css.includes('.picks-chain-legend')) errors.push('css: chain legend style missing');
-  for (const link of [...YOUTUBE_DOMAINS, FORBIDDEN_NETFLIX_LINK]) {
+  for (const link of YOUTUBE_DOMAINS) {
     if (source.includes(link)) errors.push('zh: 中文按港区，购买链接 forbidden -> ' + link);
+  }
+  /* 2026-11-24 中文按港区：允许 Netflix title 条目深链，仍禁首页/搜索页泛链。 */
+  for (const m of source.matchAll(/https:\/\/www\.netflix\.com\/[^\s"'<>]*/g)) {
+    if (!/^https:\/\/www\.netflix\.com\/title\/\d+$/.test(m[0])) errors.push('zh: Netflix link must be a title deep link -> ' + m[0]);
   }
   for (const dom of FORBIDDEN_PIRATE_DOMAINS) {
     if (source.includes(dom)) errors.push('zh: 盗版站域名不得出现 -> ' + dom);
@@ -954,9 +967,12 @@ function verify(state) {
     if (!actionsBlock.includes(DRAMA_NOTE.zh)) {
       errors.push('zh: ' + slug + ' Netflix note missing');
     }
-    /* 中文页面向中国大陆读者：TVING / Viki / U-NEXT / wavve 在大陆均不可用，禁挂外区订阅按钮 */
-    if (actionsBlock.includes('pick-link-sub')) {
-      errors.push('zh: ' + slug + ' overseas subscription button forbidden on the Chinese page');
+    /* 中文按港区（2026-11-24 站长定）：Netflix 港区正版按钮可挂；TVING/Viki/U-NEXT/wavve 等大陆不可用平台仍禁挂。 */
+    const zhSubHrefs = [...actionsBlock.matchAll(/class="pick-link pick-link-sub"\s+href="([^"]+)"/g)].map(m => m[1]);
+    for (const href of zhSubHrefs) {
+      if (!href.startsWith(NETFLIX_TITLE_PREFIX)) {
+        errors.push('zh: ' + slug + ' overseas subscription button forbidden on the Chinese page -> ' + href);
+      }
     }
   }
   /* 时间线顺序：DOM 中 drama1..drama5 依次出现，年份由新到旧 */
@@ -1284,10 +1300,10 @@ function verify(state) {
     for (const calque of FORBIDDEN_REGION_CALQUES) {
       if (actions.includes(calque)) errors.push(lang + ': Hong Kong region must not be translated into foreign copy -> ' + calque);
     }
-    if (lang !== 'en' && page.includes(FORBIDDEN_NETFLIX_LINK)) errors.push(lang + ': Netflix link forbidden -> ' + FORBIDDEN_NETFLIX_LINK);
-    if (lang === 'en') {
-      for (const m of page.matchAll(/https:\/\/www\.netflix\.com\/[^\s"'<>]*/g)) {
-        if (!m[0].startsWith(NETFLIX_TITLE_PREFIX)) errors.push('en: Netflix link must be a title deep link -> ' + m[0]);
+    /* 四语均允许 Netflix title 深链（2026-11-24 站长要求），禁首页/搜索页泛链。 */
+    for (const m of page.matchAll(/https:\/\/www\.netflix\.com\/[^\s"'<>]*/g)) {
+      if (!/^https:\/\/www\.netflix\.com\/title\/\d+$/.test(m[0])) {
+        errors.push(lang + ': Netflix link must be a title deep link -> ' + m[0]);
       }
     }
     for (const dom of FORBIDDEN_PIRATE_DOMAINS) {
@@ -1464,14 +1480,17 @@ function verify(state) {
       const actions = nodes['picks.' + slug + '.actions'] || '';
       if (!actions.includes(note)) errors.push(lang + ': ' + slug + ' Netflix note drift');
       if (!actions.includes(AFF_LINK)) errors.push(lang + ': ' + slug + ' aff entry missing in note');
-      if (lang !== 'en' && actions.includes(FORBIDDEN_NETFLIX_LINK)) errors.push(lang + ': ' + slug + ' Netflix link forbidden');
-      if (lang === 'en') {
-        for (const m of actions.matchAll(/https:\/\/www\.netflix\.com\/[^\s"'<>]*/g)) {
-          if (!m[0].startsWith(NETFLIX_TITLE_PREFIX)) errors.push(lang + ': ' + slug + ' Netflix link must be a title deep link -> ' + m[0]);
+      for (const m of actions.matchAll(/https:\/\/www\.netflix\.com\/[^\s"'<>]*/g)) {
+        if (!/^https:\/\/www\.netflix\.com\/title\/\d+$/.test(m[0])) {
+          errors.push(lang + ': ' + slug + ' Netflix link must be a title deep link -> ' + m[0]);
         }
-        const wantNf = NETFLIX_TITLE_ID[lang + '/' + slug];
-        if (wantNf && !actions.includes(NETFLIX_TITLE_PREFIX + wantNf)) errors.push(lang + ': ' + slug + ' Netflix title ID drift');
-        if (!wantNf && actions.includes(NETFLIX_TITLE_PREFIX)) errors.push(lang + ': ' + slug + ' Netflix deep link forbidden (no US Netflix license verified)');
+      }
+      const wantNf = NETFLIX_TITLE_ID[lang + '/' + slug];
+      if (wantNf) {
+        if (!actions.includes(NETFLIX_TITLE_PREFIX + wantNf)) errors.push(lang + ': ' + slug + ' Netflix title ID drift -> ' + wantNf);
+        if (!actions.includes(NETFLIX_LABEL[lang])) errors.push(lang + ': ' + slug + ' Netflix label drift');
+      } else if (actions.includes(NETFLIX_TITLE_PREFIX)) {
+        errors.push(lang + ': ' + slug + ' Netflix deep link forbidden (no Netflix license in this region)');
       }
       for (const dom of FORBIDDEN_PIRATE_DOMAINS) {
         if (actions.includes(dom)) errors.push(lang + ': ' + slug + ' pirate domain forbidden');
@@ -1497,7 +1516,9 @@ function verify(state) {
       }
       /* 订阅制渠道：按区实查到了才挂，且必须排在 featured 租买按钮与红字 AFF 之上；
          查不到的区一律禁挂，避免「点进去没有这部片」的死链。 */
-      const subAnchor = (actions.match(/class="pick-link pick-link-sub"\s+href="([^"]+)"/) || [])[1] || '';
+      /* 跳过 Netflix 按钮，取第一个非 Netflix 订阅按钮作为 DRAMA_SUB 校验锚点（2026-11-24 并存规则）。 */
+      const subHrefs = [...actions.matchAll(/class="pick-link pick-link-sub"\s+href="([^"]+)"/g)].map(m => m[1]);
+      const subAnchor = subHrefs.find(h => !h.startsWith(NETFLIX_TITLE_PREFIX)) || '';
       const subWant = DRAMA_SUB[lang + '/' + slug] || null;
       const subCount = (actions.match(/pick-link-sub/g) || []).length;
       if (subWant) {
@@ -1516,8 +1537,11 @@ function verify(state) {
         if (!actions.includes(subWant.label)) {
           errors.push(lang + ': ' + slug + ' subscription label drift');
         }
-        if (subCount !== 1) {
-          errors.push(lang + ': ' + slug + ' must carry exactly one subscription button (got ' + subCount + ')');
+        /* Netflix 按钮可与非 Netflix 订阅按钮并存（2026-11-24 站长：有正版就多挂）；
+           非 Netflix 订阅按钮仍恰好一个。 */
+        const nfCount = (actions.match(/netflix\.com\/title\//g) || []).length;
+        if (subCount - nfCount !== 1) {
+          errors.push(lang + ': ' + slug + ' must carry exactly one non-Netflix subscription button (got ' + (subCount - nfCount) + ')');
         }
         const subAt = actions.indexOf('pick-link-sub');
         const featAt = actions.indexOf('pick-link-featured');
@@ -1528,8 +1552,16 @@ function verify(state) {
         if (redAt > -1 && subAt > redAt) {
           errors.push(lang + ': ' + slug + ' subscription button must sit above the aff note');
         }
-      } else if (subCount) {
-        errors.push(lang + ': ' + slug + ' subscription button forbidden where the region has no licensed subscription channel');
+      } else {
+        /* 没有非 Netflix 渠道时，只允许该区已核实的 Netflix 按钮，其余订阅按钮禁挂。 */
+        const nfCount = (actions.match(/netflix\.com\/title\//g) || []).length;
+        const wantNfHere = NETFLIX_TITLE_ID[lang + '/' + slug];
+        if (subCount - nfCount > 0) {
+          errors.push(lang + ': ' + slug + ' subscription button forbidden where the region has no licensed subscription channel');
+        }
+        if (nfCount > (wantNfHere ? 1 : 0)) {
+          errors.push(lang + ': ' + slug + ' Netflix button count drift (got ' + nfCount + ')');
+        }
       }
     }
 
@@ -1546,12 +1578,17 @@ function verify(state) {
       const redAt = actions.indexOf('pick-netflix-note');
       if (subAt < 0 || redAt < 0 || subAt > redAt) errors.push('en: ' + slug + ' subscription button must sit above the aff note');
     }
-    /* 英文 Netflix 五剧的条目 ID 写死（drama6-9 不在 DRAMA_SLUGS，需在此单独断言）。 */
+    /* 四区 Netflix 条目 ID / 文案写死（drama6-9 不在 DRAMA_SLUGS，需在此单独断言）。 */
     for (const [key, id] of Object.entries(NETFLIX_TITLE_ID)) {
+      const lang = key.slice(0, 2);
       const slug = key.slice(3);
-      const actions = enNodes['picks.' + slug + '.actions'] || '';
-      if (!actions.includes(NETFLIX_TITLE_PREFIX + id)) errors.push('en: ' + slug + ' Netflix title ID drift -> ' + id);
-      if (!actions.includes('Watch on Netflix (subscription)')) errors.push('en: ' + slug + ' Netflix subscription label drift');
+      const nodes = extractNodes(lang === 'zh' ? state.source : (state.pages[lang] || ''));
+      const actions = nodes['picks.' + slug + '.actions'] || '';
+      if (!actions.includes(NETFLIX_TITLE_PREFIX + id)) errors.push(lang + ': ' + slug + ' Netflix title ID drift -> ' + id);
+      if (!actions.includes(NETFLIX_LABEL[lang])) errors.push(lang + ': ' + slug + ' Netflix subscription label drift');
+      const nfAt = actions.indexOf(NETFLIX_TITLE_PREFIX + id);
+      const redAt = actions.indexOf('pick-netflix-note');
+      if (nfAt < 0 || redAt < 0 || nfAt > redAt) errors.push(lang + ': ' + slug + ' Netflix button must sit above the aff note');
     }
   }
 
@@ -2257,16 +2294,15 @@ const faults = [
   { name: 'drama JP heirs buy link swapped to star gti', mutate: s => {
     s.dict.jp.html['picks.drama4.actions'] = s.dict.jp.html['picks.drama4.actions'].replace(DRAMA_AMAZON_JP_HEIRS, DRAMA_AMAZON_JP_STAR);
   } },
-  { name: 'drama Chinese source given a Netflix link', mutate: s => {
-    s.source = s.source.replace(/data-i18n="picks\.drama1\.actions"><a class="pick-link pick-link-featured" href="[^"]*nfshare[^"]*"/,
-      'data-i18n="picks.drama1.actions"><a class="pick-link pick-link-featured" href="https://www.netflix.com/title/x"');
+  { name: 'drama Chinese source Netflix link swapped to homepage', mutate: s => {
+    s.source = s.source.replace('https://www.netflix.com/title/81682438', 'https://www.netflix.com/');
   } },
   { name: 'drama aff entry removed from Japanese note', mutate: s => {
     s.dict.jp.html['picks.drama5.actions'] = s.dict.jp.html['picks.drama5.actions'].replace(AFF_LINK, 'https://nfshare.cn/');
   } },
   { name: 'drama HK-region aff button stripped from Chinese source', mutate: s => {
-    s.source = s.source.replace(/data-i18n="picks\.drama3\.actions"><a class="pick-link pick-link-featured"[\s\S]*?<\/a>/,
-      'data-i18n="picks.drama3.actions">');
+    s.source = s.source.replace(/data-i18n="picks\.drama3\.actions">([\s\S]*?)<\/div>/,
+      (m, inner) => 'data-i18n="picks.drama3.actions">' + inner.replace(/<a class="pick-link pick-link-featured"[^>]*>[\s\S]*?<\/a>/, '') + '</div>');
   } },
   { name: 'drama imageAlt left untranslated in English', mutate: s => {
     s.dict.en.attr['picks.drama1.imageAlt'] = '《车贞淑医生》海报：严正花饰演的车贞淑';
@@ -2279,7 +2315,7 @@ const faults = [
     s.pages.en = s.pages.en.replace('https://watch.amazon.com/detail?gti=amzn1.dv.gti.b8608d49-3ed5-4ed9-9655-fbd806b49fce', 'https://www.viki.com/');
   } },
   { name: 'drama JP subscription button pointed at Netflix', mutate: s => {
-    s.pages.jp = s.pages.jp.replace('https://video.unext.jp/episode/SID0003058/ED00073535', 'https://www.netflix.com/title/81682438');
+    s.pages.jp = s.pages.jp.replace('https://video.unext.jp/episode/SID0003058/ED00073535', 'https://www.tving.com/contents/P001446333');
   } },
   { name: 'drama KO subscription button duplicated', mutate: s => {
     const anchor = '<a class="pick-link pick-link-sub" href="https://www.tving.com/contents/P001710496" target="_blank" rel="noopener noreferrer">TVING에서 보기 (정액제)</a>';
@@ -2628,8 +2664,10 @@ const faults = [
     s.pages.en = s.pages.en.replace('https://www.netflix.com/title/82024852', 'https://www.netflix.com/title/00000000');
     s.dict.en.html['picks.drama9.actions'] = s.dict.en.html['picks.drama9.actions'].replace('https://www.netflix.com/title/82024852', 'https://www.netflix.com/title/00000000');
   } },
-  { name: 'Netflix deep link injected into Japanese drama card', mutate: s => {
-    s.pages.jp = s.pages.jp.replace('data-i18n="picks.drama1.actions">', 'data-i18n="picks.drama1.actions"><a class="pick-link pick-link-sub" href="https://www.netflix.com/title/81682438">x</a>');
+  { name: 'Netflix deep link injected into Japanese drama3 (no JP license)', mutate: s => {
+    s.pages.jp = s.pages.jp.replace('data-i18n="picks.drama3.actions">', 'data-i18n="picks.drama3.actions"><a class="pick-link pick-link-sub" href="https://www.netflix.com/title/80025266">x</a>');
+    s.dict.jp.html['picks.drama3.actions'] = s.dict.jp.html['picks.drama3.actions']
+      .replace('data-i18n', 'data-i18n') + '<a class="pick-link pick-link-sub" href="https://www.netflix.com/title/80025266">x</a>';
   } },
   { name: 'English Death Game Prime subscription button removed', mutate: s => {
     s.pages.en = s.pages.en.replace('https://watch.amazon.com/detail?gti=amzn1.dv.gti.a3b03bc3-0b7d-49e5-8eb1-6d80ac89dd13', 'https://www.netflix.com/title/99999999');
@@ -2680,7 +2718,31 @@ const faults = [
   } },
   { name: 'Lineage II note deleted from Japanese dictionary', mutate: s => {
     delete s.dict.jp.html['picks.lineage2.note'];
-  } },];
+  } },
+  /* 2026-11-24 四语按区 Netflix：地区串链 / 条目 ID 篡改 / 中文泛链 / 韩文无授权区注入。 */
+  { name: 'zh Netflix title ID tampered', mutate: s => {
+    s.source = s.source.replace('https://www.netflix.com/title/81682438', 'https://www.netflix.com/title/00000000');
+  } },
+  { name: 'jp Netflix title ID tampered', mutate: s => {
+    s.pages.jp = s.pages.jp.replace('https://www.netflix.com/title/81033650', 'https://www.netflix.com/title/00000000');
+    s.dict.jp.html['picks.drama4.actions'] = s.dict.jp.html['picks.drama4.actions'].replace('https://www.netflix.com/title/81033650', 'https://www.netflix.com/title/00000000');
+  } },
+  { name: 'ko Netflix button removed from licensed card', mutate: s => {
+    s.pages.ko = s.pages.ko.replace('<a class="pick-link pick-link-sub" href="https://www.netflix.com/title/81422314"', '<a class="pick-link pick-link-sub" href="https://www.tving.com/contents/REM"');
+    s.dict.ko.html['picks.drama7.actions'] = s.dict.ko.html['picks.drama7.actions'].replace('https://www.netflix.com/title/81422314', 'https://www.tving.com/contents/REM');
+  } },
+  { name: 'ko Netflix injected into unlicensed drama6', mutate: s => {
+    s.pages.ko = s.pages.ko.replace('data-i18n="picks.drama6.actions">', 'data-i18n="picks.drama6.actions"><a class="pick-link pick-link-sub" href="https://www.netflix.com/title/80031790">x</a>');
+    s.dict.ko.html['picks.drama6.actions'] = s.dict.ko.html['picks.drama6.actions'] + '<a class="pick-link pick-link-sub" href="https://www.netflix.com/title/80031790">x</a>';
+  } },
+  { name: 'zh Netflix button text drifted', mutate: s => {
+    s.source = s.source.replace('在 Netflix 观看（订阅）', 'Netflix 搜索片名');
+  } },
+  { name: 'en Netflix button moved below aff note', mutate: s => {
+    s.pages.en = s.pages.en.replace('data-i18n="picks.drama6.actions"><a class="pick-link pick-link-sub" href="https://www.netflix.com/title/80031790" target="_blank" rel="noopener noreferrer">Watch on Netflix (subscription)</a>', 'data-i18n="picks.drama6.actions">');
+    s.dict.en.html['picks.drama6.actions'] = s.dict.en.html['picks.drama6.actions'].replace('<a class="pick-link pick-link-sub" href="https://www.netflix.com/title/80031790" target="_blank" rel="noopener noreferrer">Watch on Netflix (subscription)</a>', '');
+  } },
+];
 let caught = 0;
 for (const fault of faults) {
   const broken = clone(state);
