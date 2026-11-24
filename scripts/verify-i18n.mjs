@@ -523,12 +523,14 @@ const FILM_MARKERS = {
   ko: ['5·18 광주 민주화 운동', '1980년 5월 18일', '2,500', 'Kim Sa-bok', '698,090']
 };
 const FILM_KEYS = [
-  'nav.film', 'film.kicker', 'film.head', 'film.intro',
+  'film.kicker', 'film.head', 'film.intro',
   'film.fact1.k', 'film.fact1.v', 'film.fact2.k', 'film.fact2.v',
   'film.fact3.k', 'film.fact3.v', 'film.history.head', 'film.history.p1',
   'film.history.p2', 'film.caveat.head', 'film.caveat.p1',
   'film.sourcesLabel', 'film.src1', 'film.src2', 'film.src3', 'film.src4',
-  'film.src5', 'film.sourcesNote'
+  'film.src5', 'film.sourcesNote',
+  'film.teaser', 'film.watchLabel', 'film.watchLinks', 'film.watchNote',
+  'oneThek.head', 'oneThek.p1', 'oneThek.p2', 'oneThek.link1', 'oneThek.link2'
 ];
 /* ---------- extraction helpers ---------- */
 function extractNodes(html) {
@@ -1930,7 +1932,9 @@ function verify(state) {
 
   /* ---------- 影片档案：不得照抄线索站「只写剧情片」的说法 ---------- */
   if (!source.includes(FILM_SECTION)) errors.push('zh: film-note section missing');
-  if (!source.includes('<a href="#film-note" data-i18n="nav.film">')) errors.push('zh: nav film link missing');
+  if (source.includes('data-i18n="nav.film"')) errors.push('zh: nav film link must be removed (moved to games teaser)');
+  if (!source.includes('data-i18n="film.teaser"')) errors.push('zh: film teaser button missing');
+  if (!source.includes('data-i18n="film.watchLinks"')) errors.push('zh: film licensed watch links missing');
   for (const link of FILM_SOURCE_LINKS) {
     if (!source.includes('href="' + link + '"')) errors.push('zh: film source link missing -> ' + link);
   }
@@ -1946,7 +1950,11 @@ function verify(state) {
   for (const lang of LANGS) {
     const p = state.pages[lang] || '';
     if (!p.includes(FILM_SECTION)) errors.push(lang + ': film-note section missing');
-    if (!/<a href="#film-note"[^>]*data-i18n="nav\.film"/.test(p)) errors.push(lang + ': nav film link missing');
+    if (/data-i18n="nav\.film"/.test(p)) errors.push(lang + ': nav film link must be removed');
+    if (!p.includes('data-i18n="film.teaser"')) errors.push(lang + ': film teaser button missing');
+    if (!p.includes('data-i18n="film.watchLinks"')) errors.push(lang + ': film licensed watch links missing');
+    if (!p.includes('id="1thek-note"')) errors.push(lang + ': 1theK appendix section missing');
+    if (!p.includes('href="#1thek-note"')) errors.push(lang + ': 1theK appendix button missing');
     for (const link of FILM_SOURCE_LINKS) {
       if (!p.includes('href="' + link + '"')) errors.push(lang + ': film source link missing -> ' + link);
     }
@@ -1956,6 +1964,40 @@ function verify(state) {
     for (const key of FILM_KEYS) {
       if (!(state.dict[lang].html[key] || '').length) errors.push(lang + ': film key missing/empty -> ' + key);
     }
+  }
+  /* 2026-11-24 站长：影片档案挂正版 + 1theK 附页 + 影片档案按钮移入玩游戏区，写死防回归 */
+  const FILM_WATCH_LINKS = [
+    'https://www.netflix.com/title/80200945',
+    'https://app.primevideo.com/detail?gti=amzn1.dv.gti.3a505a12-509d-4f34-af76-47f0ea441f72',
+    'https://www.catchplay.com/tw/movie/a-taxi-driver'
+  ];
+  for (const link of FILM_WATCH_LINKS) {
+    if (!source.includes('href="' + link + '"')) errors.push('zh: film licensed watch link missing -> ' + link);
+  }
+  if (/不提供(任何)?播放链接/.test(source)) errors.push('zh: film still says no playback links');
+  // film teaser 必须在玩游戏区内（链游 credit 之后、加速器标题之前）
+  {
+    const teaserAt = source.indexOf('data-i18n="film.teaser"');
+    const accelAt = source.indexOf('data-i18n="nav.picks.game.accelerator"');
+    const kpopAt = source.indexOf('data-i18n="nav.picks.kpop"');
+    if (teaserAt < 0 || accelAt < 0 || kpopAt < 0 || teaserAt < kpopAt || teaserAt > accelAt) {
+      errors.push('zh: film teaser must sit inside games section (after kpop, before accelerator)');
+    }
+  }
+  for (const lang of LANGS) {
+    const p = state.pages[lang] || '';
+    const d = state.dict[lang].html || {};
+    for (const key of ['film.teaser','film.watchLabel','film.watchLinks','film.watchNote','oneThek.head','oneThek.p1','oneThek.p2','oneThek.link1','oneThek.link2']) {
+      if (!(d[key] || '').length) errors.push(lang + ' film/1theK key empty -> ' + key);
+    }
+    const noPlay = { zh: /不提供[任何]*播放链接/, en: /provide any playback link/ };
+    if (noPlay[lang] && noPlay[lang].test(p)) errors.push(lang + ': film still disclaims playback links');
+    // 1theK 附页按钮在 actions 内部、附页区块在端游之前
+    const act = extractNodes(p)['picks.1thek.actions'] || '';
+    if (!act.includes('href="#1thek-note"')) errors.push(lang + ': 1theK appendix button missing inside actions');
+    const noteAt = p.indexOf('id="1thek-note"');
+    const pcAt = p.indexOf('data-i18n="nav.picks.game.pc"');
+    if (noteAt < 0 || pcAt < 0 || noteAt > pcAt) errors.push(lang + ': 1theK appendix must sit before PC games');
   }
   checkOfficialPCGames(state, errors);
   return errors;
@@ -2685,8 +2727,23 @@ const faults = [
   { name: 'one external source link dropped from Japanese page', mutate: s => {
     s.pages.jp = s.pages.jp.replace('href="' + FILM_SOURCE_LINKS[2] + '"', 'href="#"');
   } },
-  { name: 'nav film link drifted on Korean page', mutate: s => {
-    s.pages.ko = s.pages.ko.replace('<a href="#film-note"', '<a href="#picks"');
+  { name: 'nav film link resurrected on Korean page', mutate: s => {
+    s.pages.ko = s.pages.ko.replace('<nav class="site-nav"', '<nav class="site-nav"><a href="#film-note" data-i18n="nav.film">x</a>');
+  } },
+  { name: 'film teaser removed from Chinese picks', mutate: s => {
+    s.source = s.source.replace('data-i18n="film.teaser"', 'data-i18n="x"');
+  } },
+  { name: 'film licensed watch links removed from Chinese film record', mutate: s => {
+    s.source = s.source.replace('data-i18n="film.watchLinks"', 'data-i18n="x"');
+  } },
+  { name: 'film Netflix title ID tampered', mutate: s => {
+    s.source = s.source.replace('netflix.com/title/80200945', 'netflix.com/title/80200946');
+  } },
+  { name: '1theK appendix button removed from English actions', mutate: s => {
+    s.dict.en.html['picks.1thek.actions'] = s.dict.en.html['picks.1thek.actions'].replace('href="#1thek-note"', 'href="#"');
+  } },
+  { name: '1theK appendix section removed from Japanese page', mutate: s => {
+    s.pages.jp = s.pages.jp.replace('id="1thek-note"', 'id="x"');
   } },
   { name: 'pirate listing domain injected into Chinese film record', mutate: s => {
     s.source = s.source.replace('data-i18n="film.sourcesNote">', 'data-i18n="film.sourcesNote">ncat30.com ');
