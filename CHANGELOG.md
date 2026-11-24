@@ -2,6 +2,14 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-24 · 按区补挂正规正版订阅（中文港区→台区，日韩本区）
+
+- `a114acc` — 站长问「文姬在 Netflix 不是有吗」，核实后确认没有（聚合站 WebSearch 摘要断章取义说「Yes」，正文实为「not yet available on Netflix」）；随即定新规则：「港区没有的推荐台区（仅中文版），英文版/日韩只要是正规正版平台都可以推，AFF 不删」。
+- **全区实查**：JustWatch GraphQL 对 14 卡（13 剧 + 文姬）× 港/台/日/韩/美五区抓全部 FLATRATE/RENT/BUY/FREE 渠道（1074 次请求限速跑完），逐条 curl 验证 URL 200。排除 HBO Max（404 死链）、Viki（历史死链）、Tencent onelink（跳转不稳）。
+- **改动**：只给「本区有正版但当前无订阅按钮」的卡补齐——zh 死期将至→港区 Prime、文姬→港区无退台区 Catchplay；jp 拥抱月亮/恩东啊→U-NEXT，死期将至/打架吧鬼神/我亲爱的朋友们→Prime Video JP；ko 拥抱月亮/死期将至/恩东啊→wavve，打架吧鬼神/我亲爱的朋友们→TVING。共 12 个按钮，文案四语本地化，全部排在 aff 红字之上，AFF 邀请码与红字原样保留。drama2/5/12 美区、文姬港/日/美无订阅仍保持无按钮。
+- **校验**：新增 `LICENSED_SUB_EXTRA` 写死 12 条 URL+文案 + 专项断言（覆盖不在 `DRAMA_SLUGS` 的 drama6/10-13/film，否则会漏判）；`SUB_DOMAINS` 加 catchplay/app.primevideo；新增 4 组故障注入（文姬按钮删除/URL 篡改、日文按钮删除、韩语文案漂移）。`VERIFY OK` **396 节点 / 63 属性**，自检 **238/238**。
+- **验收**：Edge CDP 四语桌面 **4/4**，逐卡验新增按钮 URL/文案/位置、AFF 保留、无溢出、图片加载；截图 `D:/WorkBuddy-Cache/shots/subs-zones-20261124/`。
+
 ## 2026-11-24 · 四语按区挂 Netflix 正版，AFF 全部保留
 
 - `c211776` — 站长指出「日韩也没做 Netflix 链接，中文按港区算、港区没有再看台湾，AFF 不删」。

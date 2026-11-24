@@ -403,3 +403,10 @@
 - **规则**：① Netflix title ID 跨区通用，地区由账号/IP 决定，URL 一律用无前缀 `title/ID`，「按港区/日区/韩区」指的是**用 JustWatch 该区数据判定这部剧有没有正版**，不是给链接加地区前缀；② 一刀切禁某平台（上一轮禁 netflix.com）后要随业务放开时，禁链断言要从「禁整个域名」改成「禁首页/搜索页泛链、允许 title 条目深链」，别直接删断言；③ 一个国家内 Node 可能跨区复用 ID，查可看性要用 offers 的 `monetizationType=FLATRATE`，不能只看搜索结果是否出现该剧（港区搜剧名没命中不代表无 Netflix）。
 - **另**：一个卡同时挂 Netflix + 原有订阅按钮时，旧校验的「恰好一个订阅按钮」会判红——需把 Netflix 按钮排除出 DRAMA_SUB 的唯一占位统计；`subAnchor` 也要跳过 Netflix 按钮取第一个非 Netflix 渠道，否则串区 drift 误报。
 - **另**：校验脚本里 JS 正则要用 `/^...\d+$/.test()`，别写成 `startsWith(PREFIX + '\\d')`——后者是字面反斜杠+d，永远不匹配。
+
+## 57. 聚合站 WebSearch 摘要会断章取义；「按区补正版」要区分平台可用性与死链
+
+- **现象**：站长问「文姬在 Netflix 不是有吗」。WebSearch 摘要把 `netflix-movies.com` 的结果截成「Yes! ... now on Netflix」，但抓正文原文是「**Unfortunately** the movie Oh! My Gran is **not** yet available on Netflix」——摘要把否定词吞了，差点据此误挂 Netflix 死链。
+- **规则**：① 聚合站/搜索引擎的存在性断言（"is on Netflix?"）**必须抓正文原文核对**，不能信搜索结果摘要；② 确认某片不在某区后，按站长新规则「中文港区没有退台湾、英/日/韩本区任何正规正版平台都可推」补挂——文姬即港区无、台区 Catchplay，故中文挂 Catchplay；③ 判断平台可挂 = JustWatch 该区有 FLATRATE offers **且** URL 实测可用，两条都得满足。
+- **另**：JustWatch offers 里的平台名带 `Standard with Ads` / `with Ads` 是同片同平台的重复项，要去重只挂一个；`HBO Max` 的 `play.hbomax.com/video/watch/{uuid}` 实测 404（该片无此片源），Viki `/videos/` 是历史死链、Tencent `onelink.me` 是跳转链接——这三种一律不挂，即使 JustWatch 列出了。
+- **另**：新增订阅卡（drama6/10-13/film）不在 `DRAMA_SLUGS`（只含 drama1-5），旧的「恰好一个订阅按钮」循环覆盖不到——写完代码跑校验竟然全绿，正是漏判信号；必须另写 `LICENSED_SUB_EXTRA` 专项断言 + 故障注入（删除/URL 篡改/文案漂移）才锁得住。改 i18n.js 字典块要用 `  jp: {` / `  ko: {` 边界定位并从后往前改，否则插入后偏移会串块。
