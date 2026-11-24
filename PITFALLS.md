@@ -410,3 +410,9 @@
 - **规则**：① 聚合站/搜索引擎的存在性断言（"is on Netflix?"）**必须抓正文原文核对**，不能信搜索结果摘要；② 确认某片不在某区后，按站长新规则「中文港区没有退台湾、英/日/韩本区任何正规正版平台都可推」补挂——文姬即港区无、台区 Catchplay，故中文挂 Catchplay；③ 判断平台可挂 = JustWatch 该区有 FLATRATE offers **且** URL 实测可用，两条都得满足。
 - **另**：JustWatch offers 里的平台名带 `Standard with Ads` / `with Ads` 是同片同平台的重复项，要去重只挂一个；`HBO Max` 的 `play.hbomax.com/video/watch/{uuid}` 实测 404（该片无此片源），Viki `/videos/` 是历史死链、Tencent `onelink.me` 是跳转链接——这三种一律不挂，即使 JustWatch 列出了。
 - **另**：新增订阅卡（drama6/10-13/film）不在 `DRAMA_SLUGS`（只含 drama1-5），旧的「恰好一个订阅按钮」循环覆盖不到——写完代码跑校验竟然全绿，正是漏判信号；必须另写 `LICENSED_SUB_EXTRA` 专项断言 + 故障注入（删除/URL 篡改/文案漂移）才锁得住。改 i18n.js 字典块要用 `  jp: {` / `  ko: {` 边界定位并从后往前改，否则插入后偏移会串块。
+
+## 58. `primevideo.com/servicerestricted` 是通用受限页，不是作品页；Prime 详情页深链要按地区前缀区分
+
+- **现象**：站长给 `https://www.primevideo.com/servicerestricted` 问「这不是打架吧鬼神吗，为什么不做」。该 URL 实测（curl + WebFetch 境外节点）正文只有「Prime Video 及其内容因地区而异……我们无法为您当前所在地区提供服务」，**无任何作品 ID**——这是 Amazon 对受限 IP 的通用拦截页，任何 primevideo.com 链接从受限地区打开都会被跳到这里，挂上去对哪部剧都无意义。
+- **规则**：① 从受限 IP 访问 `primevideo.com` 会 302 到 `servicerestricted`，curl 拿到的最终 URL 是这个不代表原链接失效（跟 Netflix 深链从大陆打不开同理）；判断是否真有正版要靠 WebSearch 找官方详情页 + 交叉核对片名/导演/简介，而不是 curl 状态码。② 《打架吧鬼神》Prime Video 真实详情页是 `primevideo.com/-/zh_TW/detail/{url编码中文名}/{ASIN}`（`0HVE4CVQNSBVA7YGU5OYIR2H51`），繁中 zh_TW = 台区，符合中文「港区没有退台湾」规则。③ JustWatch 港/台对这部剧只收录 HBO Max（实测 404 死链），**没收录 Prime**——别因为 JustWatch 查不到就断定没有，Prime 的收录不全，要外网补查。
+- **坑**：Edge headless CDP 在此环境截图偶发空白/截错区块（clip 坐标基于文档还是视口不稳定），但 `Runtime.evaluate` 读 DOM 的断言稳定可靠——验收以程序化 DOM 检查为准，截图仅作辅助肉眼确认。

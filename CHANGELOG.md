@@ -2,6 +2,12 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-24 · 中文《打架吧鬼神》补挂 Prime Video 正版
+
+- `da2f01a` — 站长问「`primevideo.com/servicerestricted` 不是打架吧鬼神吗，为什么不做」。核实：该 URL 是 Prime Video **通用服务地区限制页**（无作品 ID，任何链接从受限地区打开都跳这里），不能当作品页挂；但 Prime Video 确实有《打架吧鬼神》真实详情页（`zh_TW/detail/打架吧,鬼神/0HVE4CVQNSBVA7YGU5OYIR2H51`，繁中简介吻合金所炫+玉泽演版）。JustWatch 港/台只收录 HBO Max（404 死链）故上一轮漏挂。按「港区没有退台湾」规则给中文卡补挂 Prime Video（台区 zh_TW 详情页），AFF 邀请码+红字原样保留。
+- **校验**：`SUB_DOMAINS` 加 `primevideo.com/-/zh_TW/detail/`，`LICENSED_SUB_EXTRA` 加 `zh/drama11`，新增 2 组故障注入（按钮删除 / URL 篡改）。`VERIFY OK` **396 节点 / 63 属性**，自检 **240/240**。
+- **验收**：Edge CDP 真浏览器验中文 drama11 卡——Prime 按钮在 AFF 之上、无溢出、无坏图；截图 `D:/WorkBuddy-Cache/shots/d11-20261124/zh-d11-card2.png`。
+
 ## 2026-11-24 · 按区补挂正规正版订阅（中文港区→台区，日韩本区）
 
 - `a114acc` — 站长问「文姬在 Netflix 不是有吗」，核实后确认没有（聚合站 WebSearch 摘要断章取义说「Yes」，正文实为「not yet available on Netflix」）；随即定新规则：「港区没有的推荐台区（仅中文版），英文版/日韩只要是正规正版平台都可以推，AFF 不删」。
