@@ -1437,27 +1437,43 @@ function verify(state) {
     }
   }
 
-  /* ---------- 仅中文卡片（data-zh-only）机制 ----------
-     这些卡只在中文源页出现，build-i18n.mjs 生成 en/jp/ko 时整块剔除。
-     不变量：① 卡内不得含任何 data-i18n（否则四语键位一致校验会失败）；
-     ② 生成页里绝不能残留 data-zh-only 标记或该卡内容。 */
-  const ZH_ONLY_ITEMS = ['泡泡堂', '跑跑卡丁车', '劲舞团', '音速觉醒',
-    '拥抱太阳的月亮', '哲仁王后', '你好妈妈，再见', '暴君的厨师', '死期将至', '打架吧鬼神'];
-  const zhOnlyCards = (state.source.match(/<article class="pick-card" data-zh-only>[\s\S]*?<\/article>/g) || []);
-  if (zhOnlyCards.length !== ZH_ONLY_ITEMS.length) {
-    errors.push('zh-only: 仅中文卡数量应为 ' + ZH_ONLY_ITEMS.length + '，实际 ' + zhOnlyCards.length);
-  }
-  for (const card of zhOnlyCards) {
-    if (/data-i18n/.test(card)) errors.push('zh-only: 仅中文卡内出现 data-i18n（应纯中文内联，保四语键位一致）');
-  }
-  for (const name of ZH_ONLY_ITEMS) {
-    if (!state.source.includes(name)) errors.push('zh: 缺少仅中文条目 -> ' + name);
+  /* ---------- 补齐原仅中文卡（2026-11-24）：10 张卡现四语齐全、均有海报 ----------
+     站长指出前一轮把 6 部韩剧 + 4 款端游做成 data-zh-only 纯文字卡且只留中文，
+     已全部改为标准两栏海报卡并补四语。不变量：源页无 data-zh-only 残留；
+     每张卡的 label/title/desc/imageCredit/imageAlt/actions/note 七键四语齐全；
+     四语页面均引用对应海报文件。 */
+  const FIXED_SLUGS = ['drama6','drama7','drama8','drama9','drama10','drama11',
+    'bnb','kart','audition','rbeat'];
+  const FIXED_IMAGE = {
+    drama6: 'moon-embracing-sun-poster.jpg', drama7: 'mr-queen-poster.jpg',
+    drama8: 'hi-bye-mama-poster.jpg', drama9: 'tyrants-chef-poster.jpg',
+    drama10: 'deaths-game-poster.jpg', drama11: 'fight-ghost-poster.jpg',
+    bnb: 'bnb-poster.jpg', kart: 'kart-poster.jpg',
+    audition: 'audition-poster.jpg', rbeat: 'rbeat-poster.jpg' };
+  if (/data-zh-only/.test(state.source)) errors.push('zh: 源页仍有 data-zh-only 残留');
+  for (const slug of FIXED_SLUGS) {
+    if (!state.source.includes('data-i18n="picks.' + slug + '.label"'))
+      errors.push('zh: 补齐卡缺 label 节点 -> ' + slug);
+    if (!state.source.includes('src="assets/' + FIXED_IMAGE[slug] + '"'))
+      errors.push('zh: 补齐卡缺海报 -> ' + slug);
+    for (const key of ['label','title','desc','imageCredit','actions','note','imageAlt']) {
+      if (!state.source.includes('picks.' + slug + '.' + key))
+        errors.push('zh: 补齐卡缺键 -> ' + slug + '.' + key);
+    }
   }
   for (const lang of LANGS) {
     const page = state.pages[lang] || '';
-    if (page.includes('data-zh-only')) errors.push(lang + ': 仅中文卡未被剔除（残留 data-zh-only 标记）');
-    for (const name of ZH_ONLY_ITEMS) {
-      if (page.includes(name)) errors.push(lang + ': 仅中文内容泄漏到外文页 -> ' + name);
+    if (page.includes('data-zh-only')) errors.push(lang + ': 仍有 data-zh-only 标记残留');
+    for (const slug of FIXED_SLUGS) {
+      if (!page.includes('assets/' + FIXED_IMAGE[slug]))
+        errors.push(lang + ': 补齐卡海报未出现在生成页 -> ' + slug);
+      for (const key of ['label','title','desc','imageCredit','actions','note']) {
+        const val = state.dict[lang].html['picks.' + slug + '.' + key];
+        if (!val) errors.push(lang + ': 补齐卡四语缺键 -> ' + slug + '.' + key);
+        else if (val && !page.includes(val)) errors.push(lang + ': 补齐卡译文未渲染 -> ' + slug + '.' + key);
+      }
+      const alt = state.dict[lang].attr['picks.' + slug + '.imageAlt'];
+      if (!alt) errors.push(lang + ': 补齐卡四语缺 imageAlt -> ' + slug);
     }
   }
 
@@ -2071,18 +2087,23 @@ const faults = [
   { name: 'accelerator notice deleted from Korean', mutate: s => {
     delete s.dict.ko.html['picks.accelerator.notice'];
   } },
-  { name: 'zh-only card leaked into English page', mutate: s => {
-    s.pages.en = s.pages.en.replace('</body>', '<article class="pick-card" data-zh-only><p>泡泡堂</p></article></body>');
+  { name: 'a fixed card loses its poster in source', mutate: s => {
+    s.source = s.source.replace('src="assets/bnb-poster.jpg"', 'src="assets/missing.jpg"');
   } },
-  { name: 'zh-only card carries a data-i18n key', mutate: s => {
-    s.source = s.source.replace('<article class="pick-card" data-zh-only>',
-      '<article class="pick-card" data-zh-only><p class="pick-title" data-i18n="picks.zhonly.x">泡泡堂</p>');
+  { name: 'a fixed card label key removed from source', mutate: s => {
+    s.source = s.source.replace('data-i18n="picks.drama9.label"', 'data-i18n="picks.drama0.label"');
   } },
-  { name: 'a zh-only game removed from Chinese source', mutate: s => {
-    s.source = s.source.replace(/[ \t]*<article class="pick-card" data-zh-only>[\s\S]*?<\/article>\r?\n/, '');
+  { name: 'a fixed card translation removed from Japanese', mutate: s => {
+    delete s.dict.jp.html['picks.drama11.title'];
   } },
-  { name: 'zh-only game name leaked into Japanese page', mutate: s => {
-    s.pages.jp = s.pages.jp.replace('</body>', '<div>劲舞团</div></body>');
+  { name: 'a fixed card imageAlt removed from Korean', mutate: s => {
+    delete s.dict.ko.attr['picks.kart.imageAlt'];
+  } },
+  { name: 'data-zh-only marker reintroduced into source', mutate: s => {
+    s.source = s.source.replace('<article class="pick-card">', '<article class="pick-card" data-zh-only>');
+  } },
+  { name: 'a fixed card poster missing from English page', mutate: s => {
+    s.pages.en = s.pages.en.replace('assets/rbeat-poster.jpg', 'assets/gone.jpg');
   } },
   { name: 'kpop card removed from Chinese source', mutate: s => {
     s.source = s.source.replace(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.minty\.label">[\s\S]*?<\/article>/, '');
