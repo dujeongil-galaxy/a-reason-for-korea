@@ -4,6 +4,11 @@
 
 > **2026-11-26 历史重写**：本文件里 2026-11-25 16:52 之后的哈希是重写前的旧值，对照见 [HASH-MAP.md](HASH-MAP.md)。
 
+## 2026-11-26 · 移除「不是韩国的 · 一个例外」整块
+
+- 站长要求删掉影单里《刺杀金正恩》（The Interview）那一条，连小标题、栏目说明一起删；该题材本站不再涉及。
+- 影响范围仅在中文源 `index.html`（这一块没有 `data-i18n`，en/jp/ko 三页本来就没有它），删后重跑 `verify-i18n.mjs` 仍全绿。
+
 ## 2026-11-26 · 历史重写：抹除旧号 dujeongil 的贡献归属
 
 - 站长明确要求「抹除」，不再只做拦截：用 `git filter-branch --env-filter` 把 15 条提交的 author/committer 邮箱从 `dujeongil@users.noreply.github.com` 改为 `dujeongil-galaxy@users.noreply.github.com`，并修正 1 条错拼署名 `dujeil-galaxy`。
