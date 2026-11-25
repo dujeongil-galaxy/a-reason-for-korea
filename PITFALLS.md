@@ -434,3 +434,10 @@
 - 另一坑：旧断言只查中文 `source`，四语生成页没人管。位置断言要放进 `for (const lang of LANGS)` 循环对 `state.pages[lang]` 再查一遍，否则 `build-i18n.mjs` 模板变动导致某语言错位照样全绿。
 - 故障注入同步：新增两条才算真锁住——「teaser 移回加速器标题上方」（改 `s.source`）、「teaser 推到 film-note 之下」（改 `s.pages.en`，顺带覆盖四语分支）。自检数从 245 涨到 247，若仍是 245 说明新用例没进数组或 mutation 是空操作。
 - 排版：`.picks-film-teaser { margin-top: 22px; }` 在网格之后依然成立（原样式是按"块后留白"设计的），搬位置不需要改 CSS。
+
+## 62. 「YouTube 有这部片」要看是哪个版本：免费带广告下架、租买仍在，且 iTunes API 查空不等于无上架
+- 现象（2026-11-25 二轮核查《哦！文姬》）：英文页原来挂的 `youtube.com/watch?v=Ck9onnQBStU`（Watch free with ads）已变 UNPLAYABLE 死链；同一部片在 YouTube Movies 的租买版 `youtu.be/cflWf3XKeFI` 仍然存在且美区/日区/韩区均返回 `requires payment`（可租可买）。只看页面搜索摘要会误判成「YouTube 也没有」。
+- 规则一：YouTube 上「同一部片」至少有三种状态——免费带广告、单片租买、频道会员/会员库。判死链只看 `playabilityStatus`：`UNPLAYABLE`＝死；`requires payment`/`LIVE_STREAM_OFFLINE` 之外的可播状态才是能挂的。免费版死掉不等于租买版死掉，要换 ID 重查而不是整站放弃 YouTube。
+- 规则二：`itunes.apple.com/search`（Search API，media=movie）对日区韩片经常返回空数组，这**不是**「日区无上架」的证据——Apple TV 的商品页会 404、API 会空，但 YouTube Movies 里照样有日区租买。查「有没有正版」必须多源交叉（JustWatch 区页 + YouTube playability + Apple TV 商品页实探），任一源为空都不能单独下结论。
+- 规则三（连带）：把一个区的「无渠道」改成「有渠道」，要同时动四处——`assets/i18n.js` 该语 actions、`PICKS_ACTIONS_EXPECT.<lang>.primary`、`PICKS_PRIMARY_LABEL.<lang>`、以及两条以 `primary: null` 为前提的故障注入（原来「硬塞按钮必判红」的用例，在有渠道后失效，要改成「错区按钮/aff 上主按钮必判红」）。否则 `SELF-TEST` 会出现 missed 或注入变空操作。
+- 规则四：副按钮用 `youtu.be` 短链时，`SUB_DOMAINS` 白名单要补 `https://youtu.be/`，否则报 `licensed platform outside allowlist`。

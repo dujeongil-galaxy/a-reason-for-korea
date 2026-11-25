@@ -150,14 +150,14 @@ const MUSIC_FORBIDDEN = [
 const PICKS_ACTIONS_EXPECT = {
   zh: { primary: 'aff', note: '到 Netflix 搜索片名观看 · 请支持正版' },
   en: { primary: 'amazon', note: 'Viewers in mainland China: <a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">click here</a> to access Netflix.' },
-  jp: { primary: null, note: '中国大陸からご覧になる場合は、<a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">こちら</a>から Netflix にアクセスできます。' },
+  jp: { primary: 'youtube', note: '中国大陸からご覧になる場合は、<a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">こちら</a>から Netflix にアクセスできます。' },
   ko: { primary: 'youtube', note: '중국 본토 시청자는 <a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">여기</a>를 눌러 Netflix에 접속하세요.' }
 };
 /* 按钮文案逐语本地化锁定：不直译、不机翻、不漂移 */
 const PICKS_PRIMARY_LABEL = {
   zh: '中国香港地区：通过此链接开通（邀请码 5rfpUarUEd）',
   en: 'Rent or buy on Prime Video',
-  jp: 'Apple TV でレンタル・購入する · 正版で応援しましょう',
+  jp: 'YouTube でレンタル・購入する · 正版で応援しましょう',
   ko: 'YouTube에서 대여하거나 구매하기 · 정식 서비스로 응원해 주세요'
 };
 const PICKS_ZH_NODES = {
@@ -448,7 +448,7 @@ const DRAMA_SUB_EXTRA = {
   /* 2026-11-25 站长「尽可能补齐」：drama6 原挂的 Netflix 80031790 已 404，改挂美区 OnDemandKorea；
      电影《哦！文姬》美区补 YouTube 免费带广告（与 Prime 租买并存）。 */
   'en/drama6': { url: 'https://www.ondemandkorea.com/player/vod/the-moon-embracing-the-sun-1?contentId=707960', label: 'Watch on OnDemandKorea (subscription)' },
-  'en/film': { url: 'https://www.youtube.com/watch?v=Ck9onnQBStU', label: 'Watch free on YouTube (with ads)' }
+  'en/film': { url: 'https://youtu.be/cflWf3XKeFI?si=pZ-WkU6w5wYkh4Wq', label: 'Rent or buy on YouTube' }
 };
 /* 2026-11-24 站长：中文按港区、港区没有退台湾区；英/日/韩按本区，正规正版订阅平台都可挂。
    给原本无订阅按钮但本区有正版的卡补齐（JustWatch 五区实查 + URL 逐条 curl 200 验证，
@@ -514,7 +514,9 @@ const SUB_DOMAINS = [
   /* 2026-11-25 站长补齐：以下三个域已逐条 curl 200 验证（美区 OnDemandKorea / 日区 FOD / 美区 YouTube 免费带广告）。 */
   'https://www.ondemandkorea.com/player/',
   'https://fod.fujitv.co.jp/title/',
-  'https://www.youtube.com/watch?'
+  'https://www.youtube.com/watch?',
+  /* 2026-11-25：YouTube Movies 的 youtu.be 短链形式（本片韩区/日区租买入口）。 */
+  'https://youtu.be/'
 ];
 /* SEO（2026-11-22 站长指令：按推荐执行 A+C+D 长尾）。
    title / description 关键词前置、金句后置；旧文艺标题不得回退。
@@ -2297,18 +2299,16 @@ const faults = [
     s.dict.en.html['picks.film.actions'] = s.dict.en.html['picks.film.actions']
       .replace('>Rent or buy on Prime Video', '>Hong Kong, China: rent or buy on Prime Video');
   } },
-  /* 2026-11-25：日区《哦！文姬》原 Apple TV（id1691528206）已 404 并移除，日文页无任何租买/订阅按钮；
-     故障注入改为「硬塞按钮」，验证无渠道区仍会被判红。 */
-  { name: 'JP page given a YouTube button where no licensed channel exists', mutate: s => {
-    const inject = '<a class="pick-link pick-link-sub" href="' + YOUTUBE_LINK + '" target="_blank" rel="noopener noreferrer">YouTube で見る</a>';
-    s.dict.jp.html['picks.film.actions'] = s.dict.jp.html['picks.film.actions']
-      .replace('<p class="pick-netflix-note">', inject + '<p class="pick-netflix-note">');
+  /* 2026-11-25（第二轮）：日文页《哦！文姬》改挂 YouTube Movies 租买（韩区/日区实测可购），
+     Apple TV 死链此后不再回挂。故障注入随之改为「错区按钮」与「港区 aff 上主按钮」。 */
+  { name: 'JP page given a US Amazon buy button (wrong region)', mutate: s => {
+    const inject = '<a class="pick-link pick-link-featured" href="' + AMAZON_LINK + '" target="_blank" rel="noopener noreferrer">Rent or buy on Prime Video</a>';
+    s.dict.jp.html['picks.film.actions'] = inject + s.dict.jp.html['picks.film.actions'];
     s.pages.jp = s.pages.jp.replace(/(<div class="pick-actions" data-i18n="picks\.film\.actions">)/, '$1' + inject);
   } },
   { name: 'JP page switched back to the HK-region aff buy button', mutate: s => {
     const inject = '<a class="pick-link pick-link-featured" href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">' + PICKS_PRIMARY_LABEL.zh + '</a>';
-    s.dict.jp.html['picks.film.actions'] = s.dict.jp.html['picks.film.actions']
-      .replace('<p class="pick-netflix-note">', inject + '<p class="pick-netflix-note">');
+    s.dict.jp.html['picks.film.actions'] = inject + s.dict.jp.html['picks.film.actions'];
     s.pages.jp = s.pages.jp.replace(/(<div class="pick-actions" data-i18n="picks\.film\.actions">)/, '$1' + inject);
   } },
   { name: 'KO page switched to the US Prime Video link', mutate: s => {
