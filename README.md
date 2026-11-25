@@ -67,6 +67,7 @@
   - 当前挂法：en《无理的前进》Kocowa（Prime 频道）、《来自星星的你》《继承者们》《大长今》Viki；jp《来自星星的你》《继承者们》《大长今》U-NEXT；ko《车贞淑医生》《来自星星的你》《大长今》TVING、《无理的前进》wavve、《继承者们》왓챠；中文四页不挂（这些平台在中国大陆均不可用）。
   - 取数方式：JustWatch GraphQL（`apis.justwatch.com/graphql`，`country=US/JP/KR`）逐区拉 `offers`，再逐条 curl 复核落地页状态码（Viki 剧集页从 episode 页里的 `/tv/NNNc-` 反查）。`verify-i18n.mjs` 以 `DRAMA_SUB` 锁定链接与文案、`SUB_DOMAINS` 白名单卡域名，并断言「订阅按钮必须在租买按钮与红字之上」「每卡仅一条」「无渠道区禁挂」「中文页禁挂外区订阅」。
 - **附页的剪报是记忆存档，不是论据**：图片原样保留并标注来源，页面不复述其内容、不评价、不核查，也不把它算作任何一条理由；外部存档链接同样不核查、不背书。四语都写着「记得一件事，不等于替它下结论」。
+- **专题报道（2026-11-25）**：`report/minty/` 是独立的**中文单页**，讲 Minty 的年龄风波，不属于四条理由，也不进 i18n 字典（预览期只写中文）。主站只在 K-pop 的 Minty 卡下挂一个 `.pick-report-link` 入口；按钮放在 `data-i18n` 之外，重建语言页不会覆盖它，也不会漏翻译。视频默认不加载，点击后才注入 `youtube-nocookie.com`。页面事实以原始报道为准（CJ E&amp;M 曾确认她没有递交《高等 Rapper 2》申请），不写未核实的「被 Mnet 除名」。
 - 第 03 条四语一致地写明「喜欢不是免检」：喜欢一部分，同时保留自己的判断。这是整页的底线。
 - 译文是人工撰写的自然表达，不是逐字直译；版式小标签（栏目名、理由小标题）在日/韩页也做了本地化，产品名（WorkBuddy / GitHub Pages / TikTok）与来源名保留原文。插画里纸箱上的 `CAT` 属于图案，不翻译。**抖音的国际产品名是 TikTok**：中文源页照写「抖音」，en/jp/ko 译文一律写 `TikTok`，不得回退成 `Douyin` / `더우인` / `抖音（Douyin）`；`v.douyin.com` 是那条原始分享的真实链接域名，属 URL 不是译文，保留不动。`scripts/verify-i18n.mjs` 有专门断言 + 故障注入防回退（站长 2026-11-16 指令）。延伸阅读第二条标签同样按此口径：中文「抖音」，en/jp/ko 一律 `TikTok`，不写 `Douyin` / `더우인`，也不回退成旧标签「近例 / Another / もう一本 / 또 하나」（站长 2026-11-22 指令）。
 
@@ -77,6 +78,7 @@ index.html                    唯一中文源文案（含 data-i18n 钩子、语
 en/index.html                 英文静态页（脚本生成，勿手改）
 jp/index.html                 日文静态页（脚本生成，勿手改）
 ko/index.html                 韩文静态页（脚本生成，勿手改）
+report/minty/index.html       中文专题报道：Minty／《You Do》／年龄风波（独立单页，暂不翻译）
 assets/styles.css             样式、响应式、语言字体栈、暗色模式、动效降级
 assets/i18n.js                en/jp/ko 译文 + 四语属性 / 运行时文案
 assets/app.js                 滚动淡入 / 点灯计数 / 理由卡片 / 复制

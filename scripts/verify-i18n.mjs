@@ -1824,7 +1824,13 @@ function verify(state) {
   }
 
   const sitemap = state.sitemap || '';
-  if ((sitemap.match(/<url>/g) || []).length !== 4) errors.push('sitemap: must contain exactly 4 <url> entries');
+  /* 2026-11-25：除四语入口外，新增中文专题页 report/minty/（只做中文，不翻译），
+     故断言改为「四语 + 1 篇专题」而非写死 4 条。 */
+  const sitemapUrlCount = (sitemap.match(/<url>/g) || []).length;
+  if (sitemapUrlCount !== SEO_SITEMAP_URLS.length + 1) {
+    errors.push('sitemap: must contain ' + (SEO_SITEMAP_URLS.length + 1) + ' <url> entries (4 languages + report page)');
+  }
+  if (!sitemap.includes('<loc>' + SITE + 'report/minty/</loc>')) errors.push('sitemap: missing report page loc -> ' + SITE + 'report/minty/');
   for (const url of SEO_SITEMAP_URLS) {
     if (!sitemap.includes('<loc>' + url + '</loc>')) errors.push('sitemap: missing loc -> ' + url);
   }

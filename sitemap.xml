@@ -45,4 +45,10 @@
     <xhtml:link rel="alternate" hreflang="ko" href="https://dujeongil-galaxy.github.io/a-reason-for-korea/ko/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://dujeongil-galaxy.github.io/a-reason-for-korea/"/>
   </url>
+  <url>
+    <loc>https://dujeongil-galaxy.github.io/a-reason-for-korea/report/minty/</loc>
+    <lastmod>2026-11-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
 </urlset>
