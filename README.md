@@ -79,6 +79,7 @@ en/index.html                 英文静态页（脚本生成，勿手改）
 jp/index.html                 日文静态页（脚本生成，勿手改）
 ko/index.html                 韩文静态页（脚本生成，勿手改）
 report/minty/index.html       中文专题报道：Minty／《You Do》／年龄风波（独立单页，暂不翻译）
+.githooks/pre-commit          提交身份检查：拦截旧号邮箱 dujeongil@users.noreply.github.com
 assets/styles.css             样式、响应式、语言字体栈、暗色模式、动效降级
 assets/i18n.js                en/jp/ko 译文 + 四语属性 / 运行时文案
 assets/app.js                 滚动淡入 / 点灯计数 / 理由卡片 / 复制
@@ -102,6 +103,17 @@ node scripts/verify-i18n.mjs    # 校验；内含故意造错的自检，必须 
 ```
 
 校验会检查四语 key 是否齐全（98 个节点 / 12 个属性）、中文是否被删、生成页是否与字典逐字一致、资源路径 / 语言切换链接 / canonical 是否正确，附页章节、边界声明、剪报图片归属措辞、三条存档链接及其状态标记在四语里是否都在，以及 SEO 关键词、四语 JSON-LD 的语言/地址、sitemap 四语入口与 robots 指向。
+
+## 提交身份（每个 clone 设一次）
+
+2026-11-25 有 15 条提交用了旧式 noreply 地址 `dujeongil@users.noreply.github.com`，GitHub 会把它映射到十年没用的 `dujeongil` 账户，贡献页因此多出一个名字。仓库现在带一个 pre-commit 钩子，邮箱不对直接拦下：
+
+```bash
+git config --local user.email "dujeongil-galaxy@users.noreply.github.com"
+git config --local core.hooksPath .githooks
+```
+
+更稳的写法是用 GitHub 设置里带数字 ID 的 noreply：`<ID>+dujeongil-galaxy@users.noreply.github.com`。旧号名下没有别的东西，不删、也不改写历史——那 15 条会留在贡献页，改写历史会让 CHANGELOG 里引用的真实提交号失效。
 
 ## 本地预览
 

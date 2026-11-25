@@ -2,6 +2,15 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-26 · 提交身份上锁：pre-commit 拦截旧号邮箱（不改写历史）
+
+- 站长发现贡献页多出 `dujeongil`（十年没用的旧账户）。查明原因：2026-11-25 有 **15 条提交**的 author/committer 邮箱是旧式 noreply `dujeongil@users.noreply.github.com`，GitHub 把它映射到同名旧号；其中一条署名还错拼成 `dujeil-galaxy`。本地当时配置是对的，问题来自另一个环境（云主机那边）沿用了旧格式。
+- 处理口径：**旧号名下没有仓库，不删号、不改写历史**（改写会让 CHANGELOG 里引用的真实提交号全部失效），只保证以后不再添名字。
+- 新增 `.githooks/pre-commit`：用 `git var GIT_AUTHOR_IDENT` 取实际邮箱，`dujeongil@users.noreply.github.com` 直接 exit 1 并提示改法；其他 `*@users.noreply.github.com` 也拦（防挂到别人名下）；非 noreply 只警告。
+- 仓库本地配置固定：`user.name=dujeongil-galaxy`、`user.email=dujeongil-galaxy@users.noreply.github.com`、`core.hooksPath=.githooks`；README 补「提交身份（每个 clone 设一次）」与文件结构一行。
+- 自测：模拟旧邮箱 → 退出码 1、正确邮箱 → 退出码 0。
+- 遗留：那 15 条仍挂在旧号名下；要彻底抹掉只能 rewrite history + force push，判定为不划算。
+
 ## 2026-11-25 · 新增专题报道：Minty／《You Do》／年龄风波（中文单页）
 
 - 站长要求「做一页专题报道、外面挂内链」，并同步 YouTube 道歉视频 `youtu.be/m1D3yLwfGpA`（《죄송합니다.》，2019-12-25），摘要注明由 **Monica（monica.im）** 生成、写清「AI 叫什么」。

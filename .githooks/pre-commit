@@ -1,0 +1,29 @@
+#!/bin/sh
+# 提交前检查 git 身份：防止把提交算到旧号 dujeongil 头上。
+# 启用方式（每个 clone 一次）：git config core.hooksPath .githooks
+# 背景：2026-11-25 有 15 条提交用了旧式 noreply 地址
+# dujeongil@users.noreply.github.com，被 GitHub 映射到十年没用的 dujeongil 账户。
+
+ident=$(git var GIT_AUTHOR_IDENT)
+email=$(printf '%s\n' "$ident" | sed -n 's/.*<\(.*\)>.*/\1/p')
+
+case "$email" in
+  dujeongil@users.noreply.github.com)
+    echo "✗ user.email 是旧号地址：$email" >&2
+    echo "  会被算到 dujeongil（旧账户）头上，已阻止提交。" >&2
+    echo "  改成：git config user.email \"<数字ID>+dujeongil-galaxy@users.noreply.github.com\"" >&2
+    exit 1
+    ;;
+  dujeongil-galaxy@users.noreply.github.com|*+dujeongil-galaxy@users.noreply.github.com)
+    exit 0
+    ;;
+  *@users.noreply.github.com)
+    echo "！user.email 是别的 GitHub noreply：$email" >&2
+    echo "  若不是本账号的地址，贡献会挂到别人名下。" >&2
+    exit 1
+    ;;
+  *)
+    echo "！user.email 不是 GitHub noreply：$email（提交可能无法关联账号）" >&2
+    exit 0
+    ;;
+esac
