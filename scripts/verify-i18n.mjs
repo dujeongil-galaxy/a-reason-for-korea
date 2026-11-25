@@ -125,10 +125,10 @@ const PICKS_HEAD = {
 /* 站长推荐二级菜单（2026-11-22）：四语各三项，下拉只在桌面出现，手机端不做。
    K-pop / 游戏先占位，等站长写入数据；标题下的分类名必须与菜单对应。 */
 const NAV_SUB = {
-  zh: { drama: '看韩剧', kpop: '听K-pop', game: '玩游戏' },
-  en: { drama: 'Watch K-dramas', kpop: 'Listen to K-pop', game: 'Play games' },
-  jp: { drama: '韓国ドラマを見る', kpop: 'K-popを聴く', game: 'ゲームを遊ぶ' },
-  ko: { drama: '한국 드라마 보기', kpop: 'K-pop 듣기', game: '게임 하기' }
+  zh: { drama: '看韩剧', kpop: '听K-pop', game: '玩游戏', learn: '学韩语' },
+  en: { drama: 'Watch K-dramas', kpop: 'Listen to K-pop', game: 'Play games', learn: 'Learn Korean' },
+  jp: { drama: '韓国ドラマを見る', kpop: 'K-popを聴く', game: 'ゲームを遊ぶ', learn: '韓国語を学ぶ' },
+  ko: { drama: '한국 드라마 보기', kpop: 'K-pop 듣기', game: '게임 하기', learn: '한국어 배우기' }
 };
 const COMING_NOTE = {
   zh: '正在开发中，请等待站长写入数据',
@@ -136,7 +136,7 @@ const COMING_NOTE = {
   jp: '準備中です。運営者がデータを入力するのをお待ちください。',
   ko: '준비 중입니다. 운영자가 데이터를 입력할 때까지 기다려 주세요.'
 };
-const NAV_SUB_HREFS = ['#picks-dramas', '#picks-kpop', '#picks-pc-games'];
+const NAV_SUB_HREFS = ['#picks-dramas', '#picks-kpop', '#picks-pc-games', '#picks-learn'];
 const escRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 /* 韩国音乐专区已撤（站长 2026-11-22）：四语一律不得再出现占位卡与占位文案。 */
 const MUSIC_FORBIDDEN = [
@@ -1362,11 +1362,11 @@ function verify(state) {
     const sub = NAV_SUB[lang];
     const menu = (page.match(/<div class="nav-dropdown-menu">([\s\S]*?)<\/div>/) || [])[1] || '';
     const menuLinks = [...menu.matchAll(/<a href="([^"]+)" data-i18n="[^"]+">([^<]+)<\/a>/g)];
-    if (menuLinks.length !== 3) {
-      errors.push(lang + ': nav dropdown must carry exactly three items');
+    if (menuLinks.length !== 4) {
+      errors.push(lang + ': nav dropdown must carry exactly four items');
     } else {
-      for (let i = 0; i < 3; i++) {
-        const label = [sub.drama, sub.kpop, sub.game][i];
+      for (let i = 0; i < 4; i++) {
+        const label = [sub.drama, sub.kpop, sub.game, sub.learn][i];
         if (menuLinks[i][1] !== NAV_SUB_HREFS[i]) {
           errors.push(lang + ': dropdown item ' + i + ' wrong anchor -> ' + menuLinks[i][1]);
         }

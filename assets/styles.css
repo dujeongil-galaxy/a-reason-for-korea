@@ -781,3 +781,22 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
   line-height: 1.95;
   color: var(--ink-soft);
 }
+
+/* 学韩语（2026-11-25 站长新增）：文字卡片列表，不做课程表，只做入口索引 */
+.learn-list { display: grid; gap: 10px; margin-top: 14px; }
+.learn-item {
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  padding: 14px 16px;
+  background: var(--surface);
+}
+.learn-item-title {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent);
+  text-decoration: none;
+  margin: 0 0 6px;
+}
+.learn-item-desc { display: block; font-size: 13.5px; line-height: 1.85; color: var(--ink-soft); }
+.learn-item-note { display: block; font-size: 12.5px; line-height: 1.7; color: var(--ink-faint); margin-top: 8px; }
