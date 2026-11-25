@@ -275,10 +275,10 @@ const PC_GAME_DATE = { lineage2: '2003-10-01', bnb: '2003-04-01' };
 const SORT_RULES = {
   drama: { grid: 'picks-dramas',
     order: ['drama9','drama1','drama10','film','drama7','drama8','drama11','drama13',
-            'drama2','drama12','drama3','drama4','drama6','drama5'],
+            'drama2','drama12','drama3','drama14','drama4','drama6','drama5'],
     year: { drama9:2025, drama1:2023, drama10:2023, film:2020, drama7:2020, drama8:2020,
             drama11:2016, drama13:2016, drama2:2015, drama12:2015, drama3:2013,
-            drama4:2013, drama6:2012, drama5:2003 } },
+            drama14:2013, drama4:2013, drama6:2012, drama5:2003 } },
   music: { grid: 'picks-kpop',
     order: ['seoeve','minty','sospecial','ussoboy','misskorea','music1','study','jjarappappa','milksong'],
     year: { seoeve:2024, minty:2019, sospecial:2018, ussoboy:2017, misskorea:2017,
@@ -472,6 +472,17 @@ const ZH_OVERSEAS_OK = {
 };
 
 const LICENSED_SUB_EXTRA = {
+  /* 2026-11-25 站长「新增《奇皇后》，只要是正版平台，买断/短租/订阅均可，尽量别空着」：
+     MBC 2013-10-28~2014-04-29，51 集。逐区实查后的四条入口——
+     zh 港区：Viu 官方专题页列有该剧（含简中/英文字幕），商品 ID 从机房 IP 取不到，与港区 Viu 同一口径走站内搜索页；
+     en 美区：Viki 官方商品页 37211c（51 集，英文字幕，免费带广告 + 订阅，JustWatch 美区同日确认在架）；
+     jp 日区：U-NEXT 商品页 SID0022475（全 51 话；从大陆 IP 返回 503 属地区封锁，不是死链）；
+     ko 韩区：TVING 站内搜索结果页（拿不到 contents ID，文案写明「검색」，不冒充商品页）。
+     Netflix 在多区有该剧（JustWatch SG/SA/FR 确认），但 netflix.com 商品页需 JS、ID 取不到，按规则不挂。 */
+  'zh/drama14': { url: 'https://www.viu.com/ott/hk/zh-hk/search?q=%E5%A5%87%E7%9A%87%E5%90%8E', label: '香港：Viu 观看（订阅）' },
+  'en/drama14': { url: 'https://www.viki.com/tv/37211c-empress-ki', label: 'Watch free on Viki (with ads)' },
+  'jp/drama14': { url: 'https://video.unext.jp/title/SID0022475', label: 'U-NEXT で見る（定額制）' },
+  'ko/drama14': { url: 'https://www.tving.com/search?keyword=%EA%B8%B0%ED%99%A9%ED%9B%84', label: 'TVING에서 검색해 보기 (정액제)' },
   'zh/drama10': { url: 'https://app.primevideo.com/detail?gti=amzn1.dv.gti.a3b03bc3-0b7d-49e5-8eb1-6d80ac89dd13', label: '在 Prime Video 观看（订阅）' },
   'zh/film': { url: 'https://www.catchplay.com/tw/video/3ec4e52d-46b6-4b5e-aca4-f06ff0b46d45', label: '在 Catchplay 观看（订阅·台湾）' },
   'zh/drama11': { url: 'https://www.primevideo.com/-/zh_TW/detail/%E6%89%93%E6%9E%B6%E5%90%A7%EF%BC%8C%E9%AC%BC%E7%A5%9E/0HVE4CVQNSBVA7YGU5OYIR2H51', label: '在 Prime Video 观看（订阅）' },
@@ -535,6 +546,10 @@ const SUB_DOMAINS = [
   'https://watch.amazon.com/detail?gti=',
   'https://watch.amazon.co.jp/detail?gti=',
   'https://video.unext.jp/episode/',
+  /* 2026-11-25：日区《奇皇后》U-NEXT 商品页是 title 级（不是 episode 级），单独放行 title 前缀。 */
+  'https://video.unext.jp/title/',
+  /* 2026-11-25：韩区 TVING 只有站内搜索结果页可直达（拿不到 contents ID），与港区 Viu 搜索页同一口径。 */
+  'https://www.tving.com/search?keyword=',
   'https://www.tving.com/contents/',
   'https://www.wavve.com/player/vod?contentid=',
   'https://watcha.com/contents/',
