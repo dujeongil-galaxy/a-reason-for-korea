@@ -769,10 +769,10 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
 /* 后记：站长本人多年前的朋友圈，放在猫的尾句下面，字号退一级，不抢主句 */
 .footer-moment {
   margin-top: 28px;
-  max-width: 640px;
 }
 .footer-moment-body {
-  margin: 0 0 10px;
+  max-width: 640px;
+  margin: 0;
   padding-left: 14px;
   border-left: 3px solid var(--gold);
   font-size: 14px;
