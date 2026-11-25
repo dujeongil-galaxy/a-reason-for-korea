@@ -148,14 +148,14 @@ const MUSIC_FORBIDDEN = [
    primary 逐语锁定。红字 note：中文保留原文；en/jp/ko 逐语本地化为「中国大陆用户点这里访问 Netflix」，
    「这里」必须指向 aff 入口（AFF_LINK），不得回退成旧版机翻的「搜索片名观看」。 */
 const PICKS_ACTIONS_EXPECT = {
-  zh: { primary: 'aff', note: '到 Netflix 搜索片名观看 · 请支持正版' },
-  en: { primary: 'amazon', note: 'Viewers in mainland China: <a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">click here</a> to access Netflix.' },
-  jp: { primary: 'youtube', note: '中国大陸からご覧になる場合は、<a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">こちら</a>から Netflix にアクセスできます。' },
-  ko: { primary: 'youtube', note: '중국 본토 시청자는 <a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">여기</a>를 눌러 Netflix에 접속하세요.' }
+  zh: { primary: 'aff', note: '到 Netflix 搜索片名观看 · 请支持正版。（上方港区按钮为第三方合租平台，非 Netflix 官方渠道）' },
+  en: { primary: 'amazon', note: 'Viewers in mainland China: <a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">click here</a> to access Netflix through a third-party account-sharing platform (not an official Netflix channel).' },
+  jp: { primary: 'youtube', note: '中国大陸からご覧になる場合は、<a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">こちら</a>（第三者のアカウント共有サービス経由、Netflix 公式窓口ではありません）から Netflix にアクセスできます。' },
+  ko: { primary: 'youtube', note: '중국 본토 시청자는 <a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">여기</a>(제3자 계정 공유 서비스, Netflix 공식 채널 아님)를 눌러 Netflix에 접속하세요.' }
 };
 /* 按钮文案逐语本地化锁定：不直译、不机翻、不漂移 */
 const PICKS_PRIMARY_LABEL = {
-  zh: '中国香港地区：通过此链接开通（邀请码 5rfpUarUEd）',
+  zh: '中国香港地区：第三方合租平台开通（邀请码 5rfpUarUEd，非 Netflix 官方渠道）',
   en: 'Rent or buy on Prime Video',
   jp: 'YouTube でレンタル・購入する · 正版で応援しましょう',
   ko: 'YouTube에서 대여하거나 구매하기 · 정식 서비스로 응원해 주세요'
@@ -391,10 +391,10 @@ const DRAMA_PRIMARY = {
   'jp/drama3': DRAMA_AMAZON_JP_STAR, 'jp/drama4': DRAMA_AMAZON_JP_HEIRS
 };
 const DRAMA_NOTE = {
-  zh: '到 Netflix 搜索片名观看 · 请支持正版',
-  en: 'Viewers in mainland China: <a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">click here</a> to access Netflix.',
-  jp: '中国大陸からご覧になる場合は、<a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">こちら</a>から Netflix にアクセスできます。',
-  ko: '중국 본토 시청자는 <a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">여기</a>를 눌러 Netflix에 접속하세요.'
+  zh: '到 Netflix 搜索片名观看 · 请支持正版。（上方港区按钮为第三方合租平台，非 Netflix 官方渠道）',
+  en: 'Viewers in mainland China: <a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">click here</a> to access Netflix through a third-party account-sharing platform (not an official Netflix channel).',
+  jp: '中国大陸からご覧になる場合は、<a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">こちら</a>（第三者のアカウント共有サービス経由、Netflix 公式窓口ではありません）から Netflix にアクセスできます。',
+  ko: '중국 본토 시청자는 <a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">여기</a>(제3자 계정 공유 서비스, Netflix 공식 채널 아님)를 눌러 Netflix에 접속하세요.'
 };
 /* 订阅制渠道（2026-11-22 站长追问「只有订阅制，既然能买正版，为什么不挂」）：
    按 JustWatch 逐区实查（apis.justwatch.com/graphql，country = US / JP / KR，2026-11-22 取数）。
@@ -2370,7 +2370,7 @@ const faults = [
   } },
   { name: 'Korean Netflix note reverted to machine-translated search wording', mutate: s => {
     s.dict.ko.html['picks.film.actions'] = s.dict.ko.html['picks.film.actions']
-      .replace('중국 본토 시청자는 <a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">여기</a>를 눌러 Netflix에 접속하세요.', 'Netflix에서 제목을 검색해 보세요. 정식 서비스로 응원해 주세요');
+      .replace('중국 본토 시청자는 <a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">여기</a>(제3자 계정 공유 서비스, Netflix 공식 채널 아님)를 눌러 Netflix에 접속하세요.', 'Netflix에서 제목을 검색해 보세요. 정식 서비스로 응원해 주세요');
   } },
   { name: 'English Netflix note link stripped of the aff entry', mutate: s => {
     s.dict.en.html['picks.film.actions'] = s.dict.en.html['picks.film.actions']
@@ -2378,7 +2378,7 @@ const faults = [
   } },
   { name: 'Japanese Netflix note reverted to machine-translated search wording', mutate: s => {
     s.dict.jp.html['picks.film.actions'] = s.dict.jp.html['picks.film.actions']
-      .replace('中国大陸からご覧になる場合は、<a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">こちら</a>から Netflix にアクセスできます。', 'Netflix で作品名を検索してご覧ください。正版で応援しましょう');
+      .replace('中国大陸からご覧になる場合は、<a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">こちら</a>（第三者のアカウント共有サービス経由、Netflix 公式窓口ではありません）から Netflix にアクセスできます。', 'Netflix で作品名を検索してご覧ください。正版で応援しましょう');
   } },
   { name: 'invitation code stripped from Chinese page', mutate: s => {
     s.source = s.source.replace(/5rfpUarUEd/g, '');
