@@ -95,7 +95,7 @@ body.report-page { background: var(--bg); }
   font-family: var(--mono); font-size: 12px; color: var(--accent);
   white-space: nowrap; width: 8.5em; padding-right: 16px;
 }
-.fact-table td:last-child { font-size: 12px; color: var(--ink-faint); width: 12em; }
+.fact-table td:last-child { font-size: 11px; color: var(--ink-faint); width: 13.5em; }
 .fact-note { font-size: 12.5px !important; color: var(--ink-faint) !important; }
 
 .quote-box {
@@ -226,6 +226,20 @@ body.report-page { background: var(--bg); }
 }
 .report-foot strong { color: var(--ink-soft); }
 
+/* 引用角标做成站内锚点：点 [1] 直接跳到末尾「来源」第 1 条，并高亮那一条 */
+.cite-link {
+  color: var(--accent); text-decoration: none;
+  font-family: var(--mono); font-size: .9em; letter-spacing: .02em;
+  padding: 0 1px; border-bottom: 1px dotted color-mix(in srgb, var(--accent) 55%, transparent);
+  white-space: nowrap;
+}
+.cite-link:hover { border-bottom-style: solid; }
+.sources li { scroll-margin-top: 96px; border-radius: 10px; }
+.sources li:target {
+  background: color-mix(in srgb, var(--accent-soft) 70%, transparent);
+  box-shadow: 0 0 0 10px color-mix(in srgb, var(--accent-soft) 70%, transparent);
+}
+
 @media (max-width: 720px) {
   .fact-table { font-size: 12.5px; }
   .fact-table thead { display: none; }
@@ -335,42 +349,42 @@ body.report-page { background: var(--bg); }
               <tr>
                 <td>1992 年</td>
                 <td>出生。2019 年公司口径为「韩龄 28 岁、国际年龄 26 岁」，按此回推即 1992 年生；具体月日未在可核实的权威页面确认。</td>
-                <td>所属社声明 [1]</td>
+                <td>所属社声明 <a class="cite-link" href="#src-1" aria-label="来源 1">[1]</a></td>
               </tr>
               <tr>
                 <td>2018-02-22</td>
                 <td>出道单曲《You Do（유두）》发行，MV 同日公开；第二天《高等 Rapper 2》首播。</td>
-                <td>首尔经济 [4]／fn스타 [5]</td>
+                <td>首尔经济 <a class="cite-link" href="#src-4" aria-label="来源 4">[4]</a>／fn스타 <a class="cite-link" href="#src-5" aria-label="来源 5">[5]</a></td>
               </tr>
               <tr>
                 <td>2018-02-23</td>
                 <td>CJ E&amp;M 向媒体确认：她<strong>没有</strong>向《高等 Rapper 2》提交申请，节目里不会出现她；网上流传的只是她自制并上传的「申请视频」。</td>
-                <td>fn스타 [5]</td>
+                <td>fn스타 <a class="cite-link" href="#src-5" aria-label="来源 5">[5]</a></td>
               </tr>
               <tr>
                 <td>2018-02 下旬</td>
                 <td>「十七岁 rapper」的洛丽塔争议爆发。她当天在 SNS 回应：「姐姐不是洛丽塔，是性感概念」「You Do 不是身体部位」。</td>
-                <td>首尔经济 [4]</td>
+                <td>首尔经济 <a class="cite-link" href="#src-4" aria-label="来源 4">[4]</a></td>
               </tr>
               <tr>
                 <td>2019-10 初</td>
                 <td>韩网出现「Minty 就是女团 Girls’ Alert 的制作人 Sorina」的比对帖：练习室、家具、著作权登记代码等被逐条对照。她起初否认。</td>
-                <td>朝鲜日报 [2]</td>
+                <td>朝鲜日报 <a class="cite-link" href="#src-2" aria-label="来源 2">[2]</a></td>
               </tr>
               <tr>
                 <td>2019-10-09／10</td>
                 <td>所属社 CoronaX 发声明承认年龄与身份；她上传《민티의 진실된 신상명세》（Minty 的真实身份明细），在镜头前公开身份证。</td>
-                <td>Koreaboo [1]／朝鲜日报 [2]</td>
+                <td>Koreaboo <a class="cite-link" href="#src-1" aria-label="来源 1">[1]</a>／朝鲜日报 <a class="cite-link" href="#src-2" aria-label="来源 2">[2]</a></td>
               </tr>
               <tr>
                 <td>2019-12-25</td>
                 <td>上传《죄송합니다.》（对不起），第二次公开道歉；简介写明「与公司长时间讨论后，判断用时间慢慢反省才是尽责」。</td>
-                <td>YouTube 视频页 [6]</td>
+                <td>YouTube 视频页 <a class="cite-link" href="#src-6" aria-label="来源 6">[6]</a></td>
               </tr>
               <tr>
                 <td>2026-06 初</td>
                 <td>为一只怀孕猫的急救手术公开筹款 1,000 万韩元，公开 538.9 万韩元收据并承诺三个月内归还；同篇报道提到她此前被诉业务侵占，获无罪判决。</td>
-                <td>OSEN [7]</td>
+                <td>OSEN <a class="cite-link" href="#src-7" aria-label="来源 7">[7]</a></td>
               </tr>
             </tbody>
           </table>
@@ -385,7 +399,7 @@ body.report-page { background: var(--bg); }
           <div class="quote-box">
             <p>「언니는 로리타 아니고 섹시 컨셉」<br>姐姐不是洛丽塔，是性感概念。</p>
             <p>「나는 어린이 말고 아린이가 될래」<br>我不想当小孩，我想当「阿琳」。</p>
-            <cite>《You Do》歌词，转引自首尔经济 2018-02-23 [4]。第二句把艺名与本名的双关做成「长大」的宣言。</cite>
+            <cite>《You Do》歌词，转引自首尔经济 2018-02-23 <a class="cite-link" href="#src-4" aria-label="来源 4">[4]</a>。第二句把艺名与本名的双关做成「长大」的宣言。</cite>
           </div>
 
           <p>MV 的视觉是这次争议的放大器：印着 <em>Eat Me</em> 的上衣、及膝白袜、刻意幼态的取景。媒体把它称作「洛丽塔概念」，她的回应是「性感概念」。这两种说法其实不在同一个层面上打架——一个说的是<strong>观感</strong>，一个说的是<strong>意图</strong>。而意图这件事，只有演唱者自己知道，也必须由她自己承担。</p>
@@ -394,8 +408,8 @@ body.report-page { background: var(--bg); }
 
         <section id="setup">
           <div class="r-head"><span class="r-no">03</span><h2>那个「16 岁」，是怎么搭起来的</h2></div>
-          <p>她后来在视频里给的因果非常简单：<strong>《高等 Rapper》只收高中生，要报名就得是高中生的年龄，所以她把真实年龄减了 10 岁。</strong>被问到为什么刚好选 2002 年，她的回答是「我算数不好」（[3]）。这句话后来被韩国网友反复拿出来吐槽，因为它把一件持续一年多的持续隐瞒，压缩成了一个笨拙的算术失误。</p>
-          <p>但更关键的一层，很多中文讨论里漏掉了：<strong>她其实没有报名。</strong>2018 年 2 月 23 日，CJ E&amp;M 方面对 fn스타 明确表示，她没有递交《高等 Rapper 2》的申请书。她的解释是想报，但父母强烈反对，最后只把拍好的视频发了出去（[5]）。</p>
+          <p>她后来在视频里给的因果非常简单：<strong>《高等 Rapper》只收高中生，要报名就得是高中生的年龄，所以她把真实年龄减了 10 岁。</strong>被问到为什么刚好选 2002 年，她的回答是「我算数不好」（<a class="cite-link" href="#src-3" aria-label="来源 3">[3]</a>）。这句话后来被韩国网友反复拿出来吐槽，因为它把一件持续一年多的持续隐瞒，压缩成了一个笨拙的算术失误。</p>
+          <p>但更关键的一层，很多中文讨论里漏掉了：<strong>她其实没有报名。</strong>2018 年 2 月 23 日，CJ E&amp;M 方面对 fn스타 明确表示，她没有递交《高等 Rapper 2》的申请书。她的解释是想报，但父母强烈反对，最后只把拍好的视频发了出去（<a class="cite-link" href="#src-5" aria-label="来源 5">[5]</a>）。</p>
           <p>于是「挤掉真正高中生的机会」这条批评要分两层说：</p>
           <p><strong>她没有占掉任何一个参赛名额</strong>，这一点有节目方的说法；<strong>但她借用了「高中生参赛者」这个公共想象来卖歌</strong>——单曲在首播前一天发行，SNS 上还发了「今天就是《高等 Rapper 2》首播日」的提醒。fn스타 当年的评论把这层看得很清楚：这是「用没有申请过的节目名」做宣传。</p>
           <p>所以真正的问题不是「她骗了节目」，而是<strong>她把一个她并不具备的身份，当成了作品的封面</strong>。这也是为什么后来道歉时，很多人不接受的不是「她 26 岁」，而是「她让一群十几岁的孩子以为她是同类」。</p>
@@ -404,20 +418,20 @@ body.report-page { background: var(--bg); }
         <section id="identity">
           <div class="r-head"><span class="r-no">04</span><h2>另一半身份：Sorina、Alpaca Production、Girls’ Alert</h2></div>
           <p>年龄只是第一层。让这件事在 2019 年彻底炸开的，是第二层：<strong>她同时是女团 Girls’ Alert（소녀주의보）的制作人「Sorina」，也是 Alpaca Production 的代表。</strong></p>
-          <p>公司的声明写得很直接：她从十几岁开始学作曲与制作，在业内做过实际工作；后来因为投资人的提议成立公司，制作了 Girls’ Alert；约两年前因健康问题，把组合的管理移交给了 Roots Entertainment（[1][2]）。她在视频里也承认了这一点，并回应了「饿着成员」「对成员有自卑感」的传闻。</p>
+          <p>公司的声明写得很直接：她从十几岁开始学作曲与制作，在业内做过实际工作；后来因为投资人的提议成立公司，制作了 Girls’ Alert；约两年前因健康问题，把组合的管理移交给了 Roots Entertainment（<a class="cite-link" href="#src-1" aria-label="来源 1">[1]</a><a class="cite-link" href="#src-2" aria-label="来源 2">[2]</a>）。她在视频里也承认了这一点，并回应了「饿着成员」「对成员有自卑感」的传闻。</p>
           <p>爆料的方式值得一提：不是匿名投稿，而是公开信息的交叉比对——练习室的墙、视频里的沙发、著作权登记代码。这类比对本身不违法，甚至是韩国网民很熟练的一种查证方式；但比对到「住址、家人、就诊记录」就越界了。这条线，本站不跟着走。</p>
           <p>还有一个容易被忽略的细节：她的名字在报道里是分裂的。有的写 김아린（金雅琳），有的写 유소리나（柳 Sorina）；Koreaboo 用前者，머니투데이 与朝鲜日报用后者。她自己在视频里承认的是「我就是 Sorina」。名字的分裂本身就是这场包装的一部分，不是媒体笔误那么简单。</p>
         </section>
 
         <section id="admit">
           <div class="r-head"><span class="r-no">05</span><h2>2019 年 10 月：承认的那一天</h2></div>
-          <p>10 月 9 日，CoronaX 发布四条声明（[1]）：</p>
+          <p>10 月 9 日，CoronaX 发布四条声明（<a class="cite-link" href="#src-1" aria-label="来源 1">[1]</a>）：</p>
           <div class="quote-box">
             <p>一、她确实是 Alpaca Production 的代表、Girls’ Alert 的制作人 Sorina；十几岁起做作曲，接受投资后成立公司，约两年前因健康问题把组合管理移交出去。</p>
             <p>二、她目前因严重压力患有进食障碍，10 月初开始接受心理咨询，仍无法正常进食。</p>
             <p>三、去年她以「2002 年生」的身份申请《高等 Rapper 2》。她本人多次想说出真实年龄与身份，但因内外部的状况与压力只能沉默；当时她是无名歌手，每个机会都很珍贵。</p>
             <p>四、她的真实年龄不是传闻里的 37 岁，而是 28 岁（国际年龄 26 岁）；外界误以为她三十多岁，可能因为她从 24 岁（国际 22 岁）就开始做制作。</p>
-            <cite>CoronaX Entertainment 声明，2019-10-09，英文全文见 Koreaboo [1]</cite>
+            <cite>CoronaX Entertainment 声明，2019-10-09，英文全文见 Koreaboo <a class="cite-link" href="#src-1" aria-label="来源 1">[1]</a></cite>
           </div>
           <p>同一天，她自己在 YouTube 上传了《민티의 진실된 신상명세》，在镜头前出示身份证，讲了三件事：减 10 岁是因为「要报名就得是高中生年龄」；回头看那些 rap 视频「确实诡异又色情」，很后悔；已经开始心理治疗。</p>
           <p>这里的错位很典型：<strong>声明的因果是「压力 → 隐瞒」，公众读到的却是「想红 → 隐瞒」。</strong>两种读法都能在材料里找到支撑——她确实说过「当时是无名歌手，机会珍贵」，也确实是先做了「高中生人设」再去发歌。这就是为什么这件事到今天还没法一句话定性。</p>
@@ -530,7 +544,7 @@ body.report-page { background: var(--bg); }
         <section id="after">
           <div class="r-head"><span class="r-no">08</span><h2>后来：没有结局，只有日子</h2></div>
           <p>年龄风波之后，她基本离开了主流节目与音源榜单的中心，活动重心转到个人 YouTube 频道（目前约 5 万订阅）和小规模发行。2019 年那张《Arcadia》就是这段时期的作品——安静、清淡，和《You Do》几乎像两个人。</p>
-          <p>2026 年 6 月初，她因为一只寄养的怀孕猫突发急症，在 SNS 上公开筹款：手术与住院合计约 1,000 万韩元，后来公开了 538.9 万韩元的收据，承诺三个月内全额归还，并说明家人重病、自己又卷入诈骗受害，才一时拿不出钱（[7]）。同篇报道还提到，她此前被诉业务侵占，最终获无罪判决。</p>
+          <p>2026 年 6 月初，她因为一只寄养的怀孕猫突发急症，在 SNS 上公开筹款：手术与住院合计约 1,000 万韩元，后来公开了 538.9 万韩元的收据，承诺三个月内全额归还，并说明家人重病、自己又卷入诈骗受害，才一时拿不出钱（<a class="cite-link" href="#src-7" aria-label="来源 7">[7]</a>）。同篇报道还提到，她此前被诉业务侵占，最终获无罪判决。</p>
           <p>这两件事放在一起看，很像她这些年的处境：<strong>每一次求助都会被翻旧账，每一次翻旧账也都会有人替她说一句「她确实救了那只猫」。</strong>信任一旦透支，后面所有事都得先过一遍「她是不是又在演」。这不是网络暴力的问题，是造假这件事本身的长期利息。</p>
           <p>所以这篇不给「她活该」或「她已改过」的结论。事实摆在这里，判断留给读的人。</p>
 
@@ -543,14 +557,14 @@ body.report-page { background: var(--bg); }
           <div class="r-head"><span class="r-no">09</span><h2>来源</h2></div>
           <p>按文中编号排列。媒体材料只用于核对时间、引语与公开说法，不代表本站认同其评论立场。</p>
           <ul class="sources">
-            <li><span class="sn">01</span><span><a href="https://www.koreaboo.com/news/high-school-rapper-2-contestant-admits-lied-age-order-try-gain-popularity/" target="_blank" rel="noopener noreferrer">Koreaboo · “High School Rapper 2” Contestant Minty Admits She Lied About Her Age</a><span class="smeta">2019-10-09，含 CoronaX 声明英文全文（身份、进食障碍、年龄 28／26）</span></span></li>
-            <li><span class="sn">02</span><span><a href="https://www.chosun.com/site/data/html_dir/2019/10/10/2019101001590.html" target="_blank" rel="noopener noreferrer">朝鲜日报（体育朝鲜）· 민티, 나이 조작 논란 직접 해명</a><span class="smeta">2019-10-10，含「37 岁不是、28 岁」「减 10 岁」「洛丽塔争议后悔」等原话</span></span></li>
-            <li><span class="sn">03</span><span><a href="http://www.shturl.cc/e6848025a71c46e8e6cec0d45702c1c0" target="_blank" rel="noopener noreferrer">머니투데이 · 민티 “‘나이 조작’ 창피…‘로리타 논란’도 후회”</a><span class="smeta">2019-10-10，含「算数不好所以减 10 岁」「要报名就得是高中生年龄」</span></span></li>
-            <li><span class="sn">04</span><span><a href="http://www.shturl.cc/08cdcee2838d6ca7658f6a7a27f49c37" target="_blank" rel="noopener noreferrer">首尔经济 · ‘17세 래퍼’ 민티, 로리타 논란</a><span class="smeta">2018-02-23，首发单曲时间、歌词引语、本人回应、MV 描述</span></span></li>
-            <li><span class="sn">05</span><span><a href="https://star.fnnews.com/article/201802231629385888" target="_blank" rel="noopener noreferrer">fn스타 · 영악한 17세 민티, ‘고등래퍼2’ 지원도 안 했다</a><span class="smeta">2018-02-23，CJ E&amp;M「没有递交申请」的原始报道，及首播前一日发歌的批评</span></span></li>
-            <li><span class="sn">06</span><span><a href="https://youtu.be/m1D3yLwfGpA" target="_blank" rel="noopener noreferrer">YouTube · 민티 Minty Official《죄송합니다.》</a><span class="smeta">2019-12-25，约 113 万次观看；发布时间、简介、播放量均以页面显示为准</span></span></li>
-            <li><span class="sn">07</span><span><a href="http://www.shturl.cc/92536c5af5235468ab9525a38d70f1be" target="_blank" rel="noopener noreferrer">OSEN · ‘고등래퍼2’ 민티 “가족 큰 병 걸리고 사기 피해 연루”</a><span class="smeta">2026-06-02，猫手术筹款金额、收据、还款承诺；同文提及业务侵占获无罪</span></span></li>
-            <li><span class="sn">08</span><span><a href="https://music.apple.com/id/artist/%EB%AF%BC%ED%8B%B0/1433495506" target="_blank" rel="noopener noreferrer">Apple Music · 민티 作品列表</a><span class="smeta">核对《You Do》(2018)、《Arcadia》(2019) 的发行年份与曲目</span></span></li>
+            <li id="src-01"><span class="sn">01</span><span><a href="https://www.koreaboo.com/news/high-school-rapper-2-contestant-admits-lied-age-order-try-gain-popularity/" target="_blank" rel="noopener noreferrer">Koreaboo · “High School Rapper 2” Contestant Minty Admits She Lied About Her Age</a><span class="smeta">2019-10-09，含 CoronaX 声明英文全文（身份、进食障碍、年龄 28／26）</span></span></li>
+            <li id="src-02"><span class="sn">02</span><span><a href="https://www.chosun.com/site/data/html_dir/2019/10/10/2019101001590.html" target="_blank" rel="noopener noreferrer">朝鲜日报（体育朝鲜）· 민티, 나이 조작 논란 직접 해명</a><span class="smeta">2019-10-10，含「37 岁不是、28 岁」「减 10 岁」「洛丽塔争议后悔」等原话</span></span></li>
+            <li id="src-03"><span class="sn">03</span><span><a href="http://www.shturl.cc/e6848025a71c46e8e6cec0d45702c1c0" target="_blank" rel="noopener noreferrer">머니투데이 · 민티 “‘나이 조작’ 창피…‘로리타 논란’도 후회”</a><span class="smeta">2019-10-10，含「算数不好所以减 10 岁」「要报名就得是高中生年龄」</span></span></li>
+            <li id="src-04"><span class="sn">04</span><span><a href="http://www.shturl.cc/08cdcee2838d6ca7658f6a7a27f49c37" target="_blank" rel="noopener noreferrer">首尔经济 · ‘17세 래퍼’ 민티, 로리타 논란</a><span class="smeta">2018-02-23，首发单曲时间、歌词引语、本人回应、MV 描述</span></span></li>
+            <li id="src-05"><span class="sn">05</span><span><a href="https://star.fnnews.com/article/201802231629385888" target="_blank" rel="noopener noreferrer">fn스타 · 영악한 17세 민티, ‘고등래퍼2’ 지원도 안 했다</a><span class="smeta">2018-02-23，CJ E&amp;M「没有递交申请」的原始报道，及首播前一日发歌的批评</span></span></li>
+            <li id="src-06"><span class="sn">06</span><span><a href="https://youtu.be/m1D3yLwfGpA" target="_blank" rel="noopener noreferrer">YouTube · 민티 Minty Official《죄송합니다.》</a><span class="smeta">2019-12-25，约 113 万次观看；发布时间、简介、播放量均以页面显示为准</span></span></li>
+            <li id="src-07"><span class="sn">07</span><span><a href="http://www.shturl.cc/92536c5af5235468ab9525a38d70f1be" target="_blank" rel="noopener noreferrer">OSEN · ‘고등래퍼2’ 민티 “가족 큰 병 걸리고 사기 피해 연루”</a><span class="smeta">2026-06-02，猫手术筹款金额、收据、还款承诺；同文提及业务侵占获无罪</span></span></li>
+            <li id="src-08"><span class="sn">08</span><span><a href="https://music.apple.com/id/artist/%EB%AF%BC%ED%8B%B0/1433495506" target="_blank" rel="noopener noreferrer">Apple Music · 민티 作品列表</a><span class="smeta">核对《You Do》(2018)、《Arcadia》(2019) 的发行年份与曲目</span></span></li>
           </ul>
 
           <div class="report-endlinks">
