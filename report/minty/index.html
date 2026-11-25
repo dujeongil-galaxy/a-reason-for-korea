@@ -240,6 +240,56 @@ body.report-page { background: var(--bg); }
   box-shadow: 0 0 0 10px color-mix(in srgb, var(--accent-soft) 70%, transparent);
 }
 
+/* 维基式引用浮卡：悬停/点角标弹出，点卡片跳到文末来源 */
+.cite-pop {
+  position: absolute; z-index: 80;
+  width: min(336px, calc(100vw - 24px));
+  padding: 14px 16px 12px;
+  background: var(--surface); color: var(--ink);
+  border: 1px solid var(--line-strong); border-radius: 14px;
+  box-shadow: var(--shadow); text-align: left;
+}
+.cite-pop[hidden] { display: none; }
+.cite-pop-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin-bottom: 9px;
+}
+.cite-pop-no {
+  font-family: var(--mono); font-size: 10px; letter-spacing: .1em; color: var(--accent);
+}
+.cite-pop-close {
+  border: 0; background: none; padding: 2px 4px; cursor: pointer;
+  color: var(--ink-faint); font-size: 15px; line-height: 1;
+}
+.cite-pop-close:hover { color: var(--accent); }
+.cite-pop-title {
+  font-family: var(--serif); font-size: 14.5px; font-weight: 700;
+  line-height: 1.65; margin: 0 0 6px;
+}
+.cite-pop-meta {
+  font-family: var(--mono); font-size: 10px; color: var(--ink-faint);
+  margin: 0 0 9px; letter-spacing: .02em;
+}
+.cite-pop-body {
+  font-size: 12.5px; line-height: 1.95; color: var(--ink-soft);
+  margin: 0 0 11px;
+}
+.cite-pop-jump {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--accent); text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
+}
+.cite-pop-jump:hover { border-bottom-color: var(--accent); }
+.cite-pop-tip {
+  display: block; margin: 7px 0 0;
+  font-family: var(--mono); font-size: 9.5px;
+  color: var(--ink-faint); letter-spacing: .04em;
+}
+@media (max-width: 720px) {
+  .cite-pop { width: calc(100vw - 20px); }
+  .cite-pop-tip { display: none; }
+}
+
 @media (max-width: 720px) {
   .fact-table { font-size: 12.5px; }
   .fact-table thead { display: none; }
@@ -557,14 +607,14 @@ body.report-page { background: var(--bg); }
           <div class="r-head"><span class="r-no">09</span><h2>来源</h2></div>
           <p>按文中编号排列。媒体材料只用于核对时间、引语与公开说法，不代表本站认同其评论立场。</p>
           <ul class="sources">
-            <li id="src-01"><span class="sn">01</span><span><a href="https://www.koreaboo.com/news/high-school-rapper-2-contestant-admits-lied-age-order-try-gain-popularity/" target="_blank" rel="noopener noreferrer">Koreaboo · “High School Rapper 2” Contestant Minty Admits She Lied About Her Age</a><span class="smeta">2019-10-09，含 CoronaX 声明英文全文（身份、进食障碍、年龄 28／26）</span></span></li>
-            <li id="src-02"><span class="sn">02</span><span><a href="https://www.chosun.com/site/data/html_dir/2019/10/10/2019101001590.html" target="_blank" rel="noopener noreferrer">朝鲜日报（体育朝鲜）· 민티, 나이 조작 논란 직접 해명</a><span class="smeta">2019-10-10，含「37 岁不是、28 岁」「减 10 岁」「洛丽塔争议后悔」等原话</span></span></li>
-            <li id="src-03"><span class="sn">03</span><span><a href="http://www.shturl.cc/e6848025a71c46e8e6cec0d45702c1c0" target="_blank" rel="noopener noreferrer">머니투데이 · 민티 “‘나이 조작’ 창피…‘로리타 논란’도 후회”</a><span class="smeta">2019-10-10，含「算数不好所以减 10 岁」「要报名就得是高中生年龄」</span></span></li>
-            <li id="src-04"><span class="sn">04</span><span><a href="http://www.shturl.cc/08cdcee2838d6ca7658f6a7a27f49c37" target="_blank" rel="noopener noreferrer">首尔经济 · ‘17세 래퍼’ 민티, 로리타 논란</a><span class="smeta">2018-02-23，首发单曲时间、歌词引语、本人回应、MV 描述</span></span></li>
-            <li id="src-05"><span class="sn">05</span><span><a href="https://star.fnnews.com/article/201802231629385888" target="_blank" rel="noopener noreferrer">fn스타 · 영악한 17세 민티, ‘고등래퍼2’ 지원도 안 했다</a><span class="smeta">2018-02-23，CJ E&amp;M「没有递交申请」的原始报道，及首播前一日发歌的批评</span></span></li>
-            <li id="src-06"><span class="sn">06</span><span><a href="https://youtu.be/m1D3yLwfGpA" target="_blank" rel="noopener noreferrer">YouTube · 민티 Minty Official《죄송합니다.》</a><span class="smeta">2019-12-25，约 113 万次观看；发布时间、简介、播放量均以页面显示为准</span></span></li>
-            <li id="src-07"><span class="sn">07</span><span><a href="http://www.shturl.cc/92536c5af5235468ab9525a38d70f1be" target="_blank" rel="noopener noreferrer">OSEN · ‘고등래퍼2’ 민티 “가족 큰 병 걸리고 사기 피해 연루”</a><span class="smeta">2026-06-02，猫手术筹款金额、收据、还款承诺；同文提及业务侵占获无罪</span></span></li>
-            <li id="src-08"><span class="sn">08</span><span><a href="https://music.apple.com/id/artist/%EB%AF%BC%ED%8B%B0/1433495506" target="_blank" rel="noopener noreferrer">Apple Music · 민티 作品列表</a><span class="smeta">核对《You Do》(2018)、《Arcadia》(2019) 的发行年份与曲目</span></span></li>
+            <li id="src-1"><span class="sn">01</span><span><a href="https://www.koreaboo.com/news/high-school-rapper-2-contestant-admits-lied-age-order-try-gain-popularity/" target="_blank" rel="noopener noreferrer">Koreaboo · “High School Rapper 2” Contestant Minty Admits She Lied About Her Age</a><span class="smeta">2019-10-09，含 CoronaX 声明英文全文（身份、进食障碍、年龄 28／26）</span></span></li>
+            <li id="src-2"><span class="sn">02</span><span><a href="https://www.chosun.com/site/data/html_dir/2019/10/10/2019101001590.html" target="_blank" rel="noopener noreferrer">朝鲜日报（体育朝鲜）· 민티, 나이 조작 논란 직접 해명</a><span class="smeta">2019-10-10，含「37 岁不是、28 岁」「减 10 岁」「洛丽塔争议后悔」等原话</span></span></li>
+            <li id="src-3"><span class="sn">03</span><span><a href="http://www.shturl.cc/e6848025a71c46e8e6cec0d45702c1c0" target="_blank" rel="noopener noreferrer">머니투데이 · 민티 “‘나이 조작’ 창피…‘로리타 논란’도 후회”</a><span class="smeta">2019-10-10，含「算数不好所以减 10 岁」「要报名就得是高中生年龄」</span></span></li>
+            <li id="src-4"><span class="sn">04</span><span><a href="http://www.shturl.cc/08cdcee2838d6ca7658f6a7a27f49c37" target="_blank" rel="noopener noreferrer">首尔经济 · ‘17세 래퍼’ 민티, 로리타 논란</a><span class="smeta">2018-02-23，首发单曲时间、歌词引语、本人回应、MV 描述</span></span></li>
+            <li id="src-5"><span class="sn">05</span><span><a href="https://star.fnnews.com/article/201802231629385888" target="_blank" rel="noopener noreferrer">fn스타 · 영악한 17세 민티, ‘고등래퍼2’ 지원도 안 했다</a><span class="smeta">2018-02-23，CJ E&amp;M「没有递交申请」的原始报道，及首播前一日发歌的批评</span></span></li>
+            <li id="src-6"><span class="sn">06</span><span><a href="https://youtu.be/m1D3yLwfGpA" target="_blank" rel="noopener noreferrer">YouTube · 민티 Minty Official《죄송합니다.》</a><span class="smeta">2019-12-25，约 113 万次观看；发布时间、简介、播放量均以页面显示为准</span></span></li>
+            <li id="src-7"><span class="sn">07</span><span><a href="http://www.shturl.cc/92536c5af5235468ab9525a38d70f1be" target="_blank" rel="noopener noreferrer">OSEN · ‘고등래퍼2’ 민티 “가족 큰 병 걸리고 사기 피해 연루”</a><span class="smeta">2026-06-02，猫手术筹款金额、收据、还款承诺；同文提及业务侵占获无罪</span></span></li>
+            <li id="src-8"><span class="sn">08</span><span><a href="https://music.apple.com/id/artist/%EB%AF%BC%ED%8B%B0/1433495506" target="_blank" rel="noopener noreferrer">Apple Music · 민티 作品列表</a><span class="smeta">核对《You Do》(2018)、《Arcadia》(2019) 的发行年份与曲目</span></span></li>
           </ul>
 
           <div class="report-endlinks">
@@ -601,6 +651,115 @@ body.report-page { background: var(--bg); }
     frame.innerHTML = '';
     frame.appendChild(iframe);
   });
+})();
+</script>
+<script>
+/* 维基式引用浮卡：hover / 点 [n] 弹简要，点卡片跳到文末来源 */
+(function () {
+  var DATA = {
+    1: { title: 'Koreaboo · 英文报道', meta: '2019-10-09 · 含 CoronaX 声明全文',
+         body: '公司承认她是 Alpaca Production 代表、Girls’ Alert 制作人 Sorina；同时公开进食障碍与真实年龄——28 岁（国际 26），并否认「37 岁」的说法。' },
+    2: { title: '朝鲜日报（体育朝鲜）', meta: '2019-10-10 · 道歉视频原话',
+         body: '她出示身份证，说「不是 37 岁，是 28 岁」；减 10 岁的原因是「要报名《高等 Rapper》就得是高中生年龄」；对洛丽塔争议说「回头看确实诡异又色情，很后悔」。' },
+    3: { title: '머니투데이（Money Today）', meta: '2019-10-10 · 同日另一版记录',
+         body: '补足「算数不好，所以从原年龄减了 10 岁」这句；也记下她对「饿着成员」「对成员有自卑感」传闻的回应，以及「以后不做刺激或虚假的样子」。' },
+    4: { title: '首尔经济', meta: '2018-02-23 · 洛丽塔争议首发',
+         body: '记录 2 月 22 日发歌与 MV；引「姐姐不是洛丽塔，是性感概念」「我不想当小孩，想当阿琳」两句歌词；本人当天在 SNS 否认性暗示。' },
+    5: { title: 'fn스타', meta: '2018-02-23 · 节目方口径',
+         body: '引 CJ E&M 原话：她没有向《高等 Rapper 2》递交申请。报道同时批评她在首播前一天发歌、用没申请过的节目名做宣传。' },
+    6: { title: 'YouTube · 原视频', meta: '2019-12-25 · 约 113 万次观看',
+         body: '《죄송합니다.》全长 9 分钟以上，简介称「与公司长谈后，判断用时间慢慢反省才是尽责」；本文的逐段摘要由 Monica（monica.im）生成。' },
+    7: { title: 'OSEN', meta: '2026-06-02 · 近况',
+         body: '为寄养的怀孕猫筹 1,000 万韩元手术费，公开 538.9 万韩元收据并承诺三个月内归还；同篇提到她此前被诉业务侵占，获无罪判决。' },
+    8: { title: 'Apple Music', meta: '作品页 · 年份核对',
+         body: '用于核对《You Do》(2018)、《Arcadia》(2019) 的发行年份与曲目，避免把两首歌混成同一件事。' }
+  };
+
+  var pop = document.createElement('div');
+  pop.className = 'cite-pop';
+  pop.hidden = true;
+  pop.setAttribute('role', 'dialog');
+  pop.setAttribute('aria-label', '引用来源简要');
+  document.body.appendChild(pop);
+
+  var pinned = false, current = null, hideTimer = null;
+
+  function build(n) {
+    var d = DATA[n];
+    if (!d) return;
+    pop.innerHTML =
+      '<div class="cite-pop-head"><span class="cite-pop-no">来源 ' + n + ' / 8</span>' +
+      '<button class="cite-pop-close" type="button" aria-label="关闭">×</button></div>' +
+      '<p class="cite-pop-title">' + d.title + '</p>' +
+      '<p class="cite-pop-meta">' + d.meta + '</p>' +
+      '<p class="cite-pop-body">' + d.body + '</p>' +
+      '<a class="cite-pop-jump" href="#src-' + n + '">查看第 ' + n + ' 条来源 <span aria-hidden="true">↓</span></a>' +
+      '<span class="cite-pop-tip">点卡片直接跳</span>';
+  }
+
+  function place(link) {
+    var r = link.getBoundingClientRect();
+    var pw = pop.offsetWidth, ph = pop.offsetHeight;
+    var left = Math.min(Math.max(12, r.left + r.width / 2 - pw / 2), window.innerWidth - pw - 12);
+    var top = r.top + window.pageYOffset - ph - 10;
+    if (r.top < ph + 24) top = r.bottom + window.pageYOffset + 10;
+    pop.style.left = left + 'px';
+    pop.style.top = top + 'px';
+  }
+
+  function open(link, pin) {
+    var n = link.getAttribute('href').replace('#src-', '');
+    current = link;
+    pinned = !!pin;
+    build(n);
+    pop.hidden = false;
+    place(link);
+  }
+
+  function close() {
+    pop.hidden = true;
+    pinned = false;
+    current = null;
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.cite-link'), function (link) {
+    link.addEventListener('mouseenter', function () {
+      if (!window.matchMedia('(hover: hover)').matches) return;
+      clearTimeout(hideTimer);
+      if (!pinned) open(link, false);
+    });
+    link.addEventListener('mouseleave', function () {
+      if (pinned) return;
+      hideTimer = setTimeout(close, 220);
+    });
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (!pop.hidden && current === link) { close(); return; }
+      open(link, true);
+    });
+    link.addEventListener('focus', function () {
+      try { if (link.matches(':focus-visible')) open(link, false); } catch (err) {}
+    });
+  });
+
+  pop.addEventListener('mouseenter', function () { clearTimeout(hideTimer); });
+  pop.addEventListener('mouseleave', function () {
+    if (!pinned) hideTimer = setTimeout(close, 220);
+  });
+  pop.addEventListener('click', function (e) {
+    if (e.target.closest('.cite-pop-close')) { e.preventDefault(); close(); return; }
+    if (e.target.closest('.cite-pop-jump')) { close(); return; }
+    if (current) window.location.hash = current.getAttribute('href');
+    close();
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+  document.addEventListener('click', function (e) {
+    if (pop.hidden) return;
+    if (pop.contains(e.target) || e.target.closest('.cite-link')) return;
+    close();
+  });
+  window.addEventListener('scroll', function () { if (!pop.hidden) close(); }, { passive: true });
+  window.addEventListener('resize', function () { if (!pop.hidden) close(); });
 })();
 </script>
 </body>
