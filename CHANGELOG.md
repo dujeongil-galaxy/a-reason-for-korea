@@ -2,14 +2,25 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
-## 2026-11-26 · 提交身份上锁：pre-commit 拦截旧号邮箱（不改写历史）
+> **2026-11-26 历史重写**：本文件里 2026-11-25 16:52 之后的哈希是重写前的旧值，对照见 [HASH-MAP.md](HASH-MAP.md)。
+
+## 2026-11-26 · 历史重写：抹除旧号 dujeongil 的贡献归属
+
+- 站长明确要求「抹除」，不再只做拦截：用 `git filter-branch --env-filter` 把 15 条提交的 author/committer 邮箱从 `dujeongil@users.noreply.github.com` 改为 `dujeongil-galaxy@users.noreply.github.com`，并修正 1 条错拼署名 `dujeil-galaxy`。
+- 内容、时间、说明零改动；从 `4d5260a`（《奇皇后》那条）起共 **19 条提交换了哈希**，其余 144 条不变。
+- 生成 [HASH-MAP.md](HASH-MAP.md) 记录旧→新对照；README「提交身份」段落同步改口径。
+- 重写前完整备份：`D:\backup\a-reason-before-rewrite-20261126.bundle`（本地，不入库）。
+- 已删除 `refs/original/*`，`git log --all` 里旧邮箱出现次数为 0；新 HEAD 的作者/提交者均为 `dujeongil-galaxy`。
+- 代价：force push 覆盖远端；第二个克隆（`D:\Ai\WorkBuddy\2026-11-21-13-32-57`）会分叉，需要重新拉。
+
+## 2026-11-26 · 提交身份上锁：pre-commit 拦截旧号邮箱（先做的一步）
 
 - 站长发现贡献页多出 `dujeongil`（十年没用的旧账户）。查明原因：2026-11-25 有 **15 条提交**的 author/committer 邮箱是旧式 noreply `dujeongil@users.noreply.github.com`，GitHub 把它映射到同名旧号；其中一条署名还错拼成 `dujeil-galaxy`。本地当时配置是对的，问题来自另一个环境（云主机那边）沿用了旧格式。
 - 处理口径：**旧号名下没有仓库，不删号、不改写历史**（改写会让 CHANGELOG 里引用的真实提交号全部失效），只保证以后不再添名字。
 - 新增 `.githooks/pre-commit`：用 `git var GIT_AUTHOR_IDENT` 取实际邮箱，`dujeongil@users.noreply.github.com` 直接 exit 1 并提示改法；其他 `*@users.noreply.github.com` 也拦（防挂到别人名下）；非 noreply 只警告。
 - 仓库本地配置固定：`user.name=dujeongil-galaxy`、`user.email=dujeongil-galaxy@users.noreply.github.com`、`core.hooksPath=.githooks`；README 补「提交身份（每个 clone 设一次）」与文件结构一行。
 - 自测：模拟旧邮箱 → 退出码 1、正确邮箱 → 退出码 0。
-- 遗留：那 15 条仍挂在旧号名下；要彻底抹掉只能 rewrite history + force push，判定为不划算。
+- 遗留：当时判定「不划算」未改写；**同日站长改要求为「抹除」，见上一条，已完成重写**。
 
 ## 2026-11-25 · 新增专题报道：Minty／《You Do》／年龄风波（中文单页）
 

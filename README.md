@@ -80,6 +80,7 @@ jp/index.html                 日文静态页（脚本生成，勿手改）
 ko/index.html                 韩文静态页（脚本生成，勿手改）
 report/minty/index.html       中文专题报道：Minty／《You Do》／年龄风波（独立单页，暂不翻译）
 .githooks/pre-commit          提交身份检查：拦截旧号邮箱 dujeongil@users.noreply.github.com
+HASH-MAP.md                   2026-11-26 历史重写的旧→新提交对照
 assets/styles.css             样式、响应式、语言字体栈、暗色模式、动效降级
 assets/i18n.js                en/jp/ko 译文 + 四语属性 / 运行时文案
 assets/app.js                 滚动淡入 / 点灯计数 / 理由卡片 / 复制
@@ -113,7 +114,7 @@ git config --local user.email "dujeongil-galaxy@users.noreply.github.com"
 git config --local core.hooksPath .githooks
 ```
 
-更稳的写法是用 GitHub 设置里带数字 ID 的 noreply：`<ID>+dujeongil-galaxy@users.noreply.github.com`。旧号名下没有别的东西，不删、也不改写历史——那 15 条会留在贡献页，改写历史会让 CHANGELOG 里引用的真实提交号失效。
+更稳的写法是用 GitHub 设置里带数字 ID 的 noreply：`<ID>+dujeongil-galaxy@users.noreply.github.com`。旧号名下没有别的东西，2026-11-26 已按站长要求**重写历史**把这 15 条改到新号名下（另修一条错拼的 `dujeil-galaxy`），贡献页上的 `dujeongil` 会随之消失。重写让 19 条提交换了哈希，旧→新对照见 [HASH-MAP.md](HASH-MAP.md)。
 
 ## 本地预览
 
