@@ -457,6 +457,10 @@ const LICENSED_SUB_EXTRA = {
   'zh/drama10': { url: 'https://app.primevideo.com/detail?gti=amzn1.dv.gti.a3b03bc3-0b7d-49e5-8eb1-6d80ac89dd13', label: '在 Prime Video 观看（订阅）' },
   'zh/film': { url: 'https://www.catchplay.com/tw/video/3ec4e52d-46b6-4b5e-aca4-f06ff0b46d45', label: '在 Catchplay 观看（订阅·台湾）' },
   'zh/drama11': { url: 'https://www.primevideo.com/-/zh_TW/detail/%E6%89%93%E6%9E%B6%E5%90%A7%EF%BC%8C%E9%AC%BC%E7%A5%9E/0HVE4CVQNSBVA7YGU5OYIR2H51', label: '在 Prime Video 观看（订阅）' },
+  /* 2026-11-25 站长「只要是正版平台，买断/短租/订阅均可」：港区《拥抱太阳的月亮》原 Netflix 条目已 404，
+     港区现存持牌渠道只有 Viu（Viu 官方稿件写「已上架 Viu，含粤语配音」，JustWatch 港区同日显示 1 季 HD 在架）。
+     港区站内搜索直达页，避免编造拿不到的商品 ID。 */
+  'zh/drama6': { url: 'https://www.viu.com/ott/hk/zh-hk/search?q=%E6%93%81%E6%8A%B1%E5%A4%AA%E9%99%BD%E7%9A%84%E6%9C%88%E4%BA%AE', label: '香港：Viu 观看（订阅）· 含粤语版' },
   'jp/drama6': { url: 'https://video.unext.jp/episode/SID0003538/ED00032550', label: 'U-NEXT で見る（定額制）' },
   'jp/drama10': { url: 'https://watch.amazon.co.jp/detail?gti=amzn1.dv.gti.a3b03bc3-0b7d-49e5-8eb1-6d80ac89dd13', label: 'Prime Video で見る（定額制）' },
   'jp/drama11': { url: 'https://watch.amazon.co.jp/detail?gti=amzn1.dv.gti.63df4c98-3660-43f4-8225-5159e6364658', label: 'Prime Video で見る（定額制）' },
@@ -516,7 +520,9 @@ const SUB_DOMAINS = [
   'https://fod.fujitv.co.jp/title/',
   'https://www.youtube.com/watch?',
   /* 2026-11-25：YouTube Movies 的 youtu.be 短链形式（本片韩区/日区租买入口）。 */
-  'https://youtu.be/'
+  'https://youtu.be/',
+  /* 2026-11-25 站长「正版平台不限计费方式」：港区《拥抱太阳的月亮》唯一在架渠道 Viu（订阅+粤语版）。 */
+  'https://www.viu.com/ott/hk/'
 ];
 /* SEO（2026-11-22 站长指令：按推荐执行 A+C+D 长尾）。
    title / description 关键词前置、金句后置；旧文艺标题不得回退。

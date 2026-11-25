@@ -441,3 +441,9 @@
 - 规则二：`itunes.apple.com/search`（Search API，media=movie）对日区韩片经常返回空数组，这**不是**「日区无上架」的证据——Apple TV 的商品页会 404、API 会空，但 YouTube Movies 里照样有日区租买。查「有没有正版」必须多源交叉（JustWatch 区页 + YouTube playability + Apple TV 商品页实探），任一源为空都不能单独下结论。
 - 规则三（连带）：把一个区的「无渠道」改成「有渠道」，要同时动四处——`assets/i18n.js` 该语 actions、`PICKS_ACTIONS_EXPECT.<lang>.primary`、`PICKS_PRIMARY_LABEL.<lang>`、以及两条以 `primary: null` 为前提的故障注入（原来「硬塞按钮必判红」的用例，在有渠道后失效，要改成「错区按钮/aff 上主按钮必判红」）。否则 `SELF-TEST` 会出现 missed 或注入变空操作。
 - 规则四：副按钮用 `youtu.be` 短链时，`SUB_DOMAINS` 白名单要补 `https://youtu.be/`，否则报 `licensed platform outside allowlist`。
+
+## 63. 「港区只剩 Viu」时：别编商品 ID，也别把中国大陆打不开当成死链
+- 现象（2026-11-25 视频区复检）：港区《拥抱太阳的月亮》Netflix 条目 404 后，唯一在架渠道是 Viu（官方稿件写明含粤语配音）。但 Viu 站点按 IP 分区，中国大陆/机房出口一律 503，**拿不到 `/ott/hk/zh-hk/vod/<id>` 里的商品号**；随手编一个 `vod/418093` 这类数字，等于给自己埋一条点进去 404 的死链。
+- 规则一：拿不到商品 ID 时，挂**站内搜索直达页**（`https://www.viu.com/ott/hk/zh-hk/search?q=<剧名>`），并在按钮文案/校验注释里写清「这是港区站内搜索入口」；`SUB_DOMAINS` 用 `https://www.viu.com/ott/hk/` 前缀放行，别放行整站 `https://www.viu.com/`，免得日后有人挂个首页冒充商品页。
+- 规则二：「本机 curl 503」和「读者打不开」是两件事。Viu/Netflix/Tubi 这类按区授权的平台，机房出口被挡很正常；判死链要看**该区官方稿件或该区检索结果**（Viu 自家文章 + JustWatch 港区在架记录），而不是本机 HTTP 状态。反过来，上一轮判 Viki 死链是因为站长本人网络打不开——判定主体是「目标读者」，别把两个标准混用。
+- 规则三：四语复检要把「港/台/日/韩/美」逐区拉一遍再动手。本轮实查结论：港区《大长今》《我亲爱的朋友们》《无理的前进》《亲爱的恩东啊》与台区同名四部均无在架渠道，`tv.apple.com/hk` 四条商品页全 404，爱奇艺国际站只有剪辑；日区《恋にチアアップ！》未配信；美区《亲爱的恩东啊》只剩 Viki（站长已判不挂）。这些卡片保持 AFF 红字 + 区块提示，不硬凑。

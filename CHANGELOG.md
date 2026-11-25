@@ -2,6 +2,16 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-25 · 视频区按站长「正版平台不限计费方式」复检：港区《拥抱太阳的月亮》补挂 Viu
+
+- 站长指令：「补全视频区，4 语言版本，只要是正版平台，无论买断制还是短期租赁，或者会员订阅制，均可」。按此把四个语言页的视频卡（剧集 + 电影）逐张复检一遍，**能挂的真渠道就挂，挂不上的写清原因，绝不编号码**。
+- **补挂 1 处（港区）**：中文页《拥抱太阳的月亮》原 `netflix.com/title/80031790` 已于 2026-11-25 判 404 并移除，此后只剩 AFF 红字。港区现存唯一持牌渠道是 **Viu**：Viu 官方 2024-11 稿件写明该剧「已上架 Viu，并提供粤语配音」，JustWatch 港区同日检索显示 1 季 HD 在架。Viu 商品 ID 从中国大陆 IP 取不到（站点按地区 503），故挂**港区站内搜索直达页**并写明是搜索入口，不编 `vod/<id>`。按钮文案「香港：Viu 观看（订阅）· 含粤语版」，排在 featured AFF 之上，AFF 与红字原样保留。
+- **仍不挂（每条都留了证据）**：
+  - 港区《大长今》《我亲爱的朋友们》《无理的前进》《亲爱的恩东啊》：JustWatch 港区与台区逐条检索均为「not available for streaming」；`tv.apple.com/hk` 四条商品页实测 404；爱奇艺国际站只有剪辑与解说、无正版专辑页。
+  - 日区《无理的前进》（日文通行名《恋にチアアップ！》）：JustWatch 日区「まだ配信されていません」，`tv.apple.com/jp` 404。
+  - 美区《亲爱的恩东啊》：JustWatch 美区只剩 Rakuten Viki；本站 2026-11-24 已按站长判定 Viki 全站不挂，维持不挂。
+- **校验**：`SUB_DOMAINS` 增 `https://www.viu.com/ott/hk/`；`LICENSED_SUB_EXTRA` 增 `zh/drama6`（URL + 文案 + 位置的专项断言）。`VERIFY OK` **404 节点 / 63 属性 / 4 语**，自检 **247/247**。见 PITFALLS 63。
+
 ## 2026-11-25 · 影片卡 YouTube/Apple TV 复核：换租买版、日文页补 YouTube
 
 - `de82c72`：英文页 YouTube 副按钮由已下架（UNPLAYABLE）的免费带广告版 `watch?v=Ck9onnQBStU` 换成同片 YouTube Movies 租买版 `youtu.be/cflWf3XKeFI`（label `Rent or buy on YouTube`）；日文页 Apple TV `id1691528206` 原本已 404，本轮把「日区无任何渠道」改为挂 YouTube 租买主按钮（韩语原版，日区可租买），文案「YouTube でレンタル・購入する · 正版で応援しましょう」。
