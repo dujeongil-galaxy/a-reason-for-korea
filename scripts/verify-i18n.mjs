@@ -2902,13 +2902,13 @@ const faults = [
   { name: 'Audition Korean page switched to TW server', mutate: s => {
     s.pages.ko = s.pages.ko.replace(AUDITION_SERVER.ko, AUDITION_SERVER.en);
   } },
-  /* 2026-11-24 站长质疑《拥抱太阳的月亮》2012 年份来自盗版站，要求以 Netflix 为准。
-     真浏览器打开 Netflix 官方条目 title/80031790：中文界面「拥抱太阳的月亮 2012 TV-14」，
-     英文界面「The Moon Embracing the Sun 2012 20 Episodes」；维基/MBC 首播 2012-01-04。
-     结论：2012 正确且与盗版站无关。故障注入确认改成别的年份会判红。 */
-  { name: 'Moon Embracing the Sun year tampered from Netflix-verified 2012', mutate: s => {
-    s.source = s.source.replace('data-i18n="picks.drama6.label">剧集 · 2012', 'data-i18n="picks.drama6.label">剧集 · 2013');
-    s.pages.en = s.pages.en.replace('picks.drama6.label">TV series · 2012', 'picks.drama6.label">TV series · 2013');
+  /* 2026-11-25 站长反复强调「《拥抱太阳的月亮》不是 2012 年的」：改为同时标出拍摄年与播出年。
+     口径（MBC 官方 + 维基 + namu）：2011 年 12 月开机、2012 年 1 月 4 日—3 月 15 日在 MBC 播出，即
+     「拍摄／制作年份 2011–2012、播出年 2012」。卡片标签写 2011–2012，正文写清开机与首播时间；
+     校验仍强制 label 里出现播出年 2012（SORT_RULES 的年份序列据此排），把年份改掉照样判红。 */
+  { name: 'Moon Embracing the Sun film year stripped from the 2011-2012 label', mutate: s => {
+    s.source = s.source.replace('data-i18n="picks.drama6.label">剧集 · 2011–2012', 'data-i18n="picks.drama6.label">剧集 · 2013');
+    s.pages.en = s.pages.en.replace('picks.drama6.label">TV series · 2011–2012', 'picks.drama6.label">TV series · 2013');
   } },
   /* 2026-11-24 剑灵/天堂2：地区官网与同年精确日期故障注入。 */
   { name: 'Blade & Soul zh card switched from TW official site to NA site', mutate: s => {
