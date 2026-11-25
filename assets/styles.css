@@ -554,6 +554,10 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
 }
 .pick-link:hover { border-color: var(--accent); background: var(--surface-2); }
 .pick-link-featured { color: var(--accent); border-color: var(--accent); font-weight: 700; }
+/* 2026-11-25 站长「仅手机版优化此布局」：港区合租按钮在窄屏只留短文案，
+   完整定性（第三方合租平台、非 Netflix 官方渠道）改由下面的红字括注承担，
+   桌面端仍显示全文，不改信息量。 */
+.aff-label-short { display: none; }
 /* 订阅制渠道（站长 2026-11-22）：按区实查后在租买按钮与 aff 之上单独一行，明确标注「订阅」，
    不冒充买断、不挤掉 aff 入口 */
 .pick-link-sub {
@@ -715,6 +719,9 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
   .footer-meta { text-align: left; }
   .reason-form-row { flex-direction: column; }
   .reason-form-row button { padding: 12px 20px; }
+  /* 手机端：港区合租按钮换短文案，避免按钮折成两行 */
+  .aff-label-long { display: none; }
+  .aff-label-short { display: inline; }
 }
 
 /* 极窄屏（<=360px）：收紧头部，避免语言切换器把 320px 视口撑宽 */
