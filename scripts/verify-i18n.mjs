@@ -401,6 +401,11 @@ const DRAMA_NOTE = {
    只挂**非 Netflix** 的持牌订阅平台——Netflix 的入口就是那条红字 AFF，不许再挂 netflix.com 直链。
    表里没有的 lang/slug（该区只有 Netflix，或查无订阅渠道）一律禁挂订阅按钮。 */
 const DRAMA_SUB = {
+  /* 2026-11-25 站长「实在找不到就挂英语的」：日区《无理的前进》日区未配信，改挂英語圏美区两条（Kocowa 频道 + OnDemandKorea）。 */
+  'jp/drama2': [
+    { url: 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.7498e914-8cdf-4f9c-ad95-4342e43e3c90', label: '英語圏：Prime Video・Kocowa チャンネル（定額制）' },
+    { url: 'https://www.ondemandkorea.com/player/vod/cheer-up-0-1?contentId=1609890', label: '英語圏：OnDemandKorea（定額制）' }
+  ],
   'en/drama2': [
     {
       url: 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.7498e914-8cdf-4f9c-ad95-4342e43e3c90',
@@ -462,7 +467,8 @@ const ZH_OVERSEAS_OK = {
     'https://watch.amazon.com/detail?gti=amzn1.dv.gti.7498e914-8cdf-4f9c-ad95-4342e43e3c90',
     'https://www.ondemandkorea.com/player/vod/cheer-up-0-1?contentId=1609890'
   ],
-  drama13: ['https://tubitv.com/series/300010014/dear-my-friends']
+  drama13: ['https://tubitv.com/series/300010014/dear-my-friends'],
+  drama12: ['https://www.viki.com/tv/27377c-my-love-eun-dong']
 };
 
 const LICENSED_SUB_EXTRA = {
@@ -473,6 +479,11 @@ const LICENSED_SUB_EXTRA = {
      港区现存持牌渠道只有 Viu（Viu 官方稿件写「已上架 Viu，含粤语配音」，JustWatch 港区同日显示 1 季 HD 在架）。
      港区站内搜索直达页，避免编造拿不到的商品 ID。 */
   /* 2026-11-25 站长「找不到就换英语区」：港区无渠道三部改挂美区，文案写明「英文区」免得读者以为是港区入口。 */
+  /* 2026-11-25 站长「实在找不到就挂英语的，尽量不要空着」：Viki 从整站禁用收窄为「只禁两条实测打不开的旧剧集页」，
+     本条 27377c 实测 200 且标题匹配，作为美区唯一渠道挂上；日区《无理的前进》改挂英語圏美区入口。 */
+  'en/drama12': { url: 'https://www.viki.com/tv/27377c-my-love-eun-dong', label: 'Watch free on Viki (with ads)' },
+  'zh/drama12': { url: 'https://www.viki.com/tv/27377c-my-love-eun-dong', label: '英文区：Viki 观看（免费带广告）' },
+  'jp/drama2': { url: 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.7498e914-8cdf-4f9c-ad95-4342e43e3c90', label: '英語圏：Prime Video・Kocowa チャンネル（定額制）' },
   'zh/drama5': { url: 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.e409f09d-a4d5-4c1a-b092-1f58faa85fb4', label: '英文区：Prime Video · Kocowa 频道（订阅）' },
   'zh/drama2': { url: 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.7498e914-8cdf-4f9c-ad95-4342e43e3c90', label: '英文区：Prime Video · Kocowa 频道（订阅）' },
   'zh/drama13': { url: 'https://tubitv.com/series/300010014/dear-my-friends', label: '英文区：Tubi 观看（免费带广告）' },
@@ -508,7 +519,7 @@ const SUB_UNAVAILABLE = {
   ko: '시청 버튼이 없는 작품은 정식 스트리밍 서비스를 확인하지 못했으며 서비스가 종료되었을 수 있습니다.'
 };
 /* 已确认失效的订阅平台：Viki 三条剧集页实测打不开，四语一律禁挂。 */
-const DEAD_SUB_PLATFORMS = ['www.viki.com/tv/'];
+const DEAD_SUB_PLATFORMS = ['www.viki.com/tv/12699c-heirs', 'www.viki.com/tv/20503c-my-love-from-the-star'];
 /* 劲舞团服务器入口（2026-11-24 站长指定 + 外网核实）：
    zh=大陆国服；en/jp=台服（日服 X-BEAT 2016 关服）；ko=韩服 audition.hanbiton.com（仍在更新）。 */
 const AUDITION_SERVER = {
