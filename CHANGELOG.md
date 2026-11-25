@@ -2,6 +2,18 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-25 · 新增《奇皇后》(2013)：四语一卡四入口，不硬挂 Netflix
+
+- `4d5260a` — 站长要求新增 MBC《奇皇后》(기황후 / Empress Ki, 2013-10-28 ~ 2014-04-29, 51 集) 卡，口径沿用「正版平台不限买断/短租/订阅，尽量别空着」。
+- 逐区实查后落四个入口（都写清地区，不冒充本区）：
+  - 中文页（港区）→ Viu 站内搜索页（Viu 官方专题页列有该剧，含简中/英文字幕；商品 ID 从机房 IP 取不到，沿用 63 号坑的搜索页口径）
+  - 英文页（美区）→ Viki 商品页 `tv/37211c-empress-ki`（51 集、英文字幕，免费带广告 + 订阅；JustWatch 美区同日确认在架）
+  - 日文页（日区）→ U-NEXT 商品页 `title/SID0022475`（全 51 话；大陆 IP 503 属地区封锁）
+  - 韩文页（韩区）→ TVING 站内搜索结果页（拿不到 contents ID，文案写「검색」，不冒充商品页）
+- 有一处**故意留白**：Netflix 在 SG/SA/FR 等区确认有该剧（51 集），但 `netflix.com/title/<id>` 的 ID 取不到（Netflix 商品页与搜索页全 JS + 403），按「不编号码、不挂死链」的既有规则不挂；四页的港区 AFF 与红字提示照旧保留。
+- 位置按年份降序插在 `drama3`(星你, 2013-12-18) 与 `drama4`(继承者们, 2013-08-07) 之间：`SORT_RULES.drama.order` / `.year` 增 `drama14`(2013)，本地海报 `assets/empress-ki-poster.jpg`(500×750, MBC 官方物料)，四语 `label/imageCredit/title/desc/actions/note` + `imageAlt` 齐备。
+- 校验：`SUB_DOMAINS` 增 `https://video.unext.jp/title/`（日区 title 级商品页）与 `https://www.tving.com/search?keyword=`（韩区站内搜索）；`LICENSED_SUB_EXTRA` 增四条并锁 URL/文案/位置；`VERIFY OK 410 nodes / 64 attrs / 4 languages`，自检 **247/247**。
+
 ## 2026-11-25 · 《拥抱太阳的月亮》年份：2012 单写 → 2011–2012（拍摄年 + 播出年）
 
 - `db71938` — 站长多次强调「不是 2012 年的」。核对 MBC 官方页、维基、namu 后确认这部剧本身有**两个年份口径**：拍摄／制作年份 **2011 年 12 月开机**，播出年份 **2012 年 1 月 4 日—3 月 15 日（MBC 水木剧）**。之前卡片只写「2012 年 MBC 作品」，等于把播出年当成作品年，站长感到被无视是合理的。

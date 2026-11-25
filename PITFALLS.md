@@ -447,3 +447,10 @@
 - 规则一：拿不到商品 ID 时，挂**站内搜索直达页**（`https://www.viu.com/ott/hk/zh-hk/search?q=<剧名>`），并在按钮文案/校验注释里写清「这是港区站内搜索入口」；`SUB_DOMAINS` 用 `https://www.viu.com/ott/hk/` 前缀放行，别放行整站 `https://www.viu.com/`，免得日后有人挂个首页冒充商品页。
 - 规则二：「本机 curl 503」和「读者打不开」是两件事。Viu/Netflix/Tubi 这类按区授权的平台，机房出口被挡很正常；判死链要看**该区官方稿件或该区检索结果**（Viu 自家文章 + JustWatch 港区在架记录），而不是本机 HTTP 状态。反过来，上一轮判 Viki 死链是因为站长本人网络打不开——判定主体是「目标读者」，别把两个标准混用。
 - 规则三：四语复检要把「港/台/日/韩/美」逐区拉一遍再动手。本轮实查结论：港区《大长今》《我亲爱的朋友们》《无理的前进》《亲爱的恩东啊》与台区同名四部均无在架渠道，`tv.apple.com/hk` 四条商品页全 404，爱奇艺国际站只有剪辑；日区《恋にチアアップ！》未配信；美区《亲爱的恩东啊》只剩 Viki（站长已判不挂）。这些卡片保持 AFF 红字 + 区块提示，不硬凑。
+
+## 64. Netflix「多区在架」≠ 能挂链接：拿不到 title ID 就别挂
+- 现象（2026-11-25 新增《奇皇后》）：JustWatch 新加坡/沙特/法国页都明确写着该剧在 Netflix（51 集），但 `netflix.com/title/<id>` 里的 ID 从任何一路都取不到——Netflix 商品页与 `/search` 全 JS 渲染且对机房 IP 返回 403，`apis.justwatch.com` 403，第三方聚合页（MyDramaList、NeoDB、IMDb）同样 403/空。
+- 规则一：**区域在架 ≠ 可挂链接**。判「这一区能不能挂」要看能不能拿到**具体商品页 URL**，不是看有没有授权新闻；拿不到 ID 就按「无渠道」处理，别猜数字（猜出来就是死链）。
+- 规则二：同类平台的分工记清楚——Viki（`www.viki.com/tv/<id>c-<slug>`）、U-NEXT（`video.unext.jp/title/SID…` 或 `/episode/SID…/ED…`）、TVING（`tving.com/contents/P…`）、wavve（`wavve.com/player/vod?contentid=…`）、Prime/Kocowa（`watch.amazon.*/detail?gti=…`）都能拿到可核验的商品号；Netflix 基本只能靠 JustWatch/博文里被引用过的现成 ID。
+- 规则三：**title 级商品页和 episode 级要分开白名单**。U-NEXT 的 `https://video.unext.jp/episode/` 放行了不等于 `https://video.unext.jp/title/` 也能过；本轮就是靠新增 title 前缀才通过 410 节点的校验。
+- 规则四：站内搜索兜底要**在文案里写明**（TVING 写「검색해 보기」、Viu 写搜索直达），读者点进去看到的是搜索页而不是商品页，提前讲清楚比事后解释便宜。
