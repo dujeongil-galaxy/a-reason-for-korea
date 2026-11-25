@@ -201,4 +201,24 @@
       });
     });
   })();
+
+  /* 附页（appendix）在桌面端默认收起（站长 2026-11-25 指令）：
+     点击「附页：…」按钮才展开，再点一次收起；手机端不拦，保持原来的直接跳转。 */
+  (function () {
+    var desktop = window.matchMedia('(min-width: 721px)');
+    var APPENDIX_IDS = ['1thek-note', 'film-note'];
+    document.addEventListener('click', function (e) {
+      var a = e.target && e.target.closest ? e.target.closest('a') : null;
+      if (!a) return;
+      var href = a.getAttribute('href') || '';
+      if (href.charAt(0) !== '#' || href.length < 2) return;
+      var panel = document.getElementById(href.slice(1));
+      if (!panel || APPENDIX_IDS.indexOf(panel.id) < 0) return;
+      if (!desktop.matches) return;
+      e.preventDefault();
+      var open = panel.classList.toggle('is-open');
+      a.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  })();
 })();

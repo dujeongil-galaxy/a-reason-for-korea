@@ -758,3 +758,10 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
 .one-thek-links { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-wrap: wrap; gap: 14px; }
 .one-thek-links a { font-size: 13px; color: var(--accent); text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); padding-bottom: 2px; }
 .one-thek-links a:hover { border-bottom-color: var(--accent); }
+
+/* 附页折叠（2026-11-25 站长：PC 端默认隐藏、点击才显示）。
+   只在 >=721px 生效，手机端保持原来的常显 + 锚点跳转。 */
+@media (min-width: 721px) {
+  #1thek-note, #film-note { display: none; }
+  #1thek-note.is-open, #film-note.is-open { display: block; }
+}
