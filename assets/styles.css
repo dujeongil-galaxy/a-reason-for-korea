@@ -798,5 +798,6 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
   text-decoration: none;
   margin: 0 0 6px;
 }
+.learn-item-title span { font-size: .9em; opacity: .75; }
 .learn-item-desc { display: block; font-size: 13.5px; line-height: 1.85; color: var(--ink-soft); }
 .learn-item-note { display: block; font-size: 12.5px; line-height: 1.7; color: var(--ink-faint); margin-top: 8px; }
