@@ -122,5 +122,6 @@ python -m http.server 8000
 
 改动与真实提交号见 [CHANGELOG.md](CHANGELOG.md)，踩过的坑见 [PITFALLS.md](PITFALLS.md)。
 
-最近一笔：`ae20406`（2026-11-25）按站长「附页：影片档案，请放在加速器下方」把 `film.teaser` 从加速器小标题之前移到 `#picks-accelerators` 卡片网格之后（四语同步重生成），并把位置断言反转为「加速器网格之后、`#film-note` 之前」、四语各加一条同序断言，新增 2 条故障注入；`node scripts/build-i18n.mjs` + `node scripts/verify-i18n.mjs` 全绿（404 节点 / 63 属性 / 自检 247/247）。
+最近一笔：`de82c72`（2026-11-25）站长追问「YouTube 和 Apple TV 什么的，也核实没有吗？」——实查后：英文页原挂的 YouTube 免费带广告版 `Ck9onnQBStU` 已 UNPLAYABLE（死链），同片 YouTube Movies 租买版 `cflWf3XKeFI` 仍在（带 offerId、需付费），故英文页把副按钮换成「Rent or buy on YouTube」；日文页原 Apple TV `id1691528206` 已是 404 且 iTunes Search API 日区返回空（API 空≠无上架），改挂同一 YouTube 租买版为主按钮，`PICKS_ACTIONS_EXPECT.jp.primary` 由 `null` 改为 `youtube`、`PICKS_PRIMARY_LABEL.jp` 同步改文案、`LICENSED_SUB_EXTRA['en/film']` 换链接、`SUB_DOMAINS` 补 `https://youtu.be/`，两条以「日文页无渠道」为前提的故障注入改为「错区 Amazon / 港区 aff 上主按钮必判红」；`node scripts/build-i18n.mjs` + `node scripts/verify-i18n.mjs` 全绿（404 节点 / 63 属性 / 自检 247/247）。
+上一笔：`ae20406`（2026-11-25）按站长「附页：影片档案，请放在加速器下方」把 `film.teaser` 从加速器小标题之前移到 `#picks-accelerators` 卡片网格之后（四语同步重生成），并把位置断言反转为「加速器网格之后、`#film-note` 之前」、四语各加一条同序断言，新增 2 条故障注入；`node scripts/build-i18n.mjs` + `node scripts/verify-i18n.mjs` 全绿（404 节点 / 63 属性 / 自检 247/247）。
 上一笔：`dbd680e`（2026-11-25）按站长「中文找不到就推英文、尽可能补齐」补齐 10 处正版订阅（OnDemandKorea / FOD / wavve / TVING ×4 / Watcha / YouTube），并修掉 drama6 Netflix 与日文《哦！文姬》Apple TV 两条死链（自检 245/245）。

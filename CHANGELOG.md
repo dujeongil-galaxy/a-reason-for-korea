@@ -2,6 +2,12 @@
 
 本站按「改动必记账」维护：改完代码 → 跑校验 → 用**真实提交号**记一笔 → 踩到的新坑写进 [PITFALLS.md](PITFALLS.md)。
 
+## 2026-11-25 · 影片卡 YouTube/Apple TV 复核：换租买版、日文页补 YouTube
+
+- `de82c72`：英文页 YouTube 副按钮由已下架（UNPLAYABLE）的免费带广告版 `watch?v=Ck9onnQBStU` 换成同片 YouTube Movies 租买版 `youtu.be/cflWf3XKeFI`（label `Rent or buy on YouTube`）；日文页 Apple TV `id1691528206` 原本已 404，本轮把「日区无任何渠道」改为挂 YouTube 租买主按钮（韩语原版，日区可租买），文案「YouTube でレンタル・購入する · 正版で応援しましょう」。
+- 同步：`PICKS_ACTIONS_EXPECT.jp.primary` null→`youtube`、`PICKS_PRIMARY_LABEL.jp` 改文案、`LICENSED_SUB_EXTRA['en/film']` 换 URL/label、`SUB_DOMAINS` 增 `https://youtu.be/`；两条故障注入改为「日文页注入美区 Amazon 主按钮」「日文页注入港区 aff 主按钮」，自检仍 247/247 全红。
+- 结论口径：YouTube 免费版下架 ≠ 该片在 YouTube 消失（租买版仍在）；`itunes.apple.com/search` 日区返回空 ≠ 日区无上架，不能单独当判死依据（见 PITFALLS 62）。
+
 ## 2026-11-25 · 影片档案 teaser 移到加速器卡片下方（四语）+ 位置断言反转收紧
 
 - `ae20406` — 站长：「附页：影片档案，请放在加速器下方」。`index.html` 里 `<p class="archive-teaser picks-film-teaser reveal">` 从链游 credit 之后、加速器小标题之前，移到 `#picks-accelerators` 卡片网格闭合之后、picks 区块 `</section>` 之前；`node scripts/build-i18n.mjs` 重生成 `en/` `jp/` `ko/`，四语入口现在都在加速器下方、`#archive` 与 `#film-note` 之上。
