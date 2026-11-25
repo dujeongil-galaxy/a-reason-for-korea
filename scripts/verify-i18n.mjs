@@ -453,6 +453,18 @@ const DRAMA_SUB_EXTRA = {
 /* 2026-11-24 站长：中文按港区、港区没有退台湾区；英/日/韩按本区，正规正版订阅平台都可挂。
    给原本无订阅按钮但本区有正版的卡补齐（JustWatch 五区实查 + URL 逐条 curl 200 验证，
    排除 HBO Max 404 / Viki 死链 / Tencent onelink 跳转）。AFF 全部保留。写死防回归。 */
+/* 2026-11-25 站长「找不到就换英语区」：港区实查无持牌渠道的三部，中文页按美区正版挂（逐 URL 白名单，不做域名放行）。
+   drama5《大长今》港区/台区全无 → 美区 Kocowa 频道；drama13《我亲爱的朋友们》→ 美区 Tubi（免费带广告）；
+   drama2《无理的前进》→ 美区 Kocowa 频道 + OnDemandKorea。drama12《亲爱的恩东啊》美区只剩 Viki（已判不挂），继续留空。 */
+const ZH_OVERSEAS_OK = {
+  drama5: ['https://watch.amazon.com/detail?gti=amzn1.dv.gti.e409f09d-a4d5-4c1a-b092-1f58faa85fb4'],
+  drama2: [
+    'https://watch.amazon.com/detail?gti=amzn1.dv.gti.7498e914-8cdf-4f9c-ad95-4342e43e3c90',
+    'https://www.ondemandkorea.com/player/vod/cheer-up-0-1?contentId=1609890'
+  ],
+  drama13: ['https://tubitv.com/series/300010014/dear-my-friends']
+};
+
 const LICENSED_SUB_EXTRA = {
   'zh/drama10': { url: 'https://app.primevideo.com/detail?gti=amzn1.dv.gti.a3b03bc3-0b7d-49e5-8eb1-6d80ac89dd13', label: '在 Prime Video 观看（订阅）' },
   'zh/film': { url: 'https://www.catchplay.com/tw/video/3ec4e52d-46b6-4b5e-aca4-f06ff0b46d45', label: '在 Catchplay 观看（订阅·台湾）' },
@@ -460,6 +472,10 @@ const LICENSED_SUB_EXTRA = {
   /* 2026-11-25 站长「只要是正版平台，买断/短租/订阅均可」：港区《拥抱太阳的月亮》原 Netflix 条目已 404，
      港区现存持牌渠道只有 Viu（Viu 官方稿件写「已上架 Viu，含粤语配音」，JustWatch 港区同日显示 1 季 HD 在架）。
      港区站内搜索直达页，避免编造拿不到的商品 ID。 */
+  /* 2026-11-25 站长「找不到就换英语区」：港区无渠道三部改挂美区，文案写明「英文区」免得读者以为是港区入口。 */
+  'zh/drama5': { url: 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.e409f09d-a4d5-4c1a-b092-1f58faa85fb4', label: '英文区：Prime Video · Kocowa 频道（订阅）' },
+  'zh/drama2': { url: 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.7498e914-8cdf-4f9c-ad95-4342e43e3c90', label: '英文区：Prime Video · Kocowa 频道（订阅）' },
+  'zh/drama13': { url: 'https://tubitv.com/series/300010014/dear-my-friends', label: '英文区：Tubi 观看（免费带广告）' },
   'zh/drama6': { url: 'https://www.viu.com/ott/hk/zh-hk/search?q=%E6%93%81%E6%8A%B1%E5%A4%AA%E9%99%BD%E7%9A%84%E6%9C%88%E4%BA%AE', label: '香港：Viu 观看（订阅）· 含粤语版' },
   'jp/drama6': { url: 'https://video.unext.jp/episode/SID0003538/ED00032550', label: 'U-NEXT で見る（定額制）' },
   'jp/drama10': { url: 'https://watch.amazon.co.jp/detail?gti=amzn1.dv.gti.a3b03bc3-0b7d-49e5-8eb1-6d80ac89dd13', label: 'Prime Video で見る（定額制）' },
@@ -1034,7 +1050,9 @@ function verify(state) {
     /* 中文按港区（2026-11-24 站长定）：Netflix 港区正版按钮可挂；TVING/Viki/U-NEXT/wavve 等大陆不可用平台仍禁挂。 */
     const zhSubHrefs = [...actionsBlock.matchAll(/class="pick-link pick-link-sub"\s+href="([^"]+)"/g)].map(m => m[1]);
     for (const href of zhSubHrefs) {
-      if (!href.startsWith(NETFLIX_TITLE_PREFIX)) {
+      if (href.startsWith(NETFLIX_TITLE_PREFIX)) continue;
+      /* 2026-11-25 站长「中文找不到就换英文区」：只对下面逐条列名的 URL 开例外，域名级放行一律不许。 */
+      if (!(ZH_OVERSEAS_OK[slug] || []).includes(href)) {
         errors.push('zh: ' + slug + ' overseas subscription button forbidden on the Chinese page -> ' + href);
       }
     }
