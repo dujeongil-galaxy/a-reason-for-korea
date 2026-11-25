@@ -768,17 +768,8 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
 
 /* 后记：站长本人多年前的朋友圈，放在猫的尾句下面，字号退一级，不抢主句 */
 .footer-moment {
-  margin-top: 34px;
-  padding-top: 22px;
-  border-top: 1px solid rgba(0, 0, 0, .08);
+  margin-top: 28px;
   max-width: 640px;
-}
-.footer-moment-head {
-  font-family: var(--mono);
-  font-size: 11.5px;
-  letter-spacing: .1em;
-  opacity: .55;
-  margin: 0 0 12px;
 }
 .footer-moment-body {
   margin: 0 0 10px;
@@ -787,12 +778,4 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
   font-size: 14px;
   line-height: 1.95;
   color: var(--ink-soft);
-}
-.footer-moment-src {
-  font-size: 12px;
-  opacity: .55;
-  margin: 0;
-}
-@media (prefers-color-scheme: dark) {
-  .footer-moment { border-top-color: rgba(255, 255, 255, .16); }
 }
