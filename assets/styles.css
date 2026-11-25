@@ -762,8 +762,10 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
 /* 附页折叠（2026-11-25 站长：PC 端默认隐藏、点击才显示）。
    只在 >=721px 生效，手机端保持原来的常显 + 锚点跳转。 */
 @media (min-width: 721px) {
-  #1thek-note, #film-note { display: none; }
-  #1thek-note.is-open, #film-note.is-open { display: block; }
+  /* 注意：id 以数字开头，CSS 里不能写 #1thek-note（标识符不得以数字起始，整条规则会被丢弃），
+     必须用属性选择器 [id="..."]。 */
+  [id="1thek-note"], [id="film-note"] { display: none; }
+  [id="1thek-note"].is-open, [id="film-note"].is-open { display: block; }
 }
 
 /* 后记：站长本人多年前的朋友圈，放在猫的尾句下面，字号退一级，不抢主句 */

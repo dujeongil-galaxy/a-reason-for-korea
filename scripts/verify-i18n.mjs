@@ -768,6 +768,15 @@ function verify(state) {
   if (!/\.pick-desc a\s*\{[^}]*font-weight:\s*700[^}]*color:\s*#C5221F/.test(state.css)) {
     errors.push('css: inline links in pick-desc must be red and bold');
   }
+  /* 附页折叠（2026-11-25）：桌面端默认隐藏、点击才展开。
+     踩坑记录：id 以数字开头时 #1thek-note 是非法选择器，整条规则被浏览器丢弃，
+     必须写成属性选择器 [id="1thek-note"]，此处写死防回退。 */
+  if (!/@media \(min-width: 721px\) \{[^}]*\[id="1thek-note"\][^}]*display: none/.test(state.css)) {
+    errors.push('css: appendix must be hidden by default on desktop ([id="1thek-note"])');
+  }
+  if (!/\[id="1thek-note"\]\.is-open[^{]*\{[^}]*display:\s*block/.test(state.css)) {
+    errors.push('css: appendix must use the .is-open state to reveal itself');
+  }
   if (!/\.picks-chain-credit\s*\{[^}]*font-weight:\s*700/.test(state.css)) {
     errors.push('css: chain credit note must be bold');
   }
