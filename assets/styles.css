@@ -166,6 +166,59 @@ ol, ul { padding: 0; list-style: none; }
 }
 .header-repo:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
 
+/* ---------- 手机端导航（2026-11-27 站长指令） ----------
+   一级 = 头部菜单键（在语言切换 CN 左边）；二级 = 导航项；
+   三级 = 站长推荐子项，从**左侧**展开（translateX(-100%) 起步），不是从右边。
+   桌面端整块隐藏（.nav-toggle / .mobile-nav 默认 display:none）。 */
+.nav-toggle {
+  display: none; align-items: center; gap: 6px; flex: none;
+  padding: 4px 10px; border: 1px solid var(--line-strong); border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  color: var(--ink-soft); font-family: inherit; font-size: 11.5px; line-height: 1.45;
+  cursor: pointer; transition: color .2s, border-color .2s, background .2s;
+}
+.nav-toggle:hover { color: var(--accent); border-color: var(--accent); }
+.nav-toggle[aria-expanded="true"] { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+.nav-toggle-bars { display: inline-flex; flex-direction: column; justify-content: space-between; width: 13px; height: 9px; }
+.nav-toggle-bars i { display: block; height: 1.5px; background: currentColor; border-radius: 2px; }
+
+.mobile-nav { display: none; }
+.mobile-nav[hidden] { display: none; }
+.mobile-nav-stack { position: relative; padding: 10px 0 40px; }
+.mobile-nav-pane { display: flex; flex-direction: column; }
+.mobile-nav-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  width: 100%; padding: 14px 2px; border: 0; border-bottom: 1px solid var(--line);
+  background: none; font-family: inherit; font-size: 16px; color: var(--ink);
+  text-align: left; text-decoration: none; cursor: pointer;
+}
+.mobile-nav-parent { font-weight: 600; }
+.mobile-nav-caret {
+  width: 8px; height: 8px; flex: none; margin-right: 4px;
+  border-right: 1.5px solid var(--ink-faint); border-bottom: 1.5px solid var(--ink-faint);
+  transform: rotate(-45deg);
+}
+.mobile-nav-pane-main { transition: transform .28s cubic-bezier(.2,.7,.3,1), opacity .28s; }
+.mobile-nav-pane-sub {
+  position: absolute; top: 0; left: 0; right: 0; background: var(--bg);
+  transform: translateX(-100%); opacity: 0; pointer-events: none;
+  transition: transform .28s cubic-bezier(.2,.7,.3,1), opacity .28s;
+}
+.mobile-nav.is-sub-open .mobile-nav-pane-main { transform: translateX(24px); opacity: .25; }
+.mobile-nav.is-sub-open .mobile-nav-pane-sub { transform: translateX(0); opacity: 1; pointer-events: auto; }
+.mobile-nav-subitem { padding-left: 18px; color: var(--ink-soft); }
+.mobile-nav-back {
+  display: inline-flex; align-items: center; gap: 8px; align-self: flex-start;
+  margin: 2px 0 8px; padding: 10px 2px; border: 0; background: none;
+  font-family: inherit; font-size: 13px; color: var(--ink-faint); cursor: pointer;
+}
+.mobile-nav-back-arrow {
+  width: 7px; height: 7px; flex: none;
+  border-left: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+}
+body.nav-open { overflow: hidden; }
+
 /* ---------- hero ---------- */
 .hero {
   position: relative; overflow: hidden;
@@ -706,7 +759,15 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
   .header-inner { height: 60px; gap: 12px; }
   .site-nav { display: none; }
   .header-repo { display: none; }
-  .lang-switch { margin-left: auto; }
+  /* 手机端：一级菜单键在语言切换（CN）左边，面板铺满头部以下 */
+  .nav-toggle { display: inline-flex; margin-left: auto; }
+  .lang-switch { margin-left: 0; }
+  .mobile-nav {
+    display: block; position: absolute; top: 100%; left: 0; right: 0;
+    height: calc(100vh - 60px); height: calc(100dvh - 60px);
+    overflow-y: auto; overscroll-behavior: contain;
+    background: var(--bg); border-top: 1px solid var(--line);
+  }
   .brand { font-size: 15px; }
   .hero h1 { font-size: clamp(2.5rem, 11vw, 3.6rem); }
   .scroll-hint { display: none; }
@@ -727,11 +788,24 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
   .aff-label-short { display: inline; }
 }
 
+/* 手机窄屏（<=430px）：菜单键只留图标 + 品牌名可省略号截断 + 语言胶囊收紧，
+   保证中英日韩四种品牌名长度下头部都不横向溢出 */
+@media (max-width: 430px) {
+  .brand { font-size: 13px; min-width: 0; }
+  .brand span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .lang-switch a { min-width: 28px; padding: 4px 6px; }
+  .nav-toggle { padding: 4px 8px; }
+  .nav-toggle-text { display: none; }
+}
+
 /* 极窄屏（<=360px）：收紧头部，避免语言切换器把 320px 视口撑宽 */
 @media (max-width: 360px) {
   .header-inner { gap: 8px; }
-  .brand { font-size: 14px; }
+  .brand { font-size: 12px; }
   .lang-switch a { min-width: 30px; padding: 4px 7px; }
+  /* 320px 视口：菜单键只留图标，避免和语言切换一起把头部撑宽 */
+  .nav-toggle { padding: 4px 6px; }
+  .nav-toggle-text { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

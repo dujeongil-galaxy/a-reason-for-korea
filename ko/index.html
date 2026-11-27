@@ -56,6 +56,10 @@
         </div>
       </div>
     </nav>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="내비게이션 메뉴 열기" data-i18n-aria-label="aria.navToggle">
+      <span class="nav-toggle-bars" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="nav-toggle-text" data-i18n="nav.toggle">메뉴</span>
+    </button>
     <div class="lang-switch" role="group" aria-label="언어" data-i18n-aria-label="aria.langSwitch">
       <a data-lang-link="zh" href="../" lang="zh"><span class="lang-long">中文</span><span class="lang-short" aria-hidden="true">CN</span></a>
       <a data-lang-link="en" href="../en/" lang="en"><span class="lang-long">English</span><span class="lang-short" aria-hidden="true">EN</span></a>
@@ -63,6 +67,31 @@
       <a data-lang-link="ko" href="../ko/" lang="ko" class="is-current" aria-current="page"><span class="lang-long">한국어</span><span class="lang-short" aria-hidden="true">KR</span></a>
     </div>
     <a class="header-repo" href="https://github.com/dujeongil-galaxy/a-reason-for-korea" target="_blank" rel="noopener noreferrer" aria-label="GitHub에서 소스 보기 (새 탭에서 열림)" data-i18n-aria-label="aria.repo" data-i18n="repo">소스 <span aria-hidden="true">↗</span></a>
+  </div>
+  <!-- 手机端导航：一级=菜单键 · 二级=导航项 · 三级=站长推荐子项（从左侧展开） -->
+  <div class="mobile-nav" id="mobile-nav" hidden>
+    <div class="wrap mobile-nav-stack">
+      <nav class="mobile-nav-pane mobile-nav-pane-main" aria-label="페이지 내 탐색" data-i18n-aria-label="aria.navMobile">
+        <a class="mobile-nav-item" href="#origin" data-i18n="nav.origin">시작</a>
+        <a class="mobile-nav-item" href="#reasons" data-i18n="nav.reasons">이유</a>
+        <a class="mobile-nav-item" href="#lamp" data-i18n="nav.lamp">불 켜기</a>
+        <a class="mobile-nav-item" href="#reading" data-i18n="nav.reading">더 읽기</a>
+        <button class="mobile-nav-item mobile-nav-parent" type="button" aria-expanded="false" aria-controls="mobile-nav-picks">
+          <span data-i18n="nav.picks">운영자 추천</span>
+          <span class="mobile-nav-caret" aria-hidden="true"></span>
+        </button>
+      </nav>
+      <nav class="mobile-nav-pane mobile-nav-pane-sub" id="mobile-nav-picks" aria-label="운영자 추천" data-i18n-aria-label="aria.navPicks" hidden>
+        <button class="mobile-nav-back" type="button">
+          <span class="mobile-nav-back-arrow" aria-hidden="true"></span>
+          <span data-i18n="nav.back">뒤로</span>
+        </button>
+        <a class="mobile-nav-item mobile-nav-subitem" href="#picks-dramas" data-i18n="nav.picks.drama">한국 드라마 보기</a>
+        <a class="mobile-nav-item mobile-nav-subitem" href="#picks-kpop" data-i18n="nav.picks.kpop">K-pop 듣기</a>
+        <a class="mobile-nav-item mobile-nav-subitem" href="#picks-pc-games" data-i18n="nav.picks.game">게임 하기</a>
+        <a class="mobile-nav-item mobile-nav-subitem" href="#picks-learn" data-i18n="nav.picks.learn">한국어 배우기</a>
+      </nav>
+    </div>
   </div>
 </header>
 

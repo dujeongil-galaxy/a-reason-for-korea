@@ -463,3 +463,13 @@
 - **规则三（登记别漏）**：新增音乐卡要同步登记 `KPOP_SLUGS`、`KPOP_IMAGE`、`KPOP_ZH_LINK`、`KPOP_YT_ID`、`MUSIC_DATE`/`MUSIC_DATE_TEXT`、`SORT_RULES.music.order`+`year` 六处常量。只改 `index.html` 不登记 → 排序断言判红或漏检；只登记不排序 → 「按发行时间降序」判红。
 - **规则四（故障注入）**：新卡至少补一条真会判红的注入（如「中文页换成 YouTube」「网易云 MV ID 篡改」「精确发行日被抹」）。mutation 的 `.replace()` 源串要写对，源串不存在就成空操作，self-test 会报 missed（见 §43）。
 - **验收**：`node scripts/build-i18n.mjs` → `node scripts/verify-i18n.mjs` 全绿（`VERIFY OK` + `SELF-TEST n/n`），再本地起服务截音乐区确认卡片排第一、图在、按钮文案对。
+
+## 66. 手机端加导航：头部宽度按「最长的品牌名 × 最窄视口」算，不是按中文页算
+
+- **现象**：手机端在语言切换（CN）左边加菜单键后，390px 视口下头部立刻横向溢出——英文页品牌名 ‘One Good Reason’ 比中文「哈韩的一个理由」长近 35px，把 JP/KR 胶囊挤出屏幕；中文页当时看着是好的。
+- **规则一**：头部宽度必须按**四语里最长的那版** × **最窄视口（320px）** 算，并逐个视口量到 `document.documentElement.scrollWidth == window.innerWidth` 为止。本轮用 Edge headless 把页面塞进 320 / 360 / 390px 定宽 iframe 渲染，再把 `getBoundingClientRect` 的实测数字打进页面截图里读回来，中英各量一轮。
+- **规则二**：headless 的 `--window-size=390,844` **不等于** 390px 视口（本机实测被撑到 492px，截图再按 390 裁切，看起来就像溢出/被切）。要真机宽度，就把页面放进一个宽度固定的 iframe 里渲染（媒体查询按 iframe 视口算）。
+- **规则三**：省空间有先后顺序——先给文字加省略号截断（`.brand span { min-width: 0; overflow: hidden; text-overflow: ellipsis }`），再收品牌字号，再收语言胶囊，最后才砍按钮文字；别一上来就把菜单键的「菜单」两个字删掉。
+- **规则四**：「同一套文案整页出现 N 次」的旧断言会随新入口失效。本轮「听K-pop 整页 2 次、玩游戏 1 次」是按整页计数判的，手机端三级菜单复用同一文案后必然变成 3 次和 2 次 → 改成**按区块计数**（桌面下拉一次、手机面板一次），并补一条「音乐区小标题 = K-pop 下拉项文案」的比对顶上原来那条计数。
+- **另（两个易踩的 CSS/JS 细节）**：① `hidden` 属性会被作者样式里的 `display: block` 盖掉，必须显式写 `.mobile-nav[hidden] { display: none; }`；② 滑入动画要先去掉 `hidden` 再强制回流（`void el.offsetWidth`），否则看不到从屏外滑入的过程。
+- **验收**：真实点击跑一遍状态机（开 → 三级展开 → 返回 → 关），断言 `panel.hidden` / `aria-expanded` / `is-sub-open` / 背景滚动锁四组值，再跑 `build-i18n.mjs` + `verify-i18n.mjs` 全绿。

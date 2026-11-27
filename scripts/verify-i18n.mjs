@@ -817,11 +817,23 @@ function verify(state) {
   if (!source.includes('id="picks-kpop"')) errors.push('zh: picks-kpop music anchor missing');
   if (!source.includes('id="picks-pc-games"')) errors.push('zh: picks-pc-games anchor missing');
   if (!source.includes('id="picks-mobile-games"')) errors.push('zh: picks-mobile-games anchor missing');
-  if ((source.match(new RegExp(escRe(NAV_SUB.zh.kpop), 'g')) || []).length !== 2) {
-    errors.push('zh: 听K-pop must appear in the dropdown and the music subhead');
+  /* 2026-11-27：手机端三级菜单沿用同一套文案，整页计数会多一次；改为按区块计数 */
+  const zhNavDropdown = (source.match(/<div class="nav-dropdown-menu">([\s\S]*?)<\/div>/) || [])[1] || '';
+  const zhMobileMenu = (source.match(/<nav class="mobile-nav-pane mobile-nav-pane-sub"[\s\S]*?<\/nav>/) || [])[0] || '';
+  if ((zhNavDropdown.match(new RegExp(escRe(NAV_SUB.zh.kpop), 'g')) || []).length !== 1) {
+    errors.push('zh: 听K-pop must appear once in the desktop dropdown');
   }
-  if ((source.match(new RegExp(escRe(NAV_SUB.zh.game), 'g')) || []).length !== 1) {
-    errors.push('zh: 玩游戏 must appear in the dropdown');
+  if ((zhNavDropdown.match(new RegExp(escRe(NAV_SUB.zh.game), 'g')) || []).length !== 1) {
+    errors.push('zh: 玩游戏 must appear once in the desktop dropdown');
+  }
+  if ((zhMobileMenu.match(new RegExp(escRe(NAV_SUB.zh.kpop), 'g')) || []).length !== 1) {
+    errors.push('zh: 听K-pop must appear once in the mobile level-3 menu');
+  }
+  if ((zhMobileMenu.match(new RegExp(escRe(NAV_SUB.zh.game), 'g')) || []).length !== 1) {
+    errors.push('zh: 玩游戏 must appear once in the mobile level-3 menu');
+  }
+  if (!source.includes('<p class="picks-subhead picks-subhead-music" data-i18n="nav.picks.kpop">' + NAV_SUB.zh.kpop + '</p>')) {
+    errors.push('zh: music section subhead must match the K-pop dropdown item');
   }
   /* 文姬卡与五部剧集卡同一套标准两栏：竖版海报在左、文字在右，无任何特殊布局 */
   const filmCard = source.match(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.film\.label">([\s\S]*?)<\/article>/);
@@ -1164,6 +1176,69 @@ function verify(state) {
     errors.push('css: full language name is not visually hidden with clip');
   }
 
+  /* 1c-2. 手机端导航（2026-11-27 站长指令）：
+     一级 = 头部菜单键（必须排在语言切换 CN 的左边）；二级 = 导航项；
+     三级 = 站长推荐子项，面板从**左侧**展开（translateX(-100%) 起步），不是从右边。 */
+  {
+    const MOBILE_L2 = [['#origin', 'nav.origin'], ['#reasons', 'nav.reasons'],
+      ['#lamp', 'nav.lamp'], ['#reading', 'nav.reading']];
+    const MOBILE_L3 = [['#picks-dramas', 'nav.picks.drama'], ['#picks-kpop', 'nav.picks.kpop'],
+      ['#picks-pc-games', 'nav.picks.game'], ['#picks-learn', 'nav.picks.learn']];
+    const mobilePages = [['zh', source]].concat(LANGS.map(l => [l, state.pages[l] || '']));
+    for (const [lang, page] of mobilePages) {
+      const tag = lang + ': ';
+      /* 一级：菜单键 */
+      if (!page.includes('class="nav-toggle"')) errors.push(tag + 'mobile nav toggle button missing');
+      if (!page.includes('aria-controls="mobile-nav"')) errors.push(tag + 'nav toggle must point at the mobile panel');
+      if (!/class="nav-toggle"[^>]*aria-expanded="false"/.test(page)) errors.push(tag + 'nav toggle must start collapsed');
+      /* 菜单键必须在语言切换（CN）左边 */
+      const toggleAt = page.indexOf('class="nav-toggle"');
+      const langAt = page.indexOf('class="lang-switch"');
+      if (toggleAt < 0 || langAt < 0 || toggleAt > langAt) {
+        errors.push(tag + 'nav toggle must sit left of the language switch');
+      }
+      /* 二级：导航项 */
+      if (!page.includes('class="mobile-nav" id="mobile-nav"')) errors.push(tag + 'mobile nav panel missing');
+      let prev = -1;
+      for (const [href, key] of MOBILE_L2) {
+        const at = page.indexOf('<a class="mobile-nav-item" href="' + href + '" data-i18n="' + key + '">');
+        if (at < 0) errors.push(tag + 'mobile level-2 item missing -> ' + href);
+        else if (at < prev) errors.push(tag + 'mobile level-2 order broken -> ' + href);
+        else prev = at;
+      }
+      if (!page.includes('class="mobile-nav-item mobile-nav-parent"')) errors.push(tag + 'mobile level-2 parent button missing');
+      /* 三级：站长推荐子项 */
+      if (!page.includes('id="mobile-nav-picks"')) errors.push(tag + 'mobile level-3 panel missing');
+      prev = -1;
+      for (const [href, key] of MOBILE_L3) {
+        const at = page.indexOf('<a class="mobile-nav-item mobile-nav-subitem" href="' + href + '" data-i18n="' + key + '">');
+        if (at < 0) errors.push(tag + 'mobile level-3 item missing -> ' + href);
+        else if (at < prev) errors.push(tag + 'mobile level-3 order broken -> ' + href);
+        else prev = at;
+      }
+      if (!page.includes('class="mobile-nav-back"')) errors.push(tag + 'mobile level-3 back button missing');
+    }
+    /* 三级必须从左侧展开：起点 translateX(-100%)，展开到 0；不许从右边起步 */
+    if (!/\.mobile-nav-pane-sub\s*\{[^}]*translateX\(-100%\)/.test(state.css)) {
+      errors.push('css: mobile level-3 panel must start off-screen to the LEFT (translateX(-100%))');
+    }
+    if (!/\.mobile-nav\.is-sub-open \.mobile-nav-pane-sub\s*\{[^}]*translateX\(0\)/.test(state.css)) {
+      errors.push('css: mobile level-3 panel must slide in to 0 when opened');
+    }
+    if (/\.mobile-nav-pane-sub\s*\{[^}]*translateX\(100%\)/.test(state.css)) {
+      errors.push('css: mobile level-3 panel must not expand to the RIGHT');
+    }
+    /* 菜单键桌面端隐藏、手机端显示 */
+    if (!/\.nav-toggle\s*\{[^}]*display:\s*none/.test(state.css)) {
+      errors.push('css: nav toggle must be hidden on desktop');
+    }
+    if (!/@media \(max-width: 720px\)[\s\S]*?\.nav-toggle\s*\{[^}]*display:\s*inline-flex/.test(state.css)) {
+      errors.push('css: nav toggle must show on phone viewports');
+    }
+    if (!/@media \(max-width: 720px\)[\s\S]*?\.mobile-nav\s*\{[^}]*display:\s*block/.test(state.css)) {
+      errors.push('css: mobile nav panel must show on phone viewports');
+    }
+  }
   /* 1d. clipping attribution is explicit; link status is marked with a date */
   if (!source.includes('这张网页截图是' + AI_MARKERS.zh)) {
     errors.push('zh: clipping attribution no longer says the owner gave it to the AI');
@@ -1384,11 +1459,25 @@ function verify(state) {
     if (!page.includes('id="picks-kpop"')) errors.push(lang + ': ' + 'picks-kpop' + ' placeholder missing');
     if (!page.includes('id="picks-pc-games"')) errors.push(lang + ': ' + 'picks-pc-games' + ' placeholder missing');
     if (!page.includes('id="picks-mobile-games"')) errors.push(lang + ': ' + 'picks-mobile-games' + ' placeholder missing');
-    if ((page.match(new RegExp(escRe(sub.kpop), 'g')) || []).length !== 2) {
-      errors.push(lang + ': ' + 'picks-kpop' + ' label must appear in both dropdown and subhead');
+    /* 2026-11-27：手机端三级菜单沿用同一套文案，整页计数会多一次；
+       改为按区块计数——桌面下拉一次、手机面板一次，
+       K-pop 文案还要与音乐区小标题一致（原来靠整页计数顺带查的）。 */
+    const mobileMenu = (page.match(/<nav class="mobile-nav-pane mobile-nav-pane-sub"[\s\S]*?<\/nav>/) || [])[0] || '';
+    if (!mobileMenu) errors.push(lang + ': mobile level-3 menu block not found');
+    if ((menu.match(new RegExp(escRe(sub.kpop), 'g')) || []).length !== 1) {
+      errors.push(lang + ': picks-kpop label must appear once in the desktop dropdown');
     }
-    if ((page.match(new RegExp(escRe(sub.game), 'g')) || []).length !== 1) {
-      errors.push(lang + ': ' + 'picks-games' + ' label must appear in dropdown');
+    if ((menu.match(new RegExp(escRe(sub.game), 'g')) || []).length !== 1) {
+      errors.push(lang + ': picks-games label must appear once in the desktop dropdown');
+    }
+    if ((mobileMenu.match(new RegExp(escRe(sub.kpop), 'g')) || []).length !== 1) {
+      errors.push(lang + ': picks-kpop label must appear once in the mobile level-3 menu');
+    }
+    if ((mobileMenu.match(new RegExp(escRe(sub.game), 'g')) || []).length !== 1) {
+      errors.push(lang + ': picks-games label must appear once in the mobile level-3 menu');
+    }
+    if (!new RegExp('class="picks-subhead picks-subhead-music"[^>]*data-i18n="nav\\.picks\\.kpop"[^>]*>' + escRe(sub.kpop)).test(page)) {
+      errors.push(lang + ': music section subhead must match the K-pop dropdown item');
     }
     const actions = nodes['picks.film.actions'] || '';
     const want = PICKS_ACTIONS_EXPECT[lang];
@@ -3038,6 +3127,32 @@ const faults = [
   { name: 'jangminho thumbnail missing from assets', mutate: s => { s.kpopImages.jangminho = false; } },
   { name: 'jangminho card removed from Chinese source', mutate: s => {
     s.source = s.source.replace(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.jangminho\.label">[\s\S]*?<\/article>/, '');
+  } },
+  /* 2026-11-27 手机端导航：菜单键位置 / 三级菜单方向 / 层级锚点 / 移动端显示。 */
+  { name: 'mobile nav toggle removed from Chinese source', mutate: s => {
+    s.source = s.source.replace(/    <button class="nav-toggle"[\s\S]*?<\/button>\r?\n/, '');
+  } },
+  { name: 'mobile nav toggle moved to the right of the language switch', mutate: s => {
+    const m = s.source.match(/    <button class="nav-toggle"[\s\S]*?<\/button>\r?\n/);
+    if (m) {
+      s.source = s.source.replace(m[0], '');
+      s.source = s.source.replace(/(\r?\n    <a class="header-repo")/, m[0].replace(/\r?\n$/, '') + '$1');
+    }
+  } },
+  { name: 'mobile level-3 panel slides in from the right', mutate: s => {
+    s.css = s.css.replace('transform: translateX(-100%); opacity: 0; pointer-events: none;', 'transform: translateX(100%); opacity: 0; pointer-events: none;');
+  } },
+  { name: 'mobile level-3 K-pop item points to a dead anchor', mutate: s => {
+    s.source = s.source.replace('<a class="mobile-nav-item mobile-nav-subitem" href="#picks-kpop"', '<a class="mobile-nav-item mobile-nav-subitem" href="#picks-nowhere"');
+    for (const l of ['en', 'jp', 'ko']) {
+      s.pages[l] = s.pages[l].replace('<a class="mobile-nav-item mobile-nav-subitem" href="#picks-kpop"', '<a class="mobile-nav-item mobile-nav-subitem" href="#picks-nowhere"');
+    }
+  } },
+  { name: 'mobile level-2 reading item removed from Chinese source', mutate: s => {
+    s.source = s.source.replace(/    <a class="mobile-nav-item" href="#reading" data-i18n="nav\.reading">[^\n]*\r?\n/, '');
+  } },
+  { name: 'mobile nav toggle hidden on phone viewports', mutate: s => {
+    s.css = s.css.replace('.nav-toggle { display: inline-flex; margin-left: auto; }', '.nav-toggle { display: none; }');
   } },
 ];
 let caught = 0;

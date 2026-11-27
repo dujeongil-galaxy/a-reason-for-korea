@@ -158,6 +158,74 @@
     });
   }
 
+  /* ---- 手机端导航（2026-11-27 站长指令） ----
+     一级 = 头部菜单键（语言切换 CN 左边）；二级 = 导航项；
+     三级 = 站长推荐子项，面板从**左侧**展开（CSS translateX(-100%) → 0），不是从右边。
+     纯本地逻辑，无网络请求。 */
+  (function () {
+    var toggle = document.querySelector('.nav-toggle');
+    var panel = document.getElementById('mobile-nav');
+    if (!toggle || !panel) { return; }
+    var parentBtn = panel.querySelector('.mobile-nav-parent');
+    var subPane = document.getElementById('mobile-nav-picks');
+    var backBtn = panel.querySelector('.mobile-nav-back');
+    var SUB_MS = 300;
+
+    function isSubOpen() { return panel.classList.contains('is-sub-open'); }
+
+    function closeSub() {
+      if (!subPane) { return; }
+      panel.classList.remove('is-sub-open');
+      if (parentBtn) { parentBtn.setAttribute('aria-expanded', 'false'); }
+      window.setTimeout(function () {
+        if (!isSubOpen()) { subPane.hidden = true; }
+      }, SUB_MS);
+    }
+
+    function openSub() {
+      if (!subPane) { return; }
+      subPane.hidden = false;
+      void subPane.offsetWidth; /* 强制回流，让滑入从屏外开始 */
+      panel.classList.add('is-sub-open');
+      if (parentBtn) { parentBtn.setAttribute('aria-expanded', 'true'); }
+    }
+
+    function setPanel(open) {
+      panel.hidden = !open;
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      document.body.classList.toggle('nav-open', open);
+      if (!open) { closeSub(); }
+    }
+
+    toggle.addEventListener('click', function () {
+      setPanel(panel.hidden);
+    });
+
+    if (parentBtn) {
+      parentBtn.addEventListener('click', function () {
+        if (isSubOpen()) { closeSub(); } else { openSub(); }
+      });
+    }
+
+    if (backBtn) { backBtn.addEventListener('click', closeSub); }
+
+    panel.addEventListener('click', function (e) {
+      var target = e.target;
+      var link = target && target.closest ? target.closest('a[href^="#"]') : null;
+      if (link) { setPanel(false); }
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') { return; }
+      if (isSubOpen()) { closeSub(); return; }
+      if (!panel.hidden) { setPanel(false); toggle.focus(); }
+    });
+
+    window.addEventListener('resize', function () {
+      if (window.innerWidth > 720 && !panel.hidden) { setPanel(false); }
+    });
+  })();
+
   /* ---- 分区搜索（看韩剧 / 听K-POP / 游戏）；中文支持拼音与首字母模糊 ---- */
   (function () {
     var PY = window.SXG_PINYIN || {};
