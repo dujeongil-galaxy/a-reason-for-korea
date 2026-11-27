@@ -454,3 +454,12 @@
 - 规则二：同类平台的分工记清楚——Viki（`www.viki.com/tv/<id>c-<slug>`）、U-NEXT（`video.unext.jp/title/SID…` 或 `/episode/SID…/ED…`）、TVING（`tving.com/contents/P…`）、wavve（`wavve.com/player/vod?contentid=…`）、Prime/Kocowa（`watch.amazon.*/detail?gti=…`）都能拿到可核验的商品号；Netflix 基本只能靠 JustWatch/博文里被引用过的现成 ID。
 - 规则三：**title 级商品页和 episode 级要分开白名单**。U-NEXT 的 `https://video.unext.jp/episode/` 放行了不等于 `https://video.unext.jp/title/` 也能过；本轮就是靠新增 title 前缀才通过 410 节点的校验。
 - 规则四：站内搜索兜底要**在文案里写明**（TVING 写「검색해 보기」、Viu 写搜索直达），读者点进去看到的是搜索页而不是商品页，提前讲清楚比事后解释便宜。
+
+## 65. 网易云 MV 链接里的 `uct2=` 是账号令牌：挂站前必须脱敏；音乐卡的通道是按区固定的
+
+- **现象**：站长给的网易云链接形如 `https://music.163.com/mv?id=34822862&uct2=<加密令牌>`。`uct2` 是与登录账号绑定的加密串（带用户标识），直接抄进公开仓库等于把站长的账号信息发到网上；YouTube 分享链接尾部的 `si=` 同样是跟踪参数，没必要带。
+- **规则一（脱敏）**：站内只保留 `https://music.163.com/#/mv?id=<id>`（与既有音乐卡写法一致），**任何情况下不写 `uct2`**；YouTube 链接只留 `https://youtu.be/<视频ID>`，去掉 `si=`。写完在四语页面各 grep 一次确认 0 命中，再提交。
+- **规则二（按区通道）**：音乐区的外链是硬规则不是习惯——中文页挂大陆平台（QQ 音乐 / 网易云），en/jp/ko 挂 YouTube；校验里是硬断言（`zh: kpop <slug> 中文页禁挂 YouTube`、`<lang>: kpop <slug> 大陆链接泄漏`、`<lang>: kpop <slug> YouTube 链接错误/缺失`）。新卡两边都要写，只挂一边照样判红。
+- **规则三（登记别漏）**：新增音乐卡要同步登记 `KPOP_SLUGS`、`KPOP_IMAGE`、`KPOP_ZH_LINK`、`KPOP_YT_ID`、`MUSIC_DATE`/`MUSIC_DATE_TEXT`、`SORT_RULES.music.order`+`year` 六处常量。只改 `index.html` 不登记 → 排序断言判红或漏检；只登记不排序 → 「按发行时间降序」判红。
+- **规则四（故障注入）**：新卡至少补一条真会判红的注入（如「中文页换成 YouTube」「网易云 MV ID 篡改」「精确发行日被抹」）。mutation 的 `.replace()` 源串要写对，源串不存在就成空操作，self-test 会报 missed（见 §43）。
+- **验收**：`node scripts/build-i18n.mjs` → `node scripts/verify-i18n.mjs` 全绿（`VERIFY OK` + `SELF-TEST n/n`），再本地起服务截音乐区确认卡片排第一、图在、按钮文案对。

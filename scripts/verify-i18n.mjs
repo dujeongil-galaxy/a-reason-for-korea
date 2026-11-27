@@ -203,13 +203,15 @@ const MUSIC_YTNOTE = {
    端游/手游拆成两个锚点两个子标题；六张卡全部沿用剧集卡标准两栏结构。 */
 /* K-POP 小众音乐卡（多卡）：中文页挂 QQ/网易云，外文页挂 YouTube。
    与单卡 music1 分开校验，避免动 music1 的既有断言。 */
-const KPOP_SLUGS = ['minty', 'seoeve', 'ussoboy', 'sospecial', 'milksong', 'jjarappappa', 'misskorea', 'study'];
+const KPOP_SLUGS = ['jangminho', 'minty', 'seoeve', 'ussoboy', 'sospecial', 'milksong', 'jjarappappa', 'misskorea', 'study'];
 const KPOP_IMAGE = {
+  jangminho: 'assets/mv-jangminho.jpg',
   minty: 'assets/mv-minty.jpg', seoeve: 'assets/mv-seoeve.jpg', ussoboy: 'assets/mv-ussoboy.jpg',
   sospecial: 'assets/mv-soSpecial.jpg', milksong: 'assets/mv-milksong.jpg', jjarappappa: 'assets/mv-jjarappappa.jpg',
   misskorea: 'assets/mv-misskorea.jpg', study: 'assets/mv-study.jpg'
 };
 const KPOP_ZH_LINK = {
+  jangminho: 'music.163.com/#/mv?id=34822862',
   minty: 'music.163.com/#/mv?id=10894437',
   seoeve: 'y.qq.com/n/m/detail/mv/index.html?vid=004AWNv33sYmI4',
   ussoboy: 'music.163.com/#/mv?id=34726420',
@@ -219,16 +221,17 @@ const KPOP_ZH_LINK = {
   misskorea: 'i.y.qq.com/v8/playsong.html?songid=204137216', study: 'y.qq.com/n/m/detail/mv/index.html?vid=q0012sypyu1'
 };
 const KPOP_YT_ID = {
+  jangminho: 'eSZiBdwbDH4',
   minty: '6rzemizJoNQ', seoeve: 'dd9yeNZXWXg', ussoboy: 'CD7J5oCKH2Q',
   sospecial: 'pzP_w8rpxHA', milksong: 'bpGZSJPq3pk', jjarappappa: 'clgGG_qWFww',
   misskorea: 'iB0FLshLbLk', study: 'rS_k1DhhDy4'
 };
 
 /* 新增两首歌的发行日期（精确到日，防「只比年份」把同年顺序排错）。 */
-const MUSIC_DATE = { seoeve:'2024', minty:'2019', sospecial:'2018',
+const MUSIC_DATE = { jangminho:'2026-11-24', seoeve:'2024', minty:'2019', sospecial:'2018',
   ussoboy:'2017-11-16', misskorea:'2017-09-20', music1:'2013-10-30',
   study:'2013-07-11', jjarappappa:'2012', milksong:'2004' };
-const MUSIC_DATE_TEXT = { misskorea:'2017-09-20', study:'2013-07-11' };
+const MUSIC_DATE_TEXT = { jangminho:'2026-11-24', misskorea:'2017-09-20', study:'2013-07-11' };
 const MUSIC_DISAMBIG = { zh:'不是李孝利', en:'not Lee Hyori',
   jp:'イ・ヒョリではありません', ko:'이효리가 아닙니다' };
 /* 站长红线：本站不推北韩相关资源，四语页面都不给这类线索。 */
@@ -280,8 +283,8 @@ const SORT_RULES = {
             drama11:2016, drama13:2016, drama2:2015, drama12:2015, drama3:2013,
             drama14:2013, drama4:2013, drama6:2012, drama5:2003 } },
   music: { grid: 'picks-kpop',
-    order: ['seoeve','minty','sospecial','ussoboy','misskorea','music1','study','jjarappappa','milksong'],
-    year: { seoeve:2024, minty:2019, sospecial:2018, ussoboy:2017, misskorea:2017,
+    order: ['jangminho','seoeve','minty','sospecial','ussoboy','misskorea','music1','study','jjarappappa','milksong'],
+    year: { jangminho:2026, seoeve:2024, minty:2019, sospecial:2018, ussoboy:2017, misskorea:2017,
             music1:2013, study:2013, jjarappappa:2012, milksong:2004 },
     date: MUSIC_DATE },
   pc: { grid: 'picks-pc-games',
@@ -3015,6 +3018,26 @@ const faults = [
   { name: 'ko drama13 TVING label drifted', mutate: s => {
     s.pages.ko = s.pages.ko.replace('TVING에서 보기 (정액제)', 'TVING에서 찾기');
     s.dict.ko.html['picks.drama13.actions'] = s.dict.ko.html['picks.drama13.actions'].replace('TVING에서 보기 (정액제)', 'TVING에서 찾기');
+  } },
+  /* 2026-11-27 新增张民皓《산, 삶》MV 卡：中文页挂网易云大陆通道（链接脱敏，不带 uct2 账号令牌），
+     en/jp/ko 挂 YouTube；精确发行日 2026-11-24 四语同现。 */
+  { name: 'jangminho Chinese mainland link swapped to YouTube', mutate: s => {
+    s.source = s.source.replace(KPOP_ZH_LINK.jangminho, 'https://youtu.be/eSZiBdwbDH4');
+  } },
+  { name: 'jangminho NetEase MV id tampered on Chinese source', mutate: s => {
+    s.source = s.source.replace('music.163.com/#/mv?id=34822862', 'music.163.com/#/mv?id=00000000');
+  } },
+  { name: 'jangminho YouTube link wrong on English page', mutate: s => {
+    s.pages.en = s.pages.en.replace('href="https://youtu.be/eSZiBdwbDH4"', 'href="https://youtu.be/AAAAAAAAAAA"');
+    s.dict.en.html['picks.jangminho.actions'] = s.dict.en.html['picks.jangminho.actions'].replace('https://youtu.be/eSZiBdwbDH4', 'https://youtu.be/AAAAAAAAAAA');
+  } },
+  { name: 'exact 2026-11-24 release date scrubbed from all four pages', mutate: s => {
+    s.source = s.source.replace('2026-11-24', '2026-11-23');
+    for (const l of ['en','jp','ko']) s.pages[l] = s.pages[l].replace('2026-11-24', '2026-11-23');
+  } },
+  { name: 'jangminho thumbnail missing from assets', mutate: s => { s.kpopImages.jangminho = false; } },
+  { name: 'jangminho card removed from Chinese source', mutate: s => {
+    s.source = s.source.replace(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.jangminho\.label">[\s\S]*?<\/article>/, '');
   } },
 ];
 let caught = 0;

@@ -4,6 +4,15 @@
 
 > **2026-11-26 历史重写**：本文件里 2026-11-25 16:52 之后的哈希是重写前的旧值，对照见 [HASH-MAP.md](HASH-MAP.md)。
 
+## 2026-11-27 · 音乐区新增张民皓《산, 삶》MV 卡
+
+- 站长给了一条网易云 MV 链接（`music.163.com/mv?id=34822862`）。链接尾部的 `uct2=` 是与登录账号绑定的加密令牌，**挂站前必须脱敏**：站内只保留 `music.163.com/#/mv?id=34822862`，全仓不出现 `uct2`，YouTube 链接也去掉 `si=` 分享跟踪参数，只留 `https://youtu.be/eSZiBdwbDH4`。
+- MV 身份双向核实：YouTube oEmbed 标题为 `[MV] Jang Min Ho(장민호) _ Mountain, life(산, 삶)`，频道 1theK（원더케이）；网易云页是同名 MV、艺人「张民皓」、发布时间 2026-11-24；YouTube 页 `publishDate` 同为 2026-11-24。
+- 按音乐区既有分区通道新增：中文页挂网易云大陆通道，en/jp/ko 挂 YouTube（中文页禁挂 YouTube、外文页禁挂大陆平台，校验里是硬断言）。
+- 缩略图取该 YouTube 视频官方缩略图 `i.ytimg.com/vi/eSZiBdwbDH4/maxresdefault.jpg`（1280×720），存为 `assets/mv-jangminho.jpg`，图注沿用「YouTube 官方 MV 缩略图（1theK）」。
+- 按发行时间降序排在音乐区第一位（原第一位是 2024 年的 SEO EVE）；同步登记 `KPOP_SLUGS` / `KPOP_IMAGE` / `KPOP_ZH_LINK` / `KPOP_YT_ID` / `MUSIC_DATE` / `MUSIC_DATE_TEXT` / `SORT_RULES.music`（order + year）。
+- 校验结果：`VERIFY OK · 428 translated nodes · 65 translated attributes · 4 languages`，`SELF-TEST 253/253 injected faults rejected`（新增 5 条故障注入：中文页换 YouTube、网易云 MV ID 篡改、外文页 YouTube 链接写错、精确发行日 2026-11-24 被抹、缩略图缺失）。
+
 ## 2026-11-26 · 移除「不是韩国的 · 一个例外」整块
 
 - 站长要求删掉影单里《刺杀金正恩》（The Interview）那一条，连小标题、栏目说明一起删；该题材本站不再涉及。
