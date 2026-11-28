@@ -632,6 +632,20 @@ html[lang="ko"] .section-kicker, html[lang="ko"] .reason-en { font-family: var(-
 /* 2026-11-25：Minty 卡下方挂站内专题页入口（只在中文页，不走 i18n 字典，重建语言页不会覆盖） */
 .pick-report-link { margin-top: 12px; }
 .pick-report-link .pick-link { font-size: 13px; padding: 11px 16px; }
+/* BGM 推荐（2026-11-28 新增，先只挂中文区看效果）：
+   一行「BGM 标签 + 歌名链接 + 通道说明」，比观看按钮轻一级，不抢主行动。
+   该块带 data-zh-only，由 build-i18n.mjs 在生成 en/jp/ko 时整块摘除。 */
+.pick-bgm { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; margin-top: 14px; }
+.pick-bgm-tag {
+  font-family: var(--mono); font-size: 10px; letter-spacing: .14em; color: var(--ink-faint);
+  border: 1px solid var(--line-strong); border-radius: 999px; padding: 2px 9px;
+}
+.pick-link-bgm {
+  font-size: 13.5px; color: var(--accent); text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.pick-link-bgm:hover { border-bottom-color: var(--accent); }
+.pick-bgm-note { font-size: 12px; color: var(--ink-faint); line-height: 1.6; }
 
 /* ---------- archive / keepsake ---------- */
 .archive { background: var(--bg-soft); }

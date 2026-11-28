@@ -36,7 +36,12 @@ const missing = [];
    removing the whole block here is enough to keep them off the other
    three languages without touching parity. */
 function stripZhOnly(html) {
-  return html.replace(/[ \t]*<article class="pick-card" data-zh-only>[\s\S]*?<\/article>\r?\n/g, '');
+  /* 整卡级：2026-11-24 已清零（卡片必须四语齐全），保留以防回滚 */
+  let out = html.replace(/[ \t]*<article class="pick-card" data-zh-only>[\s\S]*?<\/article>\r?\n/g, '');
+  /* 元素级：2026-11-28 新增的 BGM 推荐行（站长要求先只挂中文区看效果）。
+     同名标签嵌套在 HTML 里本就不合法（如 <p> 套 <p>），故按同标签配对摘除是安全的。 */
+  out = out.replace(/[ \t]*<([a-zA-Z0-9]+)\b[^>]*\bdata-zh-only\b[^>]*>[\s\S]*?<\/\1>\r?\n?/g, '');
+  return out;
 }
 const sourceForLangs = stripZhOnly(source);
 

@@ -2107,7 +2107,9 @@ function verify(state) {
     drama12: 'beloved-eundong-poster.jpg', drama13: 'dear-my-friends-poster.jpg',
     bnb: 'bnb-poster.jpg', kart: 'kart-poster.jpg',
     audition: 'audition-poster.jpg', rbeat: 'rbeat-poster.jpg' };
-  if (/data-zh-only/.test(state.source)) errors.push('zh: 源页仍有 data-zh-only 残留');
+  /* 2026-11-28：BGM 推荐行暂只挂中文区，源页允许出现**元素级** data-zh-only；
+     但整卡仍必须四语齐全，卡片上不得出现 data-zh-only。 */
+  if (/<article[^>]*\bdata-zh-only\b/.test(state.source)) errors.push('zh: 源页仍有 data-zh-only 卡片');
   for (const slug of FIXED_SLUGS) {
     if (!state.source.includes('data-i18n="picks.' + slug + '.label"'))
       errors.push('zh: 补齐卡缺 label 节点 -> ' + slug);
@@ -2132,6 +2134,34 @@ function verify(state) {
       const alt = state.dict[lang].attr['picks.' + slug + '.imageAlt'];
       if (!alt) errors.push(lang + ': 补齐卡四语缺 imageAlt -> ' + slug);
     }
+  }
+
+  /* ---------- 2026-11-28：剧集卡 BGM 推荐（暂只挂中文区） ----------
+     站长要求：先只做中文区看效果，外文区暂不做。故 BGM 行用 data-zh-only 标记，
+     由 build-i18n.mjs 在生成 en/jp/ko 时整块摘除（不走 i18n 字典）。
+     不变量：① 中文源页 BGM 行存在、挂在《继承者们》卡上、链接已脱敏（不带 uct2 账号令牌）；
+     ② 外文三页不得出现 BGM 行，也不得出现网易云歌曲链接（大陆通道不外溢）；
+     ③ BGM 行不得带 data-i18n 键（否则四语对不上）。 */
+  const BGM_LINK = 'https://music.163.com/song?id=1476000538';
+  const bgmBlock = (state.source.match(/<p class="pick-bgm"[\s\S]*?<\/p>/) || [])[0] || '';
+  if (!bgmBlock) errors.push('zh: BGM 推荐行缺失');
+  else {
+    if (!bgmBlock.includes(BGM_LINK)) errors.push('zh: BGM 推荐行链接错误/缺失');
+    if (!bgmBlock.includes('data-zh-only')) errors.push('zh: BGM 推荐行必须标 data-zh-only');
+    if (bgmBlock.includes('data-i18n')) errors.push('zh: BGM 推荐行不得带 data-i18n 键');
+  }
+  if ((state.source.match(/class="pick-bgm"/g) || []).length !== 1)
+    errors.push('zh: BGM 推荐行数量必须为 1');
+  const drama4Card = (state.source.match(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.drama4\.label">[\s\S]*?<\/article>/) || [])[0] || '';
+  if (drama4Card && !drama4Card.includes('pick-bgm')) errors.push('zh: BGM 推荐行必须挂在《继承者们》卡上');
+  for (const p of [state.source, ...LANGS.map(l => state.pages[l] || '')]) {
+    if (/uct2=/.test(p)) errors.push('音乐链接带 uct2 账号令牌，必须脱敏');
+    if (/music\.163\.com\/song\?id=\d+&/.test(p)) errors.push('网易云歌曲链接未脱敏');
+  }
+  for (const lang of LANGS) {
+    const p = state.pages[lang] || '';
+    if (p.includes('pick-bgm')) errors.push(lang + ': BGM 推荐行只挂中文区，不得出现');
+    if (p.includes('music.163.com/song')) errors.push(lang + ': 网易云歌曲链接只挂中文区');
   }
 
 
@@ -3316,6 +3346,22 @@ const faults = [
   } },
   { name: 'mobile nav toggle hidden on phone viewports', mutate: s => {
     s.css = s.css.replace('.nav-toggle { display: inline-flex; margin-left: auto; }', '.nav-toggle { display: none; }');
+  } },
+  /* 2026-11-28 BGM 推荐行（暂只挂中文区）：外文页泄漏 / 链接带账号令牌 / 中文页被删 / 误加 i18n 键 */
+  { name: 'BGM line leaks into the English page', mutate: s => {
+    s.pages.en = s.pages.en.replace('</article>',
+      '<p class="pick-bgm"><a class="pick-link-bgm" href="https://music.163.com/song?id=1476000538">My Wish</a></p></article>');
+  } },
+  { name: 'BGM link keeps the uct2 account token', mutate: s => {
+    s.source = s.source.replace('https://music.163.com/song?id=1476000538',
+      'https://music.163.com/song?id=1476000538&uct2=LEAKTOKEN');
+  } },
+  { name: 'BGM line removed from the Chinese page', mutate: s => {
+    s.source = s.source.replace(/<p class="pick-bgm"[\s\S]*?<\/p>/, '');
+  } },
+  { name: 'BGM line given a data-i18n key', mutate: s => {
+    s.source = s.source.replace('<p class="pick-bgm" data-zh-only>',
+      '<p class="pick-bgm" data-zh-only data-i18n="picks.drama4.bgm">');
   } },
 ];
 /* 故障注入用：只改某张卡 actions 里的片段（dict 与生成页同时改，避免只改一半）。 */
