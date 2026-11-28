@@ -26,6 +26,18 @@
 - 校验新增手机端导航断言（菜单键必须在语言切换左边、二级四项 + 父按钮、三级四项 + 返回按钮、三级必须 `translateX(-100%)` 左侧展开且不得改成 `translateX(100%)`、桌面隐藏 / 手机显示）+ 6 条故障注入；另把「听K-pop 整页出现 2 次、玩游戏 1 次」这类旧整页计数改成**按区块计数**（桌面下拉 / 手机面板各一次），因为手机端复用同一套文案。
 - 校验结果：`VERIFY OK · 430 translated nodes · 68 translated attributes · 4 languages`，`SELF-TEST 259/259 injected faults rejected`。
 
+## 2026-11-27 · 查不到 Netflix 的卡统一按《医生》卡口径：不挂 Netflix 入口，红字换本片专属说明
+
+- 站长新规：站内其他视频若查不到 Netflix，一律按《医生》那条规矩办——不挂 Netflix 入口、不挂第三方合租平台（AFF）入口，红字改成本片专属说明，并写明该页真正能用的渠道。
+- 实查（2026-11-28）：站内已挂 Netflix 的 6 张卡逐条打开 `netflix.com/title/<id>` 复核，HTTP 200 且 og:title 是这部片（暴君的厨师 82024852 / 车贞淑医生 81682438 / 来自星星的你 80025266 / 继承者们 81033650 / 哲仁王后 81422314 / 你好妈妈再见 81243996）；查不到 Netflix 的按站内既有逐区核查记录判定。
+- 按此口径改了 **37 处**卡片文案（中文页 9 张 + 外文页 28 处）：
+  - 中文页去掉「中国香港地区：第三方合租平台开通（邀请码 5rfpUarUEd）」按钮，红字换成「本片未见 Netflix 条目，本站不挂 Netflix 入口；〈该页渠道〉，按所在商店结算 · 请支持正版。」
+  - en / jp / ko 三语红字换成对应语言版本（英文 Not on Netflix in this region…、日文 この地域の Netflix には掲載がありません…、韩文 이 지역 Netflix에는 아직 없습니다…）
+  - 涉及的卡：drama2 / drama5 / drama6 / drama10 / drama11 / drama12 / drama13 / drama14 / film（各语区查不到 Netflix 的那几语各自改），外加 jp/drama3（日区查不到）。
+- 查得到 Netflix 的卡保持原样：Netflix 深链 + 港区合租入口 + 原红字一字不动（zh/en/ko 的 drama1、ko 的 drama7-9、jp 的 drama4 等）。
+- 校验新增 `NO_NF_CH` / `NO_NF_NOTE` 登记表（37 条逐语锁定）与三条新断言（无 Netflix 授权不得挂合租平台入口、不得挂 Netflix 深链、红字必须是本片专属说明）；旧断言「aff 入口必须在」改为按卡判定；5 条旧故障注入改指向仍挂 aff 的 drama1。
+- 结果 `VERIFY OK · 437 translated nodes · 69 translated attributes · 4 languages`，`SELF-TEST 268/268 injected faults rejected`。
+
 ## 2026-11-27 · 音乐区新增张民皓《산, 삶》MV 卡
 
 - 站长给了一条网易云 MV 链接（`music.163.com/mv?id=34822862`）。链接尾部的 `uct2=` 是与登录账号绑定的加密令牌，**挂站前必须脱敏**：站内只保留 `music.163.com/#/mv?id=34822862`，全仓不出现 `uct2`，YouTube 链接也去掉 `si=` 分享跟踪参数，只留 `https://youtu.be/eSZiBdwbDH4`。

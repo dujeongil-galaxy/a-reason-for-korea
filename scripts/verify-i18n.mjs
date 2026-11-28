@@ -388,8 +388,8 @@ const DRAMA_AMAZON_JP_STAR = 'https://watch.amazon.co.jp/detail?gti=amzn1.dv.gti
 const DRAMA_AMAZON_JP_HEIRS = 'https://watch.amazon.co.jp/detail?gti=amzn1.dv.gti.a37f89de-a7ea-4c5f-9188-2ba82f552e4a';
 /* 期望的 featured 按钮链接：键为 lang/slug，缺省为 null（只允许红字，不许主按钮） */
 const DRAMA_PRIMARY = {
-  'zh/drama1': AFF_LINK, 'zh/drama2': AFF_LINK, 'zh/drama3': AFF_LINK,
-  'zh/drama4': AFF_LINK, 'zh/drama5': AFF_LINK,
+  'zh/drama1': AFF_LINK, 'zh/drama3': AFF_LINK,
+  'zh/drama4': AFF_LINK,
   'en/drama4': DRAMA_AMAZON_US,
   'jp/drama3': DRAMA_AMAZON_JP_STAR, 'jp/drama4': DRAMA_AMAZON_JP_HEIRS
 };
@@ -399,6 +399,60 @@ const DRAMA_NOTE = {
   jp: '中国大陸からご覧になる場合は、<a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">こちら</a>（第三者のアカウント共有サービス経由、Netflix 公式窓口ではありません）から Netflix にアクセスできます。',
   ko: '중국 본토 시청자는 <a href="https://nfshare.cn/?sid=5rfpUarUEd" target="_blank" rel="noopener noreferrer">여기</a>(제3자 계정 공유 서비스, Netflix 공식 채널 아님)를 눌러 Netflix에 접속하세요.'
 };
+
+/* 2026-11-27 站长新规：查不到 Netflix 的卡，一律按《医生》卡那条规矩办——
+   不挂 Netflix 入口，也不挂第三方合租平台（AFF）入口，红字换成本片专属说明，
+   并写明该页真正能用的渠道。表：lang/slug → 该页实际可用的渠道说明。 */
+const NO_NF_CH = {
+  'zh/drama2': '英文区 Prime Video · Kocowa 频道 / 英文区 OnDemandKorea',
+  'zh/drama5': '英文区 Prime Video · Kocowa 频道',
+  'zh/drama6': '香港 Viu',
+  'zh/drama10': '英文区 Prime Video',
+  'zh/drama11': '英文区 Prime Video',
+  'zh/drama12': '英文区 Viki',
+  'zh/drama13': '英文区 Tubi',
+  'zh/drama14': '香港 Viu',
+  'zh/film': '台湾 Catchplay',
+  'en/drama2': 'Prime Video (Kocowa) or OnDemandKorea',
+  'en/drama5': 'Prime Video (Kocowa)',
+  'en/drama6': 'OnDemandKorea',
+  'en/drama10': 'Prime Video',
+  'en/drama11': 'Tubi (free with ads)',
+  'en/drama12': 'Viki (free with ads)',
+  'en/drama13': 'Tubi (free with ads)',
+  'en/drama14': 'Viki (free with ads)',
+  'en/film': 'Prime Video or YouTube (rent/buy)',
+  'jp/drama2': '英語圏の Prime Video・Kocowa チャンネルまたは OnDemandKorea',
+  'jp/drama3': 'U-NEXT または Amazon（レンタル・購入）',
+  'jp/drama5': 'U-NEXT または FOD',
+  'jp/drama6': 'U-NEXT',
+  'jp/drama10': 'Amazon（サブスク）',
+  'jp/drama11': 'Amazon（サブスク）',
+  'jp/drama12': 'U-NEXT',
+  'jp/drama13': 'Amazon（サブスク）',
+  'jp/drama14': 'U-NEXT',
+  'jp/film': 'YouTube（レンタル・購入）',
+  'ko/drama2': 'wavve',
+  'ko/drama5': 'TVING 또는 wavve',
+  'ko/drama6': 'wavve',
+  'ko/drama10': 'wavve 또는 TVING',
+  'ko/drama11': 'TVING',
+  'ko/drama12': 'wavve 또는 왓챠',
+  'ko/drama13': 'TVING',
+  'ko/drama14': 'TVING 검색',
+  'ko/film': 'YouTube(대여 또는 구매)',
+};
+const NO_NF_NOTE_TPL = {
+  zh: (ch) => '本片未见 Netflix 条目，本站不挂 Netflix 入口；' + ch + '，按所在商店结算 · 请支持正版。',
+  en: (ch) => 'Not on Netflix in this region — this site does not link a Netflix entry; use ' + ch + ' instead (billed by the store in your country).',
+  jp: (ch) => 'この地域の Netflix には掲載がありません（本站では Netflix の入口を掲載しません）。' + ch + 'をご利用ください（お住まいの地域のストアで決済されます）。',
+  ko: (ch) => '이 지역 Netflix에는 아직 없습니다(本站는 Netflix 入口를 걸지 않습니다). ' + ch + ' (결제·가격은 계정 지역 기준).'
+};
+const NO_NF_NOTE = {};
+for (const key of Object.keys(NO_NF_CH)) {
+  const lang = key.slice(0, 2);
+  NO_NF_NOTE[key] = NO_NF_NOTE_TPL[lang](NO_NF_CH[key]);
+}
 /* 订阅制渠道（2026-11-22 站长追问「只有订阅制，既然能买正版，为什么不挂」）：
    按 JustWatch 逐区实查（apis.justwatch.com/graphql，country = US / JP / KR，2026-11-22 取数）。
    只挂**非 Netflix** 的持牌订阅平台——Netflix 的入口就是那条红字 AFF，不许再挂 netflix.com 直链。
@@ -760,11 +814,10 @@ function verify(state) {
   if (!source.includes('data-i18n="picks.film.actions"')) {
     errors.push('zh: picks actions block missing');
   }
-  if (!zhActions.includes(AFF_LINK)) errors.push('zh: aff link missing from actions block');
-  if (!zhActions.includes('5rfpUarUEd')) errors.push('zh: invitation code missing from actions block');
-  if (!zhActions.includes(PICKS_PRIMARY_LABEL.zh)) errors.push('zh: primary button label drift');
-  if (!zhActions.includes('中国香港地区')) errors.push('zh: HK-region wording missing');
-  if (!zhActions.includes(PICKS_ACTIONS_EXPECT.zh.note)) errors.push('zh: Netflix note wording drift');
+  /* 2026-11-27：《哦！文姬》五区均查不到 Netflix → 不挂 aff 入口，红字换本片专属说明。 */
+  if (zhActions.includes(AFF_LINK)) errors.push('zh: 电影卡查不到 Netflix，不得挂合租平台入口');
+  if (zhActions.includes('5rfpUarUEd')) errors.push('zh: 电影卡查不到 Netflix，不得留邀请码');
+  if (!zhActions.includes(NO_NF_NOTE['zh/film'])) errors.push('zh: 电影卡未见 Netflix 说明缺失');
   if (!/\.pick-netflix-note\s*\{[^}]*color:\s*#C5221F[^}]*font-weight:\s*700/.test(state.css)) {
     errors.push('zh: Netflix note must be red and bold');
   }
@@ -1089,13 +1142,20 @@ function verify(state) {
     if (!label || !label.text.includes(DRAMA_YEAR[slug])) {
       errors.push('zh: ' + slug + ' label year drift (want ' + DRAMA_YEAR[slug] + ')');
     }
-    /* 中文五部统一挂港区 aff 邀请码按钮 + 红字原文 */
+    /* 中文页：有 Netflix 正版的卡统一挂港区 aff 邀请码按钮 + 红字原文；
+       查不到 Netflix 的卡（2026-11-27 新规）改挂本片专属说明，且不得再挂 aff 入口。 */
     const actionsBlock = (source.match(new RegExp('data-i18n="picks\\.' + slug + '\\.actions">([\\s\\S]*?)<\\/div>')) || [])[1] || '';
-    if (!actionsBlock.includes(DRAMA_PRIMARY['zh/' + slug])) {
-      errors.push('zh: ' + slug + ' HK-region aff button missing');
-    }
-    if (!actionsBlock.includes(DRAMA_NOTE.zh)) {
-      errors.push('zh: ' + slug + ' Netflix note missing');
+    const noNfZh = NO_NF_NOTE['zh/' + slug];
+    if (noNfZh) {
+      if (actionsBlock.includes(AFF_LINK)) errors.push('zh: ' + slug + ' 查不到 Netflix，不得挂合租平台入口');
+      if (!actionsBlock.includes(noNfZh)) errors.push('zh: ' + slug + ' 未见 Netflix 说明缺失');
+    } else {
+      if (!actionsBlock.includes(DRAMA_PRIMARY['zh/' + slug])) {
+        errors.push('zh: ' + slug + ' HK-region aff button missing');
+      }
+      if (!actionsBlock.includes(DRAMA_NOTE.zh)) {
+        errors.push('zh: ' + slug + ' Netflix note missing');
+      }
     }
     /* 中文按港区（2026-11-24 站长定）：Netflix 港区正版按钮可挂；TVING/Viki/U-NEXT/wavve 等大陆不可用平台仍禁挂。 */
     const zhSubHrefs = [...actionsBlock.matchAll(/class="pick-link pick-link-sub"\s+href="([^"]+)"/g)].map(m => m[1]);
@@ -1481,7 +1541,8 @@ function verify(state) {
     }
     const actions = nodes['picks.film.actions'] || '';
     const want = PICKS_ACTIONS_EXPECT[lang];
-    if (!actions.includes(want.note)) errors.push(lang + ': Netflix note wording drift');
+    /* 2026-11-27：《哦！文姬》查不到 Netflix → 四语红字统一为本片专属说明。 */
+    if (!actions.includes(NO_NF_NOTE[lang + '/film'])) errors.push(lang + ': 电影卡未见 Netflix 说明缺失');
     const featuredHref = (actions.match(/class="pick-link pick-link-featured"\s+href="([^"]+)"/) || [])[1] || '';
     if (want.primary) {
       if (!actions.includes(PICKS_PRIMARY_LABEL[lang])) errors.push(lang + ': primary button label drift');
@@ -1517,8 +1578,9 @@ function verify(state) {
       if (featuredHref.includes(AFF_LINK) || featuredHref.includes('5rfpUarUEd')) {
         errors.push(lang + ': aff link/code forbidden as primary button outside the Chinese page');
       }
-      if (!want.note.includes(AFF_LINK)) {
-        errors.push(lang + ': localized Netflix note must link the aff entry');
+      /* 2026-11-27：电影卡查不到 Netflix → 四语都不得再出现 aff 入口。 */
+      if (actions.includes(AFF_LINK)) {
+        errors.push(lang + ': 电影卡查不到 Netflix，不得挂合租平台入口');
       }
     }
     for (const calque of FORBIDDEN_REGION_CALQUES) {
@@ -1702,8 +1764,15 @@ function verify(state) {
         errors.push(lang + ': ' + slug + ' label year drift');
       }
       const actions = nodes['picks.' + slug + '.actions'] || '';
-      if (!actions.includes(note)) errors.push(lang + ': ' + slug + ' Netflix note drift');
-      if (!actions.includes(AFF_LINK)) errors.push(lang + ': ' + slug + ' aff entry missing in note');
+      const noNf = NO_NF_NOTE[lang + '/' + slug];
+      if (noNf) {
+        if (!actions.includes(noNf)) errors.push(lang + ': ' + slug + ' 未见 Netflix 说明缺失');
+        if (actions.includes(AFF_LINK)) errors.push(lang + ': ' + slug + ' 查不到 Netflix，不得挂合租平台入口');
+        if (actions.includes(NETFLIX_TITLE_PREFIX)) errors.push(lang + ': ' + slug + ' 查不到 Netflix，却挂了 Netflix 深链');
+      } else {
+        if (!actions.includes(note)) errors.push(lang + ': ' + slug + ' Netflix note drift');
+        if (!actions.includes(AFF_LINK)) errors.push(lang + ': ' + slug + ' aff entry missing in note');
+      }
       for (const m of actions.matchAll(/https:\/\/www\.netflix\.com\/[^\s"'<>]*/g)) {
         if (!/^https:\/\/www\.netflix\.com\/title\/\d+$/.test(m[0])) {
           errors.push(lang + ': ' + slug + ' Netflix link must be a title deep link -> ' + m[0]);
@@ -1896,7 +1965,14 @@ function verify(state) {
           errors.push(lang + ': ' + slug + ' licensed subscription button must sit above the aff note');
         }
       }
-      if (!actions.includes(AFF_LINK)) errors.push(lang + ': ' + slug + ' aff entry must be preserved');
+      /* 2026-11-27：查不到 Netflix 的卡不挂 aff 入口；有 Netflix 的照旧保留。 */
+      const noNfExtra = NO_NF_NOTE[lang + '/' + slug];
+      if (noNfExtra) {
+        if (actions.includes(AFF_LINK)) errors.push(lang + ': ' + slug + ' 查不到 Netflix，不得挂合租平台入口');
+        if (!actions.includes(noNfExtra)) errors.push(lang + ': ' + slug + ' 未见 Netflix 说明缺失');
+      } else if (!actions.includes(AFF_LINK)) {
+        errors.push(lang + ': ' + slug + ' aff entry must be preserved');
+      }
     }
   }
 
@@ -2532,17 +2608,14 @@ const faults = [
     s.dict.ko.html['picks.film.actions'] = s.dict.ko.html['picks.film.actions']
       .replace(YOUTUBE_LINK, 'https://www.netflix.com/');
   } },
-  { name: 'Korean Netflix note reverted to machine-translated search wording', mutate: s => {
-    s.dict.ko.html['picks.film.actions'] = s.dict.ko.html['picks.film.actions']
-      .replace('중국 본토 시청자는 <a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">여기</a>(제3자 계정 공유 서비스, Netflix 공식 채널 아님)를 눌러 Netflix에 접속하세요.', 'Netflix에서 제목을 검색해 보세요. 정식 서비스로 응원해 주세요');
+    { name: 'Korean Netflix note reverted to machine-translated search wording', mutate: s => {
+    mutateCardNote(s, 'ko', 'drama1', DRAMA_NOTE.ko, 'Netflix에서 검색해 보세요.');
   } },
-  { name: 'English Netflix note link stripped of the aff entry', mutate: s => {
-    s.dict.en.html['picks.film.actions'] = s.dict.en.html['picks.film.actions']
-      .replace(AFF_LINK, 'https://nfshare.cn/');
+    { name: 'English Netflix note link stripped of the aff entry', mutate: s => {
+    mutateCardNote(s, 'en', 'drama1', AFF_LINK, 'https://nfshare.cn/');
   } },
-  { name: 'Japanese Netflix note reverted to machine-translated search wording', mutate: s => {
-    s.dict.jp.html['picks.film.actions'] = s.dict.jp.html['picks.film.actions']
-      .replace('中国大陸からご覧になる場合は、<a href="' + AFF_LINK + '" target="_blank" rel="noopener noreferrer">こちら</a>（第三者のアカウント共有サービス経由、Netflix 公式窓口ではありません）から Netflix にアクセスできます。', 'Netflix で作品名を検索してご覧ください。正版で応援しましょう');
+    { name: 'Japanese Netflix note reverted to machine-translated search wording', mutate: s => {
+    mutateCardNote(s, 'jp', 'drama1', DRAMA_NOTE.jp, 'Netflix で検索してご覧ください。');
   } },
   { name: 'invitation code stripped from Chinese page', mutate: s => {
     s.source = s.source.replace(/5rfpUarUEd/g, '');
@@ -2657,8 +2730,8 @@ const faults = [
   { name: 'drama buy button added where no channel exists (KO)', mutate: s => {
     s.dict.ko.html['picks.drama1.actions'] = '<a class="pick-link pick-link-featured" href="' + AFF_LINK + '" target="_blank">buy</a>' + s.dict.ko.html['picks.drama1.actions'];
   } },
-  { name: 'drama localized Netflix note reverted to Chinese', mutate: s => {
-    s.dict.en.html['picks.drama2.actions'] = s.dict.en.html['picks.drama2.actions'].replace(DRAMA_NOTE.en, DRAMA_NOTE.zh);
+    { name: 'drama localized Netflix note reverted to Chinese', mutate: s => {
+    mutateCardNote(s, 'en', 'drama1', DRAMA_NOTE.en, DRAMA_NOTE.zh);
   } },
   { name: 'drama EN US buy link stripped', mutate: s => {
     s.dict.en.html['picks.drama4.actions'] = s.dict.en.html['picks.drama4.actions'].replace(DRAMA_AMAZON_US, 'https://nfshare.cn/');
@@ -2672,8 +2745,8 @@ const faults = [
   { name: 'drama Chinese source Netflix link swapped to homepage', mutate: s => {
     s.source = s.source.replace('https://www.netflix.com/title/81682438', 'https://www.netflix.com/');
   } },
-  { name: 'drama aff entry removed from Japanese note', mutate: s => {
-    s.dict.jp.html['picks.drama5.actions'] = s.dict.jp.html['picks.drama5.actions'].replace(AFF_LINK, 'https://nfshare.cn/');
+    { name: 'drama aff entry removed from Japanese note', mutate: s => {
+    mutateCardNote(s, 'jp', 'drama1', AFF_LINK, 'https://nfshare.cn/');
   } },
   { name: 'drama HK-region aff button stripped from Chinese source', mutate: s => {
     s.source = s.source.replace(/data-i18n="picks\.drama3\.actions">([\s\S]*?)<\/div>/,
@@ -3202,6 +3275,18 @@ const faults = [
     s.source = s.source.replace(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.dakter\.label">[\s\S]*?<\/article>/, '');
   } },
   { name: 'dakter poster file missing', mutate: s => { s.dakterPosterExists = false; } },
+  /* 2026-11-27 查不到 Netflix 的卡统一口径：aff 入口回来 / 说明被换回通用文案 / 混入 Netflix 深链。 */
+  { name: 'no-NF Chinese card re-adds the aff entry', mutate: s => {
+    s.source = s.source.replace('data-i18n="picks.drama5.actions">', 'data-i18n="picks.drama5.actions">' + AFF_LINK);
+  } },
+  { name: 'no-NF Japanese note reverted to the shared Netflix wording', mutate: s => {
+    s.dict.jp.html['picks.drama6.actions'] = s.dict.jp.html['picks.drama6.actions'].replace(NO_NF_NOTE['jp/drama6'], NO_NF_NOTE_TPL.jp('X'));
+    s.pages.jp = s.pages.jp.replace(NO_NF_NOTE['jp/drama6'], NO_NF_NOTE_TPL.jp('X'));
+  } },
+  { name: 'no-NF English card gains a Netflix deep link', mutate: s => {
+    s.dict.en.html['picks.drama11.actions'] = s.dict.en.html['picks.drama11.actions'].replace('<a class="pick-link pick-link-sub"', '<a class="pick-link pick-link-sub" href="https://www.netflix.com/title/80025266"');
+    s.pages.en = s.pages.en.replace('<a class="pick-link pick-link-sub"', '<a class="pick-link pick-link-sub" href="https://www.netflix.com/title/80025266"');
+  } },
   { name: 'dakter card moved out of release order', mutate: s => {
     const re = /(<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.dakter\.label">[\s\S]*?<\/article>)(\s*)(<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.drama6\.label">[\s\S]*?<\/article>)/;
     if (re.test(s.source)) s.source = s.source.replace(re, (_m, a, sp, b) => b + sp + a);
@@ -3233,6 +3318,18 @@ const faults = [
     s.css = s.css.replace('.nav-toggle { display: inline-flex; margin-left: auto; }', '.nav-toggle { display: none; }');
   } },
 ];
+/* 故障注入用：只改某张卡 actions 里的片段（dict 与生成页同时改，避免只改一半）。 */
+function mutateCardNote(st, lang, slug, find, repl) {
+  const key = 'picks.' + slug + '.actions';
+  if (lang !== 'zh') {
+    st.dict[lang].html[key] = st.dict[lang].html[key].split(find).join(repl);
+    const re = new RegExp('(data-i18n="picks\\.' + slug + '\\.actions">)([\\s\\S]*?)</div>');
+    st.pages[lang] = st.pages[lang].replace(re, (m, a, inner) => a + inner.split(find).join(repl) + '</div>');
+  } else {
+    const re = new RegExp('(data-i18n="picks\\.' + slug + '\\.actions">)([\\s\\S]*?)</div>');
+    st.source = st.source.replace(re, (m, a, inner) => a + inner.split(find).join(repl) + '</div>');
+  }
+}
 let caught = 0;
 for (const fault of faults) {
   const broken = clone(state);
