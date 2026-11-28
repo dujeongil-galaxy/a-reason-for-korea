@@ -510,3 +510,16 @@
 - **规则二（判定「查不到」要穷举写法）**：Netflix / tvN 剧集的 OST 常只收录部分 Part，或用韩文原名收录。判定「网易云没有」必须**多种写法都试过**（中文名、韩文名、去空格、去标点、加 OST 后缀）且**专辑名与曲目都不匹配**才算数。本轮《哦！文姬》《医生》(2013) 即是这么确认的——但结论只能是「**网易云没有**」，不能写成「没有 OST」。
 - **规则三（计费标照抄页面）**：网易云歌曲页标题里 `VIP单曲` / `单曲` 才是真实计费方式，别一律写「VIP 单曲」；本轮《死期将至》《拥抱太阳的月亮》《大长今》三首都是普通单曲。
 - **另（脚本本身别踩）**：临时脚本里不要写死绝对路径字面量（Windows 路径里的 `\t` 等会被当成转义），用相对路径或运行时推导目录；也**别用 PowerShell 改写含中文的脚本**（会按 ANSI 解码再写回，中文变乱码）。
+
+## 71. 查 QQ 音乐的歌曲 / 专辑：能用的是老 h5 搜索端点，`musicu.fcg` 的搜索模块对匿名请求返空
+
+- **现象**：要给站内补 QQ 音乐链接时，逐个试接口踩了一轮：
+  - `POST https://u.y.qq.com/cgi-bin/musicu.fcg` + `music.search.SearchCgiService/DoSearchForQQMusicDesktop`：**匿名请求一律返空**（信封 key 要写成 module 名、不能带顶层 `comm`，这两点照文档改对仍然空，body 里 `code` 可能是 2001 或 0 但列表为空），连「周杰伦」都搜不到——这条路当前不可用，别在这上面耗时间。
+  - `POST https://u.y.qq.com/cgi-bin/musicu.fcg` + `music.musichallAlbum.AlbumSongList/GetAlbumSongList`（参数 `albummid`）：**可用**，一次给全专辑曲目（id / mid / 歌名 / 歌手 / 专辑）。
+  - `GET https://c.y.qq.com/v8/fcg-bin/fcg_v8_album_info_cp.fcg?albummid=<mid>&format=json`：**可用**，给专辑名、发行日期、曲目表（注意：参数名是 `albummid`；写成 `albumbid` 或 `albumId` 会回 `para error`）。**不要带 Cookie**（带 `qg_cipher` 之类的反而报 para error）。
+  - `GET https://c.y.qq.com/soso/fcgi-bin/search_for_qq_cp?w=<词>&p=1&n=20&format=json&platform=h5&g_tk=5381&uin=0`：**可用**（JSONP，去掉 `callback(` 括号再 parse），给 20 条单曲的 `songmid` / `songname` / `singer` / `albumname` / `albummid`——**这是目前唯一能用的「按关键词找歌 + 拿到 albummid」的路子**。
+  - `music.srfDissInfo.DissInfo/CgiGetDiss`（歌单）、`music.musichallAlbum.AlbumListServer/GetAlbumList`（歌手专辑）、`music.web_singer_info_svr/get_singer_detail_info`（歌手页）也都能用，但都要先有 mid / disstid，而 mid 只能靠上面那条 h5 搜索拿到。
+  - `https://y.qq.com/n/ryqq/search?w=...` 网页版在无头浏览器里只出落地页（搜索结果靠 JS 渲染，SSR 不给结果），别指望 `--dump-dom`。
+- **规则一（拿到 mid 就能查一切）**：QQ 的所有详情接口都以 mid 为钥匙，所以流程固定为「h5 搜索拿 songmid / albummid → 用 mid 查专辑曲目与计费」。站内已有先例：`i.y.qq.com/v8/playsong.html?songid=<数字id>`、`y.qq.com/n/m/detail/mv/index.html?vid=<vid>`。
+- **规则二（查不到要写清「谁没有」）**：《哦！文姬》《医生》(닥터, 2013) 这两部的 OST 在**网易云和 QQ 音乐都没有**——而且原因不是「漏查」：前者 OST 是纯配乐（정지훈 音乐总监，代表曲《옹헤야》《당디기》），后者是 Mowg 的电影配乐，本来就**没有人声单曲**。写进站点时要写成「两个平台都没收录 + 本就没有单曲」，别写成「查不到」。
+- **另（本次顺带确认）**：QQ 音乐有《大长今》OST 专辑（`albummid=0035dTP92nqwDV`，2004-08-30，17 首，曲目中文名：高原 / 苍龙 / 何茫然 / 莲实 / 短歌 / 烟涛 / 悲 / 子夜吴歌 / 空八一五），与网易云的《대장금 OST》同一录音；该剧最出名的唱段「새로운 하늘을」两个平台都没有收录。
