@@ -571,3 +571,6 @@
 - **规则三（同名不同曲要交叉核对署名）**：网易云搜「빈 수레」会同时出现 **HanGroove**（《인간군상》首曲）和一堆同名的传统民谣（신형원、박삿갓、김창수…），QQ 音乐还有一首署名 **Anjo Gee** 的同名单曲（albummid `002CKlOJ4FqXd0`）——**同一首歌在两个平台署名不同**。本次以**官方 YouTube 频道 + 专辑厂牌 DINA Studio + 网易云 genre「국악힙합」**三方互证锁定 HanGroove 版本，不挂 Anjo Gee 那条。
 - **另（发行日以官方渠道为准，网易云晚三个月）**：QQ 音乐 album `aDate=2026-04-08`、官方视频发布日同为 2026-04-08，而**网易云专辑 publishTime 是 2026-07-15**（晚三个月上架）。站内的 `MUSIC_DATE` / `MUSIC_DATE_TEXT` 用**首次发行日 2026-04-08**，不要抄网易云的上架日。
 - **另（取时长的坑复发）**：本机现在取 YouTube 时长，watch 页的 `lengthSeconds` / `approxDurationMs` / innertube player（WEB / ANDROID / IOS / TVHTML5）**全部拿不到**（player 返 `LOGIN_REQUIRED: Sign in to confirm you're not a bot`）。可用的是**搜索结果页按 videoId 分块取 `lengthText`**（本例 3:29），再用 QQ 音乐的 `interval`（208 秒）交叉验证，两者吻合才下结论——别拿 watch 页第一个 `lengthText` 当本视频时长（那是侧栏别的视频，本例一度误读成 6 小时）。
+
+- **规则四（AI 参与制作必须写明）**：有些小众音乐是**用 AI 参与制作**的，官方自己在视频说明里写明（如 한그루브 每条都写「제작 과정에 AI를 활용했어요」）。这类内容必须**照实标注**，不能写成纯人工创作。判定依据不是猜：把**频道全部视频的说明**抓一遍，看这句声明是「仅此一条」还是**频道通例**——本例是通例（抽查 6 条全部带这句），所以写「官方每条视频都写明这一点」。
+- **另（按语言块改字典，别用全局搜索）**：`assets/i18n.js` 里 `zh/en/jp/ko` 四段各有同名键（如 `picks.hangroove.desc`），**只按字符串全局替换会串到别的语言块**。改写前先切出语言块（`^  (zh|en|jp|ko): {`），在块内定位再替换；同理 `zh` 段**没有 `html` 子段**（中文文案在 `index.html` 源页），所以断言不能去读 `dict.zh.html`，要直接读页面节点（`extractNodes(page)`）。

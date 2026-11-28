@@ -203,6 +203,22 @@ const MUSIC_YTNOTE = {
    端游/手游拆成两个锚点两个子标题；六张卡全部沿用剧集卡标准两栏结构。 */
 /* K-POP 小众音乐卡（多卡）：中文页挂 QQ/网易云，外文页挂 YouTube。
    与单卡 music1 分开校验，避免动 music1 的既有断言。 */
+/* 한그루브（HanGroove）用 AI 参与制作（官方每条视频说明都写「제작 과정에 AI를 활용했어요」），
+   卡片必须写明这一点，且四语都要写 —— 不能把 AI 参与制作说成纯人工创作。 */
+const AI_PHRASE = {
+  zh: 'AI',
+  en: 'AI',
+  jp: 'AI',
+  ko: 'AI'
+};
+/* note 里的精确措辞（note 更短，用它断言） */
+const AI_NOTE = {
+  zh: '制作过程使用了 AI',
+  en: 'AI was used in the production',
+  jp: '制作過程に AI を活用',
+  ko: '제작 과정에 AI를 활용'
+};
+
 const KPOP_SLUGS = ['jangminho', 'hangroove', 'minty', 'seoeve', 'ussoboy', 'sospecial', 'milksong', 'jjarappappa', 'misskorea', 'study'];
 const KPOP_IMAGE = {
   jangminho: 'assets/mv-jangminho.jpg', hangroove: 'assets/mv-hangroove.jpg',
@@ -2093,6 +2109,16 @@ function verify(state) {
         }
       }
     }
+    /* 站长 2026-11-28：한그루브 用 AI 参与制作，卡片四语都必须写明这一点。
+       中文文案在 index.html 源页（zh 字典没有 html 段），所以统一按各语页面节点判定。 */
+    for (const lang of ['zh', ...LANGS]) {
+      const page = lang === 'zh' ? state.source : (state.pages[lang] || '');
+      const nodesHG = extractNodes(page);
+      const descHG = nodesHG['picks.hangroove.desc'] || '';
+      const noteHG = nodesHG['picks.hangroove.note'] || '';
+      if (!descHG.includes(AI_PHRASE[lang])) errors.push(lang + ': hangroove 简介缺少 AI 制作声明');
+      if (!noteHG.includes(AI_NOTE[lang])) errors.push(lang + ': hangroove 注释缺少 AI 制作声明');
+    }
   }
 
   /* ---------- 补齐原仅中文卡（2026-11-24）：10 张卡现四语齐全、均有海报 ----------
@@ -3495,6 +3521,9 @@ const faults = [
   } },
   { name: 'HanGroove card leaked a mainland link into the Korean page', mutate: s => {
     s.pages.ko = s.pages.ko.replace('https://youtu.be/VWzL61kyuF0', 'https://music.163.com/song?id=3367203039');
+  } },
+  { name: 'HanGroove card dropped its AI-production disclosure', mutate: s => {
+    s.source = s.source.replace('官方声明：制作过程使用了 AI。', '');
   } },
   /* 2026-11-28 站长指定按合辑前两首：《哲仁王后》第一首换回同剧其它曲目 / 外文页挂合辑视频 */
   { name: 'Mr. Queen first BGM row swapped to another track of the same drama', mutate: s => {

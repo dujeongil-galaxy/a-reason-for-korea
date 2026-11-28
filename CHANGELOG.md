@@ -13,6 +13,8 @@
 - BGM 行总数仍是 27（一张卡换歌，不增不减）；校验登记表 `BGM_PICKS` 的 drama7 四语逐条锁定 id / 歌名 / 说明，新增 2 条故障注入（中文页第一首换成同剧其它曲目、外文页第一首挂合辑视频）。结果 `VERIFY OK · 464 translated nodes · 69 translated attributes · 4 languages`，`SELF-TEST 279/279 injected faults rejected`。
 
 ## 2026-11-28 · 音乐区新增 한그루브《빈 수레（Empty Cart）》
+- **补注（站长 2026-11-28 指出）**：한그루브 是**用 AI 参与制作**的原创乐队 —— 官方频道每一条视频的说明都写着「제작 과정에 AI를 활용했어요」（制作过程使用了 AI），本条亦同。卡片的简介与注释因此都写明了这一点，四语齐全，不把 AI 参与制作说成纯人工创作。
+- 校验新增 `AI_PHRASE` / `AI_NOTE` 两张表与一条断言：四语的简介、注释都必须含 AI 声明（注释用精确措辞断言）；另加 1 条故障注入（删掉中文页的 AI 声明应判红）。结果 `VERIFY OK · 470 translated nodes · 70 translated attributes · 4 languages`，`SELF-TEST 282/282 injected faults rejected`。
 
 - 站长给了一条 YouTube 链接（`youtu.be/VWzL61kyuF0`），核实为韩国厂牌 **한그루브（HanGroove）** 官方频道的《빈 수레（Empty Cart）》**KR/EN 歌词版视频**：官方频道（`@한그루브`，RSS 里的 channelId `UCFinJreD4z7En88n6ndLqWA`），**3 分 29 秒**，发布于 **2026-04-08**，视频描述写明「한그루브가 기획하고 만든 오리지널 음악」；缩略图取官方 `maxresdefault.jpg`（1280×720，存 `assets/mv-hangroove.jpg`）。
 - 这不是韩剧 OST，是**国乐嘻哈（국악힙합）**：韩国民谣底子 + 暗黑嘻哈。收录于同日发行的十二首专辑《인간군상》（NetEase `369606050`，QQ 音乐 `003BYI8k2sfH7x`，厂牌 DINA Studio），本曲是专辑第一首。NetEase 曲目的 genre 标注就是「국악힙합 / Korean Traditional Hip」。
