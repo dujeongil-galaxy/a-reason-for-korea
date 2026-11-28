@@ -4,6 +4,12 @@
 
 > **2026-11-26 历史重写**：本文件里 2026-11-25 16:52 之后的哈希是重写前的旧值，对照见 [HASH-MAP.md](HASH-MAP.md)。
 
+## 2026-11-28 · 《大长今》的 BGM 改成主题曲《呼唤》
+
+- 站长指正：**大长今最出名的 OST 不是《何茫然》，是《呼唤》**——我之前按「专辑里排第一的曲子」挑了《하망연(何茫然)》，那是 Alessandro Safina 的**配乐主题**，挑错了。
+- 现在《大长今》也挂两首，**主题曲在前**：第一首 **오나라 I（呼唤）**（网易云 id `5413443`，歌手 김지현，含 백보현；网易云歌曲页标题就是「오나라 I（呼唤）」），第二首保留《하망연(何茫然)》作为配乐推荐。外文页：主题曲挂官方 Track 页 `youtu.be/NhHftA5JeAc`（Release - Topic），配乐挂 `youtu.be/YrAUxK2SISU`（Alessandro Safina - Topic）。
+- BGM 行总数 26 → 27；校验登记表 `BGM_PICKS` 的 drama5 改成两首并逐条锁定 id / 歌名 / 四语说明。结果 `VERIFY OK · 464 translated nodes · 69 translated attributes · 4 languages`，`SELF-TEST 277/277 injected faults rejected`。
+
 ## 2026-11-28 · 每部剧补上第二首 OST（BGM 由 1 首变 1~2 首）
 
 - 站长指正：**一部剧不止一首 OST**——《继承者们》还有《咬住下唇》（아랫입술 물고，OST Part.4，eSNa），「我不说你也不找」。这轮把 14 张卡的 **OST 专辑全部扫了一遍**（网易云各 Part 单曲 + 全曲专辑），逐部挑第二首，**12 张卡各加一首**，BGM 行总数 14 → 26。

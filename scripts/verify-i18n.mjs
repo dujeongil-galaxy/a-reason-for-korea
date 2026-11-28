@@ -2225,10 +2225,14 @@ function verify(state) {
       ko: [{ id: 'BgcRLIXw4dQ', song: '시간을 거슬러 — 린 (LYn)', note: '해를 품은 달 (2011–2012) OST Part.2 · YouTube' }, { id: 'c4EsqYxRcsE', song: '달빛이 지고 — 해오라 (임세주)', note: '해를 품은 달 (2011–2012) OST Part 1 · YouTube' }]
     },
     drama5: {
-      zh: [{ id: '5413431', song: '하망연(何茫然) — Alessandro Safina', note: '《大长今》OST 原声配乐 · 网易云音乐（单曲）' }],
-      en: [{ id: 'YrAUxK2SISU', song: 'Hamangyeon (何茫然) — Alessandro Safina', note: 'Jewel in the Palace (2003) OST score · YouTube' }],
-      jp: [{ id: 'YrAUxK2SISU', song: 'Hamangyeon (何茫然) — Alessandro Safina', note: '宮廷女官チャングムの誓い（2003） OST score · YouTube' }],
-      ko: [{ id: 'YrAUxK2SISU', song: 'Hamangyeon (何茫然) — Alessandro Safina', note: '대장금 (2003) OST score · YouTube' }]
+      zh: [{ id: '5413443', song: '오나라 I（呼唤）— 김지현', note: '《大长今》OST 主题曲 · 网易云音乐（单曲）' },
+            { id: '5413431', song: '하망연(何茫然) — Alessandro Safina', note: '《大长今》OST 原声配乐 · 网易云音乐（单曲）' }],
+      en: [{ id: 'NhHftA5JeAc', song: '오나라 I (Onara) — 김지현', note: 'Jewel in the Palace (2003) OST theme song · YouTube' },
+            { id: 'YrAUxK2SISU', song: 'Hamangyeon (何茫然) — Alessandro Safina', note: 'Jewel in the Palace (2003) OST score · YouTube' }],
+      jp: [{ id: 'NhHftA5JeAc', song: '오나라 I (Onara) — 김지현', note: '宮廷女官チャングムの誓い（2003）OST テーマソング · YouTube' },
+            { id: 'YrAUxK2SISU', song: 'Hamangyeon (何茫然) — Alessandro Safina', note: '宮廷女官チャングムの誓い（2003）OST スコア · YouTube' }],
+      ko: [{ id: 'NhHftA5JeAc', song: '오나라 I (Onara) — 김지현', note: '대장금 (2003) OST 테마송 · YouTube' },
+            { id: 'YrAUxK2SISU', song: 'Hamangyeon (何茫然) — Alessandro Safina', note: '대장금 (2003) OST 스코어 · YouTube' }]
     }
   };
   const bgmSlugs = Object.keys(BGM_PICKS);
