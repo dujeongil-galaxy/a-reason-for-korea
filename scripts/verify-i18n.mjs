@@ -2165,10 +2165,10 @@ function verify(state) {
       ko: [{ id: '1gE7VxIhAeE', song: '기적은 없어도 — 서인국', note: '이제 내가 죽으면 된다 (2023) OST Part.2 · YouTube' }, { id: '7lRaRtnlVWs', song: '거짓말인데 — Sondia', note: '이제 내가 죽으면 된다 (2023) OST Part.1 · YouTube' }]
     },
     drama7: {
-      zh: [{ id: '1818581719', song: '별들 중에서 — 林韩星', note: '《哲仁王后》OST Part.8 · 网易云音乐（VIP 单曲）' }, { id: '1806729608', song: '마음이 별이 되어 — 寒星', note: '《哲仁王后》OST Part.2 · 网易云音乐（VIP 单曲）' }],
-      en: [{ id: 'BbZLHTfub3c', song: '별들 중에서 — 임한별', note: 'Mr. Queen (2020) OST Part.8 · YouTube' }, { id: 'zfo7gb4OqnM', song: '마음이 별이 되어 — 장한별', note: 'Mr. Queen (2020) OST Part.2 · YouTube' }],
-      jp: [{ id: 'BbZLHTfub3c', song: '별들 중에서 — 임한별', note: '哲仁王后（2020） OST Part.8 · YouTube' }, { id: 'zfo7gb4OqnM', song: '마음이 별이 되어 — 장한별', note: '哲仁王后（2020） OST Part.2 · YouTube' }],
-      ko: [{ id: 'BbZLHTfub3c', song: '별들 중에서 — 임한별', note: '철인왕후 (2020) OST Part.8 · YouTube' }, { id: 'zfo7gb4OqnM', song: '마음이 별이 되어 — 장한별', note: '철인왕후 (2020) OST Part.2 · YouTube' }]
+      zh: [{ id: '1501717991', song: '봉환아（奉焕啊） — Norazo', note: '《哲仁王后》OST Part.1 · 网易云音乐（VIP 单曲）' }, { id: '1806729608', song: '마음이 별이 되어 — 寒星', note: '《哲仁王后》OST Part.2 · 网易云音乐（VIP 单曲）' }],
+      en: [{ id: '8FS2pOOixSo', song: '봉환아 — 노라조 (Norazo)', note: 'Mr. Queen (2020) OST Part.1 · YouTube' }, { id: 'zfo7gb4OqnM', song: '마음이 별이 되어 — 장한별', note: 'Mr. Queen (2020) OST Part.2 · YouTube' }],
+      jp: [{ id: '8FS2pOOixSo', song: '봉환아 — 노라조 (Norazo)', note: '哲仁王后（2020） OST Part.1 · YouTube' }, { id: 'zfo7gb4OqnM', song: '마음이 별이 되어 — 장한별', note: '哲仁王后（2020） OST Part.2 · YouTube' }],
+      ko: [{ id: '8FS2pOOixSo', song: '봉환아 — 노라조 (Norazo)', note: '철인왕후 (2020) OST Part.1 · YouTube' }, { id: 'zfo7gb4OqnM', song: '마음이 별이 되어 — 장한별', note: '철인왕후 (2020) OST Part.2 · YouTube' }]
     },
     drama8: {
       zh: [{ id: '1427705631', song: '별처럼 빛나는 시간 — JAMIE', note: '《你好妈妈，再见》OST Part.1 · 网易云音乐（VIP 单曲）' }, { id: '1429356004', song: 'Touch — 김영근', note: '《你好妈妈，再见》OST Part 2 · 网易云音乐（VIP 单曲）' }],
@@ -3486,6 +3486,13 @@ const faults = [
   } },
   { name: 'second BGM row leaked a mainland channel into the Japanese page', mutate: s => {
     s.pages.jp = s.pages.jp.replace('https://youtu.be/d-jxqm9JePk', 'https://music.163.com/song?id=27906297');
+  } },
+  /* 2026-11-28 站长指定按合辑前两首：《哲仁王后》第一首换回同剧其它曲目 / 外文页挂合辑视频 */
+  { name: 'Mr. Queen first BGM row swapped to another track of the same drama', mutate: s => {
+    s.source = s.source.replace('https://music.163.com/song?id=1501717991', 'https://music.163.com/song?id=1818581719');
+  } },
+  { name: 'Mr. Queen foreign BGM row pointed at the 22-track compilation video', mutate: s => {
+    s.pages.en = s.pages.en.replace('https://youtu.be/8FS2pOOixSo', 'https://youtu.be/bho7F4Vm8Qg');
   } },
 ];
 /* 故障注入用：只改某张卡 actions 里的片段（dict 与生成页同时改，避免只改一半）。 */

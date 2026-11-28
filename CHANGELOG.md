@@ -4,6 +4,14 @@
 
 > **2026-11-26 历史重写**：本文件里 2026-11-25 16:52 之后的哈希是重写前的旧值，对照见 [HASH-MAP.md](HASH-MAP.md)。
 
+## 2026-11-28 · 《哲仁王后》的 BGM 改按 OST 合辑前两首
+
+- 站长给了一条合辑视频（`youtu.be/bho7F4Vm8Qg`，bambooforest 频道「Mr. Queen OST & BGM (All 22 tracks)」），指示「按这个弄，只推前 2 个；YouTube 那边视频要自己去找了」。
+- 合辑描述里的时间戳曲目表确认了官方顺序：第 1 首 **00:02 Bong Hwan A**、第 2 首 **02:40 Like A Star (by Jang Han Byul)**，与网易云官方合辑「철인왕후 OST」（20 首）的曲目顺序一致。
+- 因此《哲仁王后》卡的第一首从 **별들 중에서（임한별，OST Part.8）** 换成 **봉환아（Norazo，OST Part.1）**；第二首仍是 마음이 별이 되어（장한별，OST Part.2），不变。原来那首 Part.8 退出本站这张卡。
+- 中文页挂网易云 **1501717991**（철인왕후 OST Part.1，歌曲页标题「봉환아（奉焕啊） - Norazo - 单曲」，VIP 单曲）；外文三页挂 Dreamus Music 官方 Lyric Video **8FS2pOOixSo**（노라조 (Norazo) - 봉환아，说明写「released 2020.12.13」，与 Part.1 发行日一致）。第二首的外文链接仍是 ClsQ 官方 MV `zfo7gb4OqnM`。
+- BGM 行总数仍是 27（一张卡换歌，不增不减）；校验登记表 `BGM_PICKS` 的 drama7 四语逐条锁定 id / 歌名 / 说明，新增 2 条故障注入（中文页第一首换成同剧其它曲目、外文页第一首挂合辑视频）。结果 `VERIFY OK · 464 translated nodes · 69 translated attributes · 4 languages`，`SELF-TEST 279/279 injected faults rejected`。
+
 ## 2026-11-28 · 《大长今》的 BGM 改成主题曲《呼唤》
 
 - 站长指正：**大长今最出名的 OST 不是《何茫然》，是《呼唤》**——我之前按「专辑里排第一的曲子」挑了《하망연(何茫然)》，那是 Alessandro Safina 的**配乐主题**，挑错了。
