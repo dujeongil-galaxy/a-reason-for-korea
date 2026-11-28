@@ -203,15 +203,16 @@ const MUSIC_YTNOTE = {
    端游/手游拆成两个锚点两个子标题；六张卡全部沿用剧集卡标准两栏结构。 */
 /* K-POP 小众音乐卡（多卡）：中文页挂 QQ/网易云，外文页挂 YouTube。
    与单卡 music1 分开校验，避免动 music1 的既有断言。 */
-const KPOP_SLUGS = ['jangminho', 'minty', 'seoeve', 'ussoboy', 'sospecial', 'milksong', 'jjarappappa', 'misskorea', 'study'];
+const KPOP_SLUGS = ['jangminho', 'hangroove', 'minty', 'seoeve', 'ussoboy', 'sospecial', 'milksong', 'jjarappappa', 'misskorea', 'study'];
 const KPOP_IMAGE = {
-  jangminho: 'assets/mv-jangminho.jpg',
+  jangminho: 'assets/mv-jangminho.jpg', hangroove: 'assets/mv-hangroove.jpg',
   minty: 'assets/mv-minty.jpg', seoeve: 'assets/mv-seoeve.jpg', ussoboy: 'assets/mv-ussoboy.jpg',
   sospecial: 'assets/mv-soSpecial.jpg', milksong: 'assets/mv-milksong.jpg', jjarappappa: 'assets/mv-jjarappappa.jpg',
   misskorea: 'assets/mv-misskorea.jpg', study: 'assets/mv-study.jpg'
 };
 const KPOP_ZH_LINK = {
   jangminho: 'music.163.com/#/mv?id=34822862',
+  hangroove: 'music.163.com/song?id=3367203039',
   minty: 'music.163.com/#/mv?id=10894437',
   seoeve: 'y.qq.com/n/m/detail/mv/index.html?vid=004AWNv33sYmI4',
   ussoboy: 'music.163.com/#/mv?id=34726420',
@@ -222,16 +223,17 @@ const KPOP_ZH_LINK = {
 };
 const KPOP_YT_ID = {
   jangminho: 'eSZiBdwbDH4',
+  hangroove: 'VWzL61kyuF0',
   minty: '6rzemizJoNQ', seoeve: 'dd9yeNZXWXg', ussoboy: 'CD7J5oCKH2Q',
   sospecial: 'pzP_w8rpxHA', milksong: 'bpGZSJPq3pk', jjarappappa: 'clgGG_qWFww',
   misskorea: 'iB0FLshLbLk', study: 'rS_k1DhhDy4'
 };
 
 /* 新增两首歌的发行日期（精确到日，防「只比年份」把同年顺序排错）。 */
-const MUSIC_DATE = { jangminho:'2026-11-24', seoeve:'2024', minty:'2019', sospecial:'2018',
+const MUSIC_DATE = { jangminho:'2026-11-24', hangroove:'2026-04-08', seoeve:'2024', minty:'2019', sospecial:'2018',
   ussoboy:'2017-11-16', misskorea:'2017-09-20', music1:'2013-10-30',
   study:'2013-07-11', jjarappappa:'2012', milksong:'2004' };
-const MUSIC_DATE_TEXT = { jangminho:'2026-11-24', misskorea:'2017-09-20', study:'2013-07-11' };
+const MUSIC_DATE_TEXT = { jangminho:'2026-11-24', hangroove:'2026-04-08', misskorea:'2017-09-20', study:'2013-07-11' };
 const MUSIC_DISAMBIG = { zh:'不是李孝利', en:'not Lee Hyori',
   jp:'イ・ヒョリではありません', ko:'이효리가 아닙니다' };
 /* 站长红线：本站不推北韩相关资源，四语页面都不给这类线索。 */
@@ -283,8 +285,8 @@ const SORT_RULES = {
             drama11:2016, drama13:2016, drama2:2015, drama12:2015, drama3:2013,
             drama14:2013, drama4:2013, dakter:2013, drama6:2012, drama5:2003 } },
   music: { grid: 'picks-kpop',
-    order: ['jangminho','seoeve','minty','sospecial','ussoboy','misskorea','music1','study','jjarappappa','milksong'],
-    year: { jangminho:2026, seoeve:2024, minty:2019, sospecial:2018, ussoboy:2017, misskorea:2017,
+    order: ['jangminho','hangroove','seoeve','minty','sospecial','ussoboy','misskorea','music1','study','jjarappappa','milksong'],
+    year: { jangminho:2026, hangroove:2026, seoeve:2024, minty:2019, sospecial:2018, ussoboy:2017, misskorea:2017,
             music1:2013, study:2013, jjarappappa:2012, milksong:2004 },
     date: MUSIC_DATE },
   pc: { grid: 'picks-pc-games',
@@ -3486,6 +3488,13 @@ const faults = [
   } },
   { name: 'second BGM row leaked a mainland channel into the Japanese page', mutate: s => {
     s.pages.jp = s.pages.jp.replace('https://youtu.be/d-jxqm9JePk', 'https://music.163.com/song?id=27906297');
+  } },
+  /* 2026-11-28 站长新增 한그루브《빈 수레》音乐卡：本曲网易云只有单曲页，无 MV */
+  { name: 'HanGroove card pointed the Chinese page at a YouTube link', mutate: s => {
+    s.source = s.source.replace('https://music.163.com/song?id=3367203039', 'https://youtu.be/VWzL61kyuF0');
+  } },
+  { name: 'HanGroove card leaked a mainland link into the Korean page', mutate: s => {
+    s.pages.ko = s.pages.ko.replace('https://youtu.be/VWzL61kyuF0', 'https://music.163.com/song?id=3367203039');
   } },
   /* 2026-11-28 站长指定按合辑前两首：《哲仁王后》第一首换回同剧其它曲目 / 外文页挂合辑视频 */
   { name: 'Mr. Queen first BGM row swapped to another track of the same drama', mutate: s => {

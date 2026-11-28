@@ -562,3 +562,12 @@
 - **规则二（合辑顺序 ≠ Part 编号顺序）**：合辑第 1 首是 **Part.1** 的主打曲（봉환아 / Norazo），而我原来挑的 Part.8（별들 중에서 / 임한별）在合辑里排第 8 位——**「最有名」和「合辑第一位」是两个口径**。站长这次明确要「合辑前 2 首」，就以合辑顺序为准，原先那首退出本站。
 - **规则三（合辑链接只用来定曲目，链接要另找）**：中文页按站内规矩只能挂网易云 / QQ，所以要在网易云找到对应单曲（本作是 `1501717991`，철인왕후 OST Part.1）；外文页要按单曲另找官方视频——本作用 Dreamus Music 官方 Lyric Video `8FS2pOOixSo`（노라조 (Norazo) - 봉환아，说明写「released 2020.12.13」，与 Part.1 发行日吻合；同一首歌 Dreamus 还有一条 `CtiRi-OuH8w` 说明写「released 2021.02.17」，是 Part.2 时期的另一支，别混用）。
 - **另（取时长的坑）**：本机抓 YouTube 视频时长时，watch 页的 `lengthSeconds` / `approxDurationMs`、innertube player（WEB / ANDROID / IOS / TVHTML5）、embed 页、m.youtube 页全部拿不到——innertube player 现在直接返 `LOGIN_REQUIRED: Sign in to confirm you're not a bot`，ANDROID / IOS 返 400；`lengthText` 只在**搜索结果页**里有，且是那条结果的时长、不是 watch 页里第一个视频的时长。要判断「这是完整版还是片段」，改用**同频道同标题的官方 MV 交叉比对**，别拿 watch 页里第一个 `lengthText` 当结论。
+
+## 76. 新增音乐卡：先确认「这是 MV 还是歌词版」，再决定挂哪个链接
+
+- **现象**：站长给一条 YouTube 链接让加到音乐区。这条是 **한그루브（HanGroove）** 的《빈 수레（Empty Cart）》，3 分 29 秒，官方频道（`@한그루브`，RSS channelId `UCFinJreD4z7En88n6ndLqWA`），发布日 2026-04-08。
+- **规则一（先问「官方 MV / 现场演出 / 歌词版」）**：站内既有三种视频形态——官方 MV（如张民皓）、现场演出（如《미스코리아》）、**歌词版**（本例，标题结尾 `| KR/EN Lyrics`）。**歌词版不是 MV**，文案与按钮不能写成「MV」，注释要说清「这曲在网易云/QQ 只有单曲页，没有 MV，官方歌词版只在 YouTube」。
+- **规则二（大陆通道先查有没有 MV）**：韩国小众音乐常有「只在自家平台有 MV」的情况。判定顺序：网易云歌曲 `mvid`、QQ 音乐 `vid`（h5 搜索返回）→ 两边都没有 MV 就只能挂单曲页（`music.163.com/song?id=` 或 `i.y.qq.com/v8/playsong.html?songid=`），跟《미스코리아》卡同一写法。
+- **规则三（同名不同曲要交叉核对署名）**：网易云搜「빈 수레」会同时出现 **HanGroove**（《인간군상》首曲）和一堆同名的传统民谣（신형원、박삿갓、김창수…），QQ 音乐还有一首署名 **Anjo Gee** 的同名单曲（albummid `002CKlOJ4FqXd0`）——**同一首歌在两个平台署名不同**。本次以**官方 YouTube 频道 + 专辑厂牌 DINA Studio + 网易云 genre「국악힙합」**三方互证锁定 HanGroove 版本，不挂 Anjo Gee 那条。
+- **另（发行日以官方渠道为准，网易云晚三个月）**：QQ 音乐 album `aDate=2026-04-08`、官方视频发布日同为 2026-04-08，而**网易云专辑 publishTime 是 2026-07-15**（晚三个月上架）。站内的 `MUSIC_DATE` / `MUSIC_DATE_TEXT` 用**首次发行日 2026-04-08**，不要抄网易云的上架日。
+- **另（取时长的坑复发）**：本机现在取 YouTube 时长，watch 页的 `lengthSeconds` / `approxDurationMs` / innertube player（WEB / ANDROID / IOS / TVHTML5）**全部拿不到**（player 返 `LOGIN_REQUIRED: Sign in to confirm you're not a bot`）。可用的是**搜索结果页按 videoId 分块取 `lengthText`**（本例 3:29），再用 QQ 音乐的 `interval`（208 秒）交叉验证，两者吻合才下结论——别拿 watch 页第一个 `lengthText` 当本视频时长（那是侧栏别的视频，本例一度误读成 6 小时）。

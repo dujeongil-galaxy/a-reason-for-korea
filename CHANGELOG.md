@@ -12,6 +12,14 @@
 - 中文页挂网易云 **1501717991**（철인왕후 OST Part.1，歌曲页标题「봉환아（奉焕啊） - Norazo - 单曲」，VIP 单曲）；外文三页挂 Dreamus Music 官方 Lyric Video **8FS2pOOixSo**（노라조 (Norazo) - 봉환아，说明写「released 2020.12.13」，与 Part.1 发行日一致）。第二首的外文链接仍是 ClsQ 官方 MV `zfo7gb4OqnM`。
 - BGM 行总数仍是 27（一张卡换歌，不增不减）；校验登记表 `BGM_PICKS` 的 drama7 四语逐条锁定 id / 歌名 / 说明，新增 2 条故障注入（中文页第一首换成同剧其它曲目、外文页第一首挂合辑视频）。结果 `VERIFY OK · 464 translated nodes · 69 translated attributes · 4 languages`，`SELF-TEST 279/279 injected faults rejected`。
 
+## 2026-11-28 · 音乐区新增 한그루브《빈 수레（Empty Cart）》
+
+- 站长给了一条 YouTube 链接（`youtu.be/VWzL61kyuF0`），核实为韩国厂牌 **한그루브（HanGroove）** 官方频道的《빈 수레（Empty Cart）》**KR/EN 歌词版视频**：官方频道（`@한그루브`，RSS 里的 channelId `UCFinJreD4z7En88n6ndLqWA`），**3 分 29 秒**，发布于 **2026-04-08**，视频描述写明「한그루브가 기획하고 만든 오리지널 음악」；缩略图取官方 `maxresdefault.jpg`（1280×720，存 `assets/mv-hangroove.jpg`）。
+- 这不是韩剧 OST，是**国乐嘻哈（국악힙합）**：韩国民谣底子 + 暗黑嘻哈。收录于同日发行的十二首专辑《인간군상》（NetEase `369606050`，QQ 音乐 `003BYI8k2sfH7x`，厂牌 DINA Studio），本曲是专辑第一首。NetEase 曲目的 genre 标注就是「국악힙합 / Korean Traditional Hip」。
+- **平台挂法**：这曲在网易云 / QQ 音乐只有单曲页、**没有 MV**（两边 `mvid` / `vid` 均为空），所以中文页挂网易云单曲页 `music.163.com/song?id=3367203039`（跟《미스코리아》卡同一写法），外文三语挂官方歌词版视频 `youtu.be/VWzL61kyuF0`；卡片注释写明「没有 MV，官方歌词版只在 YouTube」，不假装它是 MV。
+- 卡片排在音乐区第二位（张民皓 2026-11-24 之后、SEO EVE 2024 之前），四语齐全：标签 / 缩略图 / 标题 / 简介 / 按钮 / 注释 / alt 七键。校验登记表新增 `hangroove`，并把精确发行日 `2026-04-08` 写进 `MUSIC_DATE`（参与同年排序）与 `MUSIC_DATE_TEXT`（逐语断言日期字符串）。
+- 新增 2 条故障注入（中文页误挂 YouTube、韩文页泄漏网易云链接）。结果 `VERIFY OK · 470 translated nodes · 70 translated attributes · 4 languages`，`SELF-TEST 281/281 injected faults rejected`。
+
 ## 2026-11-28 · 《大长今》的 BGM 改成主题曲《呼唤》
 
 - 站长指正：**大长今最出名的 OST 不是《何茫然》，是《呼唤》**——我之前按「专辑里排第一的曲子」挑了《하망연(何茫然)》，那是 Alessandro Safina 的**配乐主题**，挑错了。
