@@ -523,3 +523,19 @@
 - **规则一（拿到 mid 就能查一切）**：QQ 的所有详情接口都以 mid 为钥匙，所以流程固定为「h5 搜索拿 songmid / albummid → 用 mid 查专辑曲目与计费」。站内已有先例：`i.y.qq.com/v8/playsong.html?songid=<数字id>`、`y.qq.com/n/m/detail/mv/index.html?vid=<vid>`。
 - **规则二（查不到要写清「谁没有」）**：《哦！文姬》《医生》(닥터, 2013) 这两部的 OST 在**网易云和 QQ 音乐都没有**——而且原因不是「漏查」：前者 OST 是纯配乐（정지훈 音乐总监，代表曲《옹헤야》《당디기》），后者是 Mowg 的电影配乐，本来就**没有人声单曲**。写进站点时要写成「两个平台都没收录 + 本就没有单曲」，别写成「查不到」。
 - **另（本次顺带确认）**：QQ 音乐有《大长今》OST 专辑（`albummid=0035dTP92nqwDV`，2004-08-30，17 首，曲目中文名：高原 / 苍龙 / 何茫然 / 莲实 / 短歌 / 烟涛 / 悲 / 子夜吴歌 / 空八一五），与网易云的《대장금 OST》同一录音；该剧最出名的唱段「새로운 하늘을」两个平台都没有收录。
+
+## 72. 查 Spotify 链接：匿名通道基本都封了；「先 Spotify 后 YouTube」要按平台分区写进校验
+
+- **现象**：站长要求「外文页优先 Spotify，没有才用 YouTube」。实测 Spotify 在本机（2026-11-28）的可用路径：
+  - `GET https://open.spotify.com/get_access_token?reason=transport&productType=web_player` → **403**；
+  - `POST https://clienttoken.spotify.com/v1/clienttoken` → **400**（拿不到匿名 token）；
+  - `POST https://u.y.qq.com/cgi-bin/musicu.fcg` 同族思路的 `musicu.fcg` 搜索模块 `music.search.SearchCgiService/DoSearchForQQMusicDesktop` → 匿名请求**列表恒空**（信封 key 要用 module 名、不能带顶层 comm，照文档改对仍空，连「周杰伦」都搜不到）；
+  - `GET https://api.spotify.com/v1/search` → 401（需 Bearer）；
+  - `open.spotify.com/search/...` 与 `/album/...` 网页**只有 SSR 空壳**（HTML 里没有 `spotify:track:`、没有 `__NEXT_DATA__`），无头浏览器渲染后 `--dump-dom` 同样拿不到 id；
+  - `GET https://open.spotify.com/oembed?url=<track url>` **可用**，但必须先有 track id —— 只能验真，不能用来搜；
+  - MusicBrainz 能查到这些韩剧 OST 单曲，但**没有 Spotify 外链关系**；
+  - 结论：本机只能靠搜索引擎 / 歌单 / 歌手页反查，而搜索引擎不收录 open.spotify.com。
+- **规则一（兜底要在登记表里写明）**：「先 Spotify 后 YouTube」落地时，校验登记表要**显式记录当前实际用的平台**（`BGM_PICKS` 的 `en/jp/ko.id` 存 YouTube id）。以后 Spotify 通道通了，只改登记表里的 id，版式与文案都不用动；**不要在页面文案里写「Spotify」却实际挂 YouTube**。
+- **规则二（按区锁平台要做成断言）**：站长的平台规矩要落成机器可验的规则：中文页 BGM 行只能指向 `music.163.com` / `y.qq.com`，外文页只能指向 `open.spotify.com` / `youtu.be` / `youtube.com`，且大陆通道不得外溢到外文页。**按 BGM 行内的 href 判断**，比「全页扫某域名」准（后者会误伤页面上其它用途的链接）。
+- **规则三（YouTube 链接要挑官方频道）**：站内挂 YouTube 时务必用 oEmbed 核对**频道名**（`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=<id>&format=json` 的 `author_name`），优先发行方 / 经纪公司 / OST 官方频道 / 艺人本人或 Topic 号；找歌可用 YouTube 搜索页 HTML 里的 `"videoId":"..."`（页面 SSR 带结果，普通 fetch 就能拿到，无需渲染）。
+- **另（韩剧 OST 在三个平台的收录差别很大）**：网易云与 QQ 对同一批韩剧 OST 的收录不一致（例：《哦！文姬》《医生》(닥터, 2013) 两边都没有；而《车贞淑医生》《大长今》两边都有）。**逐张查，别按剧推断**。
