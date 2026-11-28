@@ -473,3 +473,12 @@
 - **规则四**：「同一套文案整页出现 N 次」的旧断言会随新入口失效。本轮「听K-pop 整页 2 次、玩游戏 1 次」是按整页计数判的，手机端三级菜单复用同一文案后必然变成 3 次和 2 次 → 改成**按区块计数**（桌面下拉一次、手机面板一次），并补一条「音乐区小标题 = K-pop 下拉项文案」的比对顶上原来那条计数。
 - **另（两个易踩的 CSS/JS 细节）**：① `hidden` 属性会被作者样式里的 `display: block` 盖掉，必须显式写 `.mobile-nav[hidden] { display: none; }`；② 滑入动画要先去掉 `hidden` 再强制回流（`void el.offsetWidth`），否则看不到从屏外滑入的过程。
 - **验收**：真实点击跑一遍状态机（开 → 三级展开 → 返回 → 关），断言 `panel.hidden` / `aria-expanded` / `is-sub-open` / 背景滚动锁四组值，再跑 `build-i18n.mjs` + `verify-i18n.mjs` 全绿。
+
+## 67. 查某片某区有无正版：JustWatch 只建「当地有渠道」的区页，其余区要去平台分区页自己验
+
+- **现象**：给《닥터》(2013) 找各区正版时，JustWatch 只有美区（`/us/movie/doctor-2013`）与韩区（`/kr/%EC%98%81%ED%99%94/doctor`）两个页面，港/台/日四个候选 slug 全 404——看着像「没上架」，但 JustWatch 的分区页只在当地有持牌渠道时才建，别处没页**不能当作确定的没有**。
+- **规则一**：分区页 404 不作数，改查平台自己的分区详情页。Prime Video 的分区 URL 形如 `https://www.primevideo.com/-/{locale}/detail/<片名>/<影片条目ID>`，同一个条目 ID 在 `zh_TW` / `zh_HK` / `ja_JP` / `ko_KR` 都能打开。条目 ID 从美区的 `watch.amazon.com/detail?gti=amzn1.dv.gti.<uuid>` 跳转后的 `amazon.com/gp/video/detail/<ASIN>` 拿到（同一影片在各区共用一个条目 ID）。
+- **规则二**：**状态码 200 不等于可看**（同 §42）。Prime Video 对不可看的片也会渲染标题，所以要同时抓「标题命中片名」+「页里有租/买标签与当地货币价格」两个信号；文案写「按所在商店结算」，别把「页面打得开」说成「本地已授权」。
+- **规则三**：Netflix 有没有这部片要「五区 JustWatch + 官方 title 深链」两头查；查不到就四语一律不挂 Netflix 链接，红字改成**本片专属**说明（本例写「本片未见 Netflix 条目」），别留「到 Netflix 搜索片名观看」这种指向空结果的提示。
+- **规则四**：海报取源有优先序——TMDB / IMDb / Amazon 图源常被 Cloudflare 403（本机三处全挡），退到维基百科收录的官方竖版海报（本例 264×376），再按站内 2:3 裁切放大到 500×750，图注写明「经英文维基百科收录」，**不要假称是 TMDB**。
+- **验收**：`node scripts/build-i18n.mjs` + `node scripts/verify-i18n.mjs` 全绿；本地起服务截新卡确认海报 / 点评 / 按钮 / 红字都在位；六条渠道逐条 HTTP 200 + 标题命中。

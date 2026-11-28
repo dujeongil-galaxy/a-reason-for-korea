@@ -278,10 +278,10 @@ const PC_GAME_DATE = { lineage2: '2003-10-01', bnb: '2003-04-01' };
 const SORT_RULES = {
   drama: { grid: 'picks-dramas',
     order: ['drama9','drama1','drama10','film','drama7','drama8','drama11','drama13',
-            'drama2','drama12','drama3','drama14','drama4','drama6','drama5'],
+            'drama2','drama12','drama3','drama14','drama4','dakter','drama6','drama5'],
     year: { drama9:2025, drama1:2023, drama10:2023, film:2020, drama7:2020, drama8:2020,
             drama11:2016, drama13:2016, drama2:2015, drama12:2015, drama3:2013,
-            drama14:2013, drama4:2013, drama6:2012, drama5:2003 } },
+            drama14:2013, drama4:2013, dakter:2013, drama6:2012, drama5:2003 } },
   music: { grid: 'picks-kpop',
     order: ['jangminho','seoeve','minty','sospecial','ussoboy','misskorea','music1','study','jjarappappa','milksong'],
     year: { jangminho:2026, seoeve:2024, minty:2019, sospecial:2018, ussoboy:2017, misskorea:2017,
@@ -1793,6 +1793,62 @@ function verify(state) {
       }
     }
 
+  /* ---------- 2026-11-27 新增电影卡《医生》(닥터, 2013)：四语各按区挂正版渠道 ----------
+     渠道实查（2026-11-28）：美区 Prime Video 租/买 + Tubi 免费带广告；
+     港区 / 台湾 / 日区为 Prime Video 分区页（同一影片条目，商店按地区结算）；
+     韩区 wavve 租赁。本片未见 Netflix 条目 → 四语一律禁挂 Netflix 链接。 */
+  {
+    const DAKTER_POSTER = 'assets/dakter-poster.jpg';
+    const DAKTER_YEAR = '2013';
+    const DAKTER_REVIEW = {
+      zh: '站长点评：这种电影只有韩国敢拍，人性的丑陋发挥到极致，全程看的心惊肉跳！',
+      en: "Webmaster's note: Only Korea dares to make a film like this — human ugliness at its worst, heart-pounding from start to finish.",
+      jp: '運営者のメモ：こういう映画を撮れるのは韓国だけだ。人間の醜悪さを極限まで突き詰めて、見る間ずっと息を呑む。',
+      ko: '운영자의 한마디: 이런 영화는 한국만 만들 수 있다. 인간의 추악함을 극한까지 밀어붙여, 보는 내내 숨이 막힌다.'
+    };
+    const DAKTER_LINKS = {
+      zh: ['https://www.primevideo.com/-/zh_TW/detail/%E3%83%89%E3%82%AF%E3%82%BF%E3%83%BC/0PX65SCPDHH3DU6GTVCH4438EA',
+           'https://www.primevideo.com/-/zh_HK/detail/%E3%83%89%E3%82%AF%E3%82%BF%E3%83%BC/0PX65SCPDHH3DU6GTVCH4438EA'],
+      en: ['https://tubitv.com/movies/100008859',
+           'https://watch.amazon.com/detail?gti=amzn1.dv.gti.b5d80bce-0867-4453-8b4c-6f315d617142'],
+      jp: ['https://www.primevideo.com/-/ja_JP/detail/%E3%83%89%E3%82%AF%E3%82%BF%E3%83%BC/0PX65SCPDHH3DU6GTVCH4438EA'],
+      ko: ['https://www.wavve.com/player/movie?movieid=MV_CK01_TCO000011312']
+    };
+    /* 别区渠道禁入：中文页不许出现美区 / 韩区通道，外文页不许出现港区 / 台区 / 日区通道 */
+    const DAKTER_FOREIGN = {
+      zh: ['tubitv.com', 'watch.amazon.com', 'wavve.com', 'primevideo.com/-/ja_JP', 'primevideo.com/-/ko_KR'],
+      en: ['wavve.com', 'primevideo.com/-/zh_TW', 'primevideo.com/-/zh_HK', 'primevideo.com/-/ja_JP'],
+      jp: ['tubitv.com', 'watch.amazon.com', 'wavve.com', 'primevideo.com/-/zh_TW', 'primevideo.com/-/zh_HK'],
+      ko: ['tubitv.com', 'watch.amazon.com', 'primevideo.com/-/zh_TW', 'primevideo.com/-/zh_HK', 'primevideo.com/-/ja_JP']
+    };
+    if (!state.dakterPosterExists) errors.push('dakter: 海报文件缺失 -> ' + DAKTER_POSTER);
+    if (!/\.pick-review\s*\{[^}]*border-left:\s*3px solid var\(--accent\)/.test(state.css)) {
+      errors.push('css: 站长点评样式缺失（.pick-review 左侧竖线）');
+    }
+    const dakterPages = [['zh', state.source]].concat(LANGS.map(l => [l, state.pages[l] || '']));
+    for (const [lang, page] of dakterPages) {
+      const tag = lang + ': ';
+      const nodes = extractNodes(page);
+      const attrs = extractAttrs(page);
+      const actions = nodes['picks.dakter.actions'] || '';
+      if (!nodes['picks.dakter.label'] || !nodes['picks.dakter.label'].includes(DAKTER_YEAR)) errors.push(tag + 'dakter 缺 label 年份');
+      if (!nodes['picks.dakter.title']) errors.push(tag + 'dakter 缺 title');
+      if (!nodes['picks.dakter.desc']) errors.push(tag + 'dakter 缺 desc');
+      if (!attrs['picks.dakter.imageAlt']) errors.push(tag + 'dakter 缺 imageAlt');
+      if (!nodes['picks.dakter.imageCredit']) errors.push(tag + 'dakter 缺 imageCredit');
+      if (!nodes['picks.dakter.note']) errors.push(tag + 'dakter 缺 note');
+      const review = nodes['picks.dakter.review'] || '';
+      if (review !== DAKTER_REVIEW[lang]) errors.push(tag + 'dakter 站长点评文案漂移 -> ' + review);
+      const hrefs = [...actions.matchAll(/href="([^"]+)"/g)].map(m => m[1]);
+      const want = DAKTER_LINKS[lang];
+      if (hrefs.length !== want.length) errors.push(tag + 'dakter 渠道数量不符（应为 ' + want.length + '，实为 ' + hrefs.length + '）');
+      for (const w of want) if (!actions.includes(w)) errors.push(tag + 'dakter 缺渠道链接 -> ' + w);
+      for (const f of DAKTER_FOREIGN[lang]) if (actions.includes(f)) errors.push(tag + 'dakter 混入别区渠道 -> ' + f);
+      if (/netflix\.com/.test(actions)) errors.push(tag + 'dakter 无 Netflix 授权，不得挂 Netflix 链接');
+      for (const dom of FORBIDDEN_PIRATE_DOMAINS) if (actions.includes(dom)) errors.push(tag + 'dakter 盗版域名 -> ' + dom);
+      if (!page.includes('dakter-poster.jpg')) errors.push(tag + 'dakter 海报未引用');
+    }
+  }
   /* 英文区 drama10/11/13 正版按钮写死：链接、文案、位置（红字之前）。 */
   {
     const enNodes = extractNodes(state.pages.en || '');
@@ -2248,6 +2304,7 @@ const state = {
   kpopImages: Object.fromEntries(KPOP_SLUGS.map(s => [s, fs.existsSync(path.join(ROOT, KPOP_IMAGE[s]))])),
   dramaImages: Object.fromEntries(DRAMA_SLUGS.map(slug => [slug,
     fs.existsSync(path.join(ROOT, DRAMA_IMAGE[slug]))])),
+  dakterPosterExists: fs.existsSync(path.join(ROOT, 'assets/dakter-poster.jpg')),
   gameImages: Object.fromEntries(GAME_SLUGS.map(slug => [slug,
     fs.existsSync(path.join(ROOT, GAME_IMAGE[slug]))])),
   officialGameImages: Object.fromEntries(PC_OFFICIAL_SLUGS.map(slug => [slug,
@@ -3127,6 +3184,27 @@ const faults = [
   { name: 'jangminho thumbnail missing from assets', mutate: s => { s.kpopImages.jangminho = false; } },
   { name: 'jangminho card removed from Chinese source', mutate: s => {
     s.source = s.source.replace(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.jangminho\.label">[\s\S]*?<\/article>/, '');
+  } },
+  /* 2026-11-27 新增电影卡《医生》：别区渠道混入 / 点评被改 / 卡被删 / 海报丢失 / 排序漂移。 */
+  { name: 'dakter Chinese card points to YouTube instead of Prime Video', mutate: s => {
+    s.source = s.source.replace('https://www.primevideo.com/-/zh_TW/detail/%E3%83%89%E3%82%AF%E3%82%BF%E3%83%BC/0PX65SCPDHH3DU6GTVCH4438EA', 'https://youtu.be/eSZiBdwbDH4');
+  } },
+  { name: 'dakter Korean page leaked the US Prime Video link', mutate: s => {
+    s.pages.ko = s.pages.ko.replace('https://www.wavve.com/player/movie?movieid=MV_CK01_TCO000011312', 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.b5d80bce-0867-4453-8b4c-6f315d617142');
+    s.dict.ko.html['picks.dakter.actions'] = s.dict.ko.html['picks.dakter.actions'].replace('https://www.wavve.com/player/movie?movieid=MV_CK01_TCO000011312', 'https://watch.amazon.com/detail?gti=amzn1.dv.gti.b5d80bce-0867-4453-8b4c-6f315d617142');
+  } },
+  { name: 'dakter webmaster review text altered on Japanese page', mutate: s => {
+    const old = s.dict.jp.html['picks.dakter.review'];
+    s.dict.jp.html['picks.dakter.review'] = '運営者のメモ：すごい映画です。';
+    s.pages.jp = s.pages.jp.replace(old, '運営者のメモ：すごい映画です。');
+  } },
+  { name: 'dakter card removed from Chinese source', mutate: s => {
+    s.source = s.source.replace(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.dakter\.label">[\s\S]*?<\/article>/, '');
+  } },
+  { name: 'dakter poster file missing', mutate: s => { s.dakterPosterExists = false; } },
+  { name: 'dakter card moved out of release order', mutate: s => {
+    const re = /(<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.dakter\.label">[\s\S]*?<\/article>)(\s*)(<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.drama6\.label">[\s\S]*?<\/article>)/;
+    if (re.test(s.source)) s.source = s.source.replace(re, (_m, a, sp, b) => b + sp + a);
   } },
   /* 2026-11-27 手机端导航：菜单键位置 / 三级菜单方向 / 层级锚点 / 移动端显示。 */
   { name: 'mobile nav toggle removed from Chinese source', mutate: s => {
