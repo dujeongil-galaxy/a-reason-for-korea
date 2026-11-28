@@ -2136,129 +2136,136 @@ function verify(state) {
     }
   }
 
-  /* ---------- 2026-11-28：剧集卡 BGM 推荐（按区锁平台） ----------
+  /* ---------- 2026-11-28：剧集卡 BGM 推荐（按区锁平台，每卡 1~2 首） ----------
      站长 2026-11-28 定的规矩：中文页只挂网易云 / QQ 音乐（其他平台不挂）；
-     外文页优先 Spotify，没有才用 YouTube（本次 Spotify 搜索接口在本机不可达，14 首全部落 YouTube）。
-     登记表 BGM_PICKS：每张卡挂哪首 OST 主打曲（id / 歌名 / 四语说明文案）逐条锁定。
-     不变量：① 四语都有 BGM 行，行数与登记条数一致；
+     外文页优先 Spotify，没有才用 YouTube（本次 Spotify 搜索接口在本机不可达，全部落 YouTube）。
+     站长指正：一剧不止一首 OST —— 每部剧挂两首（《继承者们》补《咬住下唇》等 12 张卡各加一首）。
+     登记表 BGM_PICKS：每张卡挂哪几首 OST（id / 歌名 / 四语说明文案）逐条锁定。
+     不变量：① 四语都有同样数量的 BGM 行，且每行必须挂在自己的卡上；
      ② 中文页的 BGM 行只能指向 music.163.com / y.qq.com；
-     ③ 外文三页的 BGM 行只能指向 open.spotify.com / youtu.be / youtube.com；
+     ③ 外文三页的 BGM 行只能指向 open.spotify.com / youtu.be / youtube.com，且大陆通道不得外溢；
      ④ 全站不得出现 uct2 账号令牌。 */
   const BGM_PICKS = {
     drama9: {
-      zh: { id: '2738613686', song: '시간을 넘어 너에게로 — 道英', note: '《暴君的厨师》OST Part.1 · 网易云音乐（VIP 单曲）' },
-      en: { id: 'j2vcrm1oVJs', song: '시간을 넘어 너에게로 — 도영', note: 'Bon Appétit, Your Majesty (2025) OST Part.1 · YouTube' },
-      jp: { id: 'j2vcrm1oVJs', song: '시간을 넘어 너에게로 — 도영', note: '暴君のシェフ（2025） OST Part.1 · YouTube' },
-      ko: { id: 'j2vcrm1oVJs', song: '시간을 넘어 너에게로 — 도영', note: '폭군의 셰프 (2025) OST Part.1 · YouTube' }
+      zh: [{ id: '2738613686', song: '시간을 넘어 너에게로 — 道英', note: '《暴君的厨师》OST Part.1 · 网易云音乐（VIP 单曲）' }, { id: '2740922186', song: '있어줘요 — 许阁', note: '《暴君的厨师》OST Part.2 · 网易云音乐（VIP 单曲）' }],
+      en: [{ id: 'j2vcrm1oVJs', song: '시간을 넘어 너에게로 — 도영', note: 'Bon Appétit, Your Majesty (2025) OST Part.1 · YouTube' }, { id: '9DPKL8yizNM', song: '있어줘요 — 허각', note: 'Bon Appétit, Your Majesty (2025) OST Part.2 · YouTube' }],
+      jp: [{ id: 'j2vcrm1oVJs', song: '시간을 넘어 너에게로 — 도영', note: '暴君のシェフ（2025） OST Part.1 · YouTube' }, { id: '9DPKL8yizNM', song: '있어줘요 — 허각', note: '暴君のシェフ（2025） OST Part.2 · YouTube' }],
+      ko: [{ id: 'j2vcrm1oVJs', song: '시간을 넘어 너에게로 — 도영', note: '폭군의 셰프 (2025) OST Part.1 · YouTube' }, { id: '9DPKL8yizNM', song: '있어줘요 — 허각', note: '폭군의 셰프 (2025) OST Part.2 · YouTube' }]
     },
     drama1: {
-      zh: { id: '2043178599', song: '숨 — 郑承焕', note: '《车贞淑医生》OST Part.3 · 网易云音乐（VIP 单曲）' },
-      en: { id: 'ExdYYs1yHGg', song: '숨 — 정승환', note: 'Doctor Cha (2023) OST Part.3 · YouTube' },
-      jp: { id: 'ExdYYs1yHGg', song: '숨 — 정승환', note: 'ドクター・チャ・ジョンスク（2023） OST Part.3 · YouTube' },
-      ko: { id: 'ExdYYs1yHGg', song: '숨 — 정승환', note: '닥터 차정숙 (2023) OST Part.3 · YouTube' }
+      zh: [{ id: '2043178599', song: '숨 — 郑承焕', note: '《车贞淑医生》OST Part.3 · 网易云音乐（VIP 单曲）' }, { id: '2047059099', song: '이 밤이 지나면 — 朴敏惠', note: '《车贞淑医生》OST Part.4 · 网易云音乐（VIP 单曲）' }],
+      en: [{ id: 'ExdYYs1yHGg', song: '숨 — 정승환', note: 'Doctor Cha (2023) OST Part.3 · YouTube' }, { id: 'Y-NI2TKnZww', song: '이 밤이 지나면 — 박민혜', note: 'Doctor Cha (2023) OST Part.4 · YouTube' }],
+      jp: [{ id: 'ExdYYs1yHGg', song: '숨 — 정승환', note: 'ドクター・チャ・ジョンスク（2023） OST Part.3 · YouTube' }, { id: 'Y-NI2TKnZww', song: '이 밤이 지나면 — 박민혜', note: 'ドクター・チャ・ジョンスク（2023） OST Part.4 · YouTube' }],
+      ko: [{ id: 'ExdYYs1yHGg', song: '숨 — 정승환', note: '닥터 차정숙 (2023) OST Part.3 · YouTube' }, { id: 'Y-NI2TKnZww', song: '이 밤이 지나면 — 박민혜', note: '닥터 차정숙 (2023) OST Part.4 · YouTube' }]
     },
     drama10: {
-      zh: { id: '2108515847', song: '기적은 없어도 — 徐仁国', note: '《死期将至》OST Part.2 · 网易云音乐（单曲）' },
-      en: { id: '1gE7VxIhAeE', song: '기적은 없어도 — 서인국', note: 'Death’s Game (2023) OST Part.2 · YouTube' },
-      jp: { id: '1gE7VxIhAeE', song: '기적은 없어도 — 서인국', note: '死期将至（2023） OST Part.2 · YouTube' },
-      ko: { id: '1gE7VxIhAeE', song: '기적은 없어도 — 서인국', note: '이제 내가 죽으면 된다 (2023) OST Part.2 · YouTube' }
+      zh: [{ id: '2108515847', song: '기적은 없어도 — 徐仁国', note: '《死期将至》OST Part.2 · 网易云音乐（单曲）' }, { id: '2103739607', song: '거짓말인데 — Sondia', note: '《死期将至》OST Part.1 · 网易云音乐（单曲）' }],
+      en: [{ id: '1gE7VxIhAeE', song: '기적은 없어도 — 서인국', note: 'Death’s Game (2023) OST Part.2 · YouTube' }, { id: '7lRaRtnlVWs', song: '거짓말인데 — Sondia', note: 'Death’s Game (2023) OST Part.1 · YouTube' }],
+      jp: [{ id: '1gE7VxIhAeE', song: '기적은 없어도 — 서인국', note: '死期将至（2023） OST Part.2 · YouTube' }, { id: '7lRaRtnlVWs', song: '거짓말인데 — Sondia', note: '死期将至（2023） OST Part.1 · YouTube' }],
+      ko: [{ id: '1gE7VxIhAeE', song: '기적은 없어도 — 서인국', note: '이제 내가 죽으면 된다 (2023) OST Part.2 · YouTube' }, { id: '7lRaRtnlVWs', song: '거짓말인데 — Sondia', note: '이제 내가 죽으면 된다 (2023) OST Part.1 · YouTube' }]
     },
     drama7: {
-      zh: { id: '1818581719', song: '별들 중에서 — 林韩星', note: '《哲仁王后》OST Part.8 · 网易云音乐（VIP 单曲）' },
-      en: { id: 'BbZLHTfub3c', song: '별들 중에서 — 임한별', note: 'Mr. Queen (2020) OST Part.8 · YouTube' },
-      jp: { id: 'BbZLHTfub3c', song: '별들 중에서 — 임한별', note: '哲仁王后（2020） OST Part.8 · YouTube' },
-      ko: { id: 'BbZLHTfub3c', song: '별들 중에서 — 임한별', note: '철인왕후 (2020) OST Part.8 · YouTube' }
+      zh: [{ id: '1818581719', song: '별들 중에서 — 林韩星', note: '《哲仁王后》OST Part.8 · 网易云音乐（VIP 单曲）' }, { id: '1806729608', song: '마음이 별이 되어 — 寒星', note: '《哲仁王后》OST Part.2 · 网易云音乐（VIP 单曲）' }],
+      en: [{ id: 'BbZLHTfub3c', song: '별들 중에서 — 임한별', note: 'Mr. Queen (2020) OST Part.8 · YouTube' }, { id: 'zfo7gb4OqnM', song: '마음이 별이 되어 — 장한별', note: 'Mr. Queen (2020) OST Part.2 · YouTube' }],
+      jp: [{ id: 'BbZLHTfub3c', song: '별들 중에서 — 임한별', note: '哲仁王后（2020） OST Part.8 · YouTube' }, { id: 'zfo7gb4OqnM', song: '마음이 별이 되어 — 장한별', note: '哲仁王后（2020） OST Part.2 · YouTube' }],
+      ko: [{ id: 'BbZLHTfub3c', song: '별들 중에서 — 임한별', note: '철인왕후 (2020) OST Part.8 · YouTube' }, { id: 'zfo7gb4OqnM', song: '마음이 별이 되어 — 장한별', note: '철인왕후 (2020) OST Part.2 · YouTube' }]
     },
     drama8: {
-      zh: { id: '1427705631', song: '별처럼 빛나는 시간 — JAMIE', note: '《你好妈妈，再见》OST Part.1 · 网易云音乐（VIP 单曲）' },
-      en: { id: 'EDXVhBn9RB4', song: '별처럼 빛나는 시간 — 제이미 (JAMIE)', note: 'Hi Bye, Mama! (2020) OST Part.1 · YouTube' },
-      jp: { id: 'EDXVhBn9RB4', song: '별처럼 빛나는 시간 — 제이미 (JAMIE)', note: 'ハイ バイ ママ！（2020） OST Part.1 · YouTube' },
-      ko: { id: 'EDXVhBn9RB4', song: '별처럼 빛나는 시간 — 제이미 (JAMIE)', note: '하이바이, 마마! (2020) OST Part.1 · YouTube' }
+      zh: [{ id: '1427705631', song: '별처럼 빛나는 시간 — JAMIE', note: '《你好妈妈，再见》OST Part.1 · 网易云音乐（VIP 单曲）' }, { id: '1429356004', song: 'Touch — 김영근', note: '《你好妈妈，再见》OST Part 2 · 网易云音乐（VIP 单曲）' }],
+      en: [{ id: 'EDXVhBn9RB4', song: '별처럼 빛나는 시간 — 제이미 (JAMIE)', note: 'Hi Bye, Mama! (2020) OST Part.1 · YouTube' }, { id: 'uEVUOY-Ct9c', song: 'Touch — 김영근', note: 'Hi Bye, Mama! (2020) OST Part 2 · YouTube' }],
+      jp: [{ id: 'EDXVhBn9RB4', song: '별처럼 빛나는 시간 — 제이미 (JAMIE)', note: 'ハイ バイ ママ！（2020） OST Part.1 · YouTube' }, { id: 'uEVUOY-Ct9c', song: 'Touch — 김영근', note: 'ハイ バイ ママ！（2020） OST Part 2 · YouTube' }],
+      ko: [{ id: 'EDXVhBn9RB4', song: '별처럼 빛나는 시간 — 제이미 (JAMIE)', note: '하이바이, 마마! (2020) OST Part.1 · YouTube' }, { id: 'uEVUOY-Ct9c', song: 'Touch — 김영근', note: '하이바이, 마마! (2020) OST Part 2 · YouTube' }]
     },
     drama11: {
-      zh: { id: '421423448', song: '너만 보여 — 柳智娴', note: '《打架吧鬼神》OST Part.1 · 网易云音乐（VIP 单曲）' },
-      en: { id: '4lJy2AjqvQE', song: '너만 보여 — 류지현, 김민지', note: 'Let’s Fight, Ghost (2016) OST Part.1 · YouTube' },
-      jp: { id: '4lJy2AjqvQE', song: '너만 보여 — 류지현, 김민지', note: '打架吧鬼神（2016） OST Part.1 · YouTube' },
-      ko: { id: '4lJy2AjqvQE', song: '너만 보여 — 류지현, 김민지', note: '싸우자 귀신아 (2016) OST Part.1 · YouTube' }
+      zh: [{ id: '421423448', song: '너만 보여 — 柳智娴', note: '《打架吧鬼神》OST Part.1 · 网易云音乐（VIP 单曲）' }, { id: '423407596', song: '우연한 일들 — 金昭希 / 宋宥彬', note: '《打架吧鬼神》OST Part 3 · 网易云音乐（VIP 单曲）' }],
+      en: [{ id: '4lJy2AjqvQE', song: '너만 보여 — 류지현, 김민지', note: 'Let’s Fight, Ghost (2016) OST Part.1 · YouTube' }, { id: '1mUmECGzCGs', song: '우연한 일들 — 김소희, 송유빈', note: 'Let’s Fight, Ghost (2016) OST Part 3 · YouTube' }],
+      jp: [{ id: '4lJy2AjqvQE', song: '너만 보여 — 류지현, 김민지', note: '打架吧鬼神（2016） OST Part.1 · YouTube' }, { id: '1mUmECGzCGs', song: '우연한 일들 — 김소희, 송유빈', note: '打架吧鬼神（2016） OST Part 3 · YouTube' }],
+      ko: [{ id: '4lJy2AjqvQE', song: '너만 보여 — 류지현, 김민지', note: '싸우자 귀신아 (2016) OST Part.1 · YouTube' }, { id: '1mUmECGzCGs', song: '우연한 일들 — 김소희, 송유빈', note: '싸우자 귀신아 (2016) OST Part 3 · YouTube' }]
     },
     drama13: {
-      zh: { id: '412902448', song: 'Baby Blue — Kevin Oh', note: '《我亲爱的朋友们》OST Part.1 · 网易云音乐（VIP 单曲）' },
-      en: { id: 'd3MoxJv6rMI', song: 'Baby Blue — 케빈오 (Kevin Oh)', note: 'Dear My Friends (2016) OST Part.1 · YouTube' },
-      jp: { id: 'd3MoxJv6rMI', song: 'Baby Blue — 케빈오 (Kevin Oh)', note: 'ディア マイ フレンズ（2016） OST Part.1 · YouTube' },
-      ko: { id: 'd3MoxJv6rMI', song: 'Baby Blue — 케빈오 (Kevin Oh)', note: '디어 마이 프렌즈 (2016) OST Part.1 · YouTube' }
+      zh: [{ id: '412902448', song: 'Baby Blue — Kevin Oh', note: '《我亲爱的朋友们》OST Part.1 · 网易云音乐（VIP 单曲）' }, { id: '414979313', song: '바람에 머문다 — LYn', note: '《我亲爱的朋友们》OST Part.3 · 网易云音乐（VIP 单曲）' }],
+      en: [{ id: 'd3MoxJv6rMI', song: 'Baby Blue — 케빈오 (Kevin Oh)', note: 'Dear My Friends (2016) OST Part.1 · YouTube' }, { id: 'MJym9hB74C8', song: '바람에 머문다 — LYn', note: 'Dear My Friends (2016) OST Part.3 · YouTube' }],
+      jp: [{ id: 'd3MoxJv6rMI', song: 'Baby Blue — 케빈오 (Kevin Oh)', note: 'ディア マイ フレンズ（2016） OST Part.1 · YouTube' }, { id: 'MJym9hB74C8', song: '바람에 머문다 — LYn', note: 'ディア マイ フレンズ（2016） OST Part.3 · YouTube' }],
+      ko: [{ id: 'd3MoxJv6rMI', song: 'Baby Blue — 케빈오 (Kevin Oh)', note: '디어 마이 프렌즈 (2016) OST Part.1 · YouTube' }, { id: 'MJym9hB74C8', song: '바람에 머문다 — LYn', note: '디어 마이 프렌즈 (2016) OST Part.3 · YouTube' }]
     },
     drama2: {
-      zh: { id: '35345403', song: 'Shooting Star — 寒星', note: '《无理的前进》OST Part.2 · 网易云音乐（VIP 单曲）' },
-      en: { id: '-Sy-TP1ICXQ', song: 'Shooting Star — 장한별', note: 'Sassy Go Go (2015) OST Part.2 · YouTube' },
-      jp: { id: '-Sy-TP1ICXQ', song: 'Shooting Star — 장한별', note: 'チアアップ！（2015） OST Part.2 · YouTube' },
-      ko: { id: '-Sy-TP1ICXQ', song: 'Shooting Star — 장한별', note: '발칙하게 고고 (2015) OST Part.2 · YouTube' }
+      zh: [{ id: '35345403', song: 'Shooting Star — 寒星', note: '《无理的前进》OST Part.2 · 网易云音乐（VIP 单曲）' }, { id: '35090939', song: '거북이 날다 — Jadu', note: '《无理的前进》OST Part.1 · 网易云音乐（VIP 单曲）' }],
+      en: [{ id: '-Sy-TP1ICXQ', song: 'Shooting Star — 장한별', note: 'Sassy Go Go (2015) OST Part.2 · YouTube' }, { id: 'fZKg1ZhqyGM', song: '거북이 날다 — Jadu', note: 'Sassy Go Go (2015) OST Part.1 · YouTube' }],
+      jp: [{ id: '-Sy-TP1ICXQ', song: 'Shooting Star — 장한별', note: 'チアアップ！（2015） OST Part.2 · YouTube' }, { id: 'fZKg1ZhqyGM', song: '거북이 날다 — Jadu', note: 'チアアップ！（2015） OST Part.1 · YouTube' }],
+      ko: [{ id: '-Sy-TP1ICXQ', song: 'Shooting Star — 장한별', note: '발칙하게 고고 (2015) OST Part.2 · YouTube' }, { id: 'fZKg1ZhqyGM', song: '거북이 날다 — Jadu', note: '발칙하게 고고 (2015) OST Part.1 · YouTube' }]
     },
     drama12: {
-      zh: { id: '32451208', song: '내맘이 그래요 — 金泰贤', note: '《亲爱的恩东啊》OST Part.1 · 网易云音乐（VIP 单曲）' },
-      en: { id: 'Tya5faAH9PQ', song: '내맘이 그래요 — 김태현', note: 'Beloved Eun-dong (2015) OST Part.1 · YouTube' },
-      jp: { id: 'Tya5faAH9PQ', song: '내맘이 그래요 — 김태현', note: '愛するウンドンよ（2015） OST Part.1 · YouTube' },
-      ko: { id: 'Tya5faAH9PQ', song: '내맘이 그래요 — 김태현', note: '사랑하는 은동아 (2015) OST Part.1 · YouTube' }
+      zh: [{ id: '32451208', song: '내맘이 그래요 — 金泰贤', note: '《亲爱的恩东啊》OST Part.1 · 网易云音乐（VIP 单曲）' }],
+      en: [{ id: 'Tya5faAH9PQ', song: '내맘이 그래요 — 김태현', note: 'Beloved Eun-dong (2015) OST Part.1 · YouTube' }],
+      jp: [{ id: 'Tya5faAH9PQ', song: '내맘이 그래요 — 김태현', note: '愛するウンドンよ（2015） OST Part.1 · YouTube' }],
+      ko: [{ id: 'Tya5faAH9PQ', song: '내맘이 그래요 — 김태현', note: '사랑하는 은동아 (2015) OST Part.1 · YouTube' }]
     },
     drama3: {
-      zh: { id: '28228208', song: '안녕 — 孝琳', note: '《来自星星的你》OST Part.4 · 网易云音乐（VIP 单曲）' },
-      en: { id: 'CYyD1cQoIJY', song: '안녕 — 효린', note: 'My Love from the Star (2013) OST Part.4 · YouTube' },
-      jp: { id: 'CYyD1cQoIJY', song: '안녕 — 효린', note: '星から来たあなた（2013） OST Part.4 · YouTube' },
-      ko: { id: 'CYyD1cQoIJY', song: '안녕 — 효린', note: '별에서 온 그대 (2013) OST Part.4 · YouTube' }
+      zh: [{ id: '28228208', song: '안녕 — 孝琳', note: '《来自星星的你》OST Part.4 · 网易云音乐（VIP 单曲）' }, { id: '28242975', song: '너의 모든 순간 — 成始璄', note: '《来自星星的你》OST Part.7 · 网易云音乐（VIP 单曲）' }],
+      en: [{ id: 'CYyD1cQoIJY', song: '안녕 — 효린', note: 'My Love from the Star (2013) OST Part.4 · YouTube' }, { id: 'Dbxzh078jr4', song: '너의 모든 순간 — 성시cery', note: 'My Love from the Star (2013) OST Part.7 · YouTube' }],
+      jp: [{ id: 'CYyD1cQoIJY', song: '안녕 — 효린', note: '星から来たあなた（2013） OST Part.4 · YouTube' }, { id: 'Dbxzh078jr4', song: '너의 모든 순간 — 성시cery', note: '星から来たあなた（2013） OST Part.7 · YouTube' }],
+      ko: [{ id: 'CYyD1cQoIJY', song: '안녕 — 효린', note: '별에서 온 그대 (2013) OST Part.4 · YouTube' }, { id: 'Dbxzh078jr4', song: '너의 모든 순간 — 성시cery', note: '별에서 온 그대 (2013) OST Part.7 · YouTube' }]
     },
     drama14: {
-      zh: { id: '27901889', song: '가시사랑 — 4MEN', note: '《奇皇后》OST Part.1 · 网易云音乐（VIP 单曲）' },
-      en: { id: 'Cn5-d0EdDFU', song: '가시사랑 — 4MEN', note: 'Empress Ki (2013) OST Part.1 · YouTube' },
-      jp: { id: 'Cn5-d0EdDFU', song: '가시사랑 — 4MEN', note: '奇皇后（2013） OST Part.1 · YouTube' },
-      ko: { id: 'Cn5-d0EdDFU', song: '가시사랑 — 4MEN', note: '기황후 (2013) OST Part.1 · YouTube' }
+      zh: [{ id: '27901889', song: '가시사랑 — 4MEN', note: '《奇皇后》OST Part.1 · 网易云音乐（VIP 单曲）' }, { id: '28095030', song: '사랑합니다 — 金俊秀', note: '《奇皇后》OST Part.3 · 网易云音乐（VIP 单曲）' }],
+      en: [{ id: 'Cn5-d0EdDFU', song: '가시사랑 — 4MEN', note: 'Empress Ki (2013) OST Part.1 · YouTube' }, { id: 'olcpLZV7Lzg', song: '사랑합니다 — XIA (준수)', note: 'Empress Ki (2013) OST Part.3 · YouTube' }],
+      jp: [{ id: 'Cn5-d0EdDFU', song: '가시사랑 — 4MEN', note: '奇皇后（2013） OST Part.1 · YouTube' }, { id: 'olcpLZV7Lzg', song: '사랑합니다 — XIA (준수)', note: '奇皇后（2013） OST Part.3 · YouTube' }],
+      ko: [{ id: 'Cn5-d0EdDFU', song: '가시사랑 — 4MEN', note: '기황후 (2013) OST Part.1 · YouTube' }, { id: 'olcpLZV7Lzg', song: '사랑합니다 — XIA (준수)', note: '기황후 (2013) OST Part.3 · YouTube' }]
     },
     drama4: {
-      zh: { id: '1476000538', song: 'My Wish — 朴正炫', note: '《继承者们》OST Part.8 · 李敏镐×朴信惠 爱情主题曲 · 网易云音乐（VIP 单曲）' },
-      en: { id: 'sOO9QuGKaCY', song: '마음으로만 — 박정현 (Lena Park)', note: 'The Heirs (2013) OST Part.8 · YouTube' },
-      jp: { id: 'sOO9QuGKaCY', song: '마음으로만 — 박정현 (Lena Park)', note: '相続者たち（2013） OST Part.8 · YouTube' },
-      ko: { id: 'sOO9QuGKaCY', song: '마음으로만 — 박정현 (Lena Park)', note: '상속자들 (2013) OST Part.8 · YouTube' }
+      zh: [{ id: '1476000538', song: 'My Wish — 朴正炫', note: '《继承者们》OST Part.8 · 李敏镐×朴信惠 爱情主题曲 · 网易云音乐（VIP 单曲）' }, { id: '27906297', song: '아랫입술 물고 — eSNa', note: '《继承者们》OST Part 4 · 网易云音乐（单曲）' }],
+      en: [{ id: 'sOO9QuGKaCY', song: '마음으로만 — 박정현 (Lena Park)', note: 'The Heirs (2013) OST Part.8 · YouTube' }, { id: 'd-jxqm9JePk', song: '아랫입술 물고 — eSNa', note: 'The Heirs (2013) OST Part 4 · YouTube' }],
+      jp: [{ id: 'sOO9QuGKaCY', song: '마음으로만 — 박정현 (Lena Park)', note: '相続者たち（2013） OST Part.8 · YouTube' }, { id: 'd-jxqm9JePk', song: '아랫입술 물고 — eSNa', note: '相続者たち（2013） OST Part 4 · YouTube' }],
+      ko: [{ id: 'sOO9QuGKaCY', song: '마음으로만 — 박정현 (Lena Park)', note: '상속자들 (2013) OST Part.8 · YouTube' }, { id: 'd-jxqm9JePk', song: '아랫입술 물고 — eSNa', note: '상속자들 (2013) OST Part 4 · YouTube' }]
     },
     drama6: {
-      zh: { id: '5350321', song: '시간을 거슬러 — LYn', note: '《拥抱太阳的月亮》OST Part.2 · 网易云音乐（单曲）' },
-      en: { id: 'BgcRLIXw4dQ', song: '시간을 거슬러 — 린 (LYn)', note: 'The Moon Embracing the Sun (2011–2012) OST Part.2 · YouTube' },
-      jp: { id: 'BgcRLIXw4dQ', song: '시간을 거슬러 — 린 (LYn)', note: '太陽を抱く月（2011–2012） OST Part.2 · YouTube' },
-      ko: { id: 'BgcRLIXw4dQ', song: '시간을 거슬러 — 린 (LYn)', note: '해를 품은 달 (2011–2012) OST Part.2 · YouTube' }
+      zh: [{ id: '5350321', song: '시간을 거슬러 — LYn', note: '《拥抱太阳的月亮》OST Part.2 · 网易云音乐（单曲）' }, { id: '527806269', song: '달빛이 지고 — 임세주', note: '《拥抱太阳的月亮》OST Part 1 · 网易云音乐（单曲）' }],
+      en: [{ id: 'BgcRLIXw4dQ', song: '시간을 거슬러 — 린 (LYn)', note: 'The Moon Embracing the Sun (2011–2012) OST Part.2 · YouTube' }, { id: 'c4EsqYxRcsE', song: '달빛이 지고 — 해오라 (임세주)', note: 'The Moon Embracing the Sun (2011–2012) OST Part 1 · YouTube' }],
+      jp: [{ id: 'BgcRLIXw4dQ', song: '시간을 거슬러 — 린 (LYn)', note: '太陽を抱く月（2011–2012） OST Part.2 · YouTube' }, { id: 'c4EsqYxRcsE', song: '달빛이 지고 — 해오라 (임세주)', note: '太陽を抱く月（2011–2012） OST Part 1 · YouTube' }],
+      ko: [{ id: 'BgcRLIXw4dQ', song: '시간을 거슬러 — 린 (LYn)', note: '해를 품은 달 (2011–2012) OST Part.2 · YouTube' }, { id: 'c4EsqYxRcsE', song: '달빛이 지고 — 해오라 (임세주)', note: '해를 품은 달 (2011–2012) OST Part 1 · YouTube' }]
     },
     drama5: {
-      zh: { id: '5413431', song: '하망연(何茫然) — Alessandro Safina', note: '《大长今》OST 原声配乐 · 网易云音乐（单曲）' },
-      en: { id: 'YrAUxK2SISU', song: 'Hamangyeon (何茫然) — Alessandro Safina', note: 'Jewel in the Palace (2003) OST score · YouTube' },
-      jp: { id: 'YrAUxK2SISU', song: 'Hamangyeon (何茫然) — Alessandro Safina', note: '宮廷女官チャングムの誓い（2003） OST score · YouTube' },
-      ko: { id: 'YrAUxK2SISU', song: 'Hamangyeon (何茫然) — Alessandro Safina', note: '대장금 (2003) OST score · YouTube' }
+      zh: [{ id: '5413431', song: '하망연(何茫然) — Alessandro Safina', note: '《大长今》OST 原声配乐 · 网易云音乐（单曲）' }],
+      en: [{ id: 'YrAUxK2SISU', song: 'Hamangyeon (何茫然) — Alessandro Safina', note: 'Jewel in the Palace (2003) OST score · YouTube' }],
+      jp: [{ id: 'YrAUxK2SISU', song: 'Hamangyeon (何茫然) — Alessandro Safina', note: '宮廷女官チャングムの誓い（2003） OST score · YouTube' }],
+      ko: [{ id: 'YrAUxK2SISU', song: 'Hamangyeon (何茫然) — Alessandro Safina', note: '대장금 (2003) OST score · YouTube' }]
     }
   };
   const bgmSlugs = Object.keys(BGM_PICKS);
-  const bgmBlockOf = (html, slug) => (html.match(new RegExp('data-i18n="picks\\.' + slug + '\\.bgm"[^>]*>([\\s\\S]*?)<\\/p>')) || [])[1] || '';
+  const bgmKey = (slug, i) => 'picks.' + slug + '.bgm' + (i ? '2' : '');
+  const bgmBlockOf = (html, slug, i) => (html.match(new RegExp('data-i18n="' + bgmKey(slug, i) + '"[^>]*>([\\s\\S]*?)<\\/p>')) || [])[1] || '';
+  let bgmTotal = 0;
   for (const slug of bgmSlugs) {
     const card = (state.source.match(new RegExp('<article class="pick-card">\\s*<p class="pick-card-label" data-i18n="picks\\.' + slug + '\\.label">[\\s\\S]*?<\\/article>')) || [])[0] || '';
-    const zhBlock = bgmBlockOf(card, slug);
-    if (!zhBlock) { errors.push('zh: ' + slug + ' 缺 BGM 推荐行'); continue; }
-    const zw = BGM_PICKS[slug].zh;
-    if (!zhBlock.includes('music.163.com/song?id=' + zw.id)) errors.push('zh: ' + slug + ' BGM 链接错误 -> ' + zw.id);
-    if (!zhBlock.includes(zw.song)) errors.push('zh: ' + slug + ' BGM 歌名/歌手漂移');
-    if (!zhBlock.includes(zw.note)) errors.push('zh: ' + slug + ' BGM 说明文案漂移');
-    const zhHref = (zhBlock.match(/href="([^"]+)"/) || [])[1] || '';
-    if (!/music\.163\.com|y\.qq\.com/.test(zhHref)) errors.push('zh: ' + slug + ' BGM 行只能挂网易云/QQ');
-    for (const lang of LANGS) {
-      const want = BGM_PICKS[slug][lang];
-      const block = bgmBlockOf(state.pages[lang] || '', slug);
-      if (!block) { errors.push(lang + ': ' + slug + ' 缺 BGM 推荐行'); continue; }
-      if (!block.includes('youtu.be/' + want.id) && !block.includes('open.spotify.com/track/' + want.id)) errors.push(lang + ': ' + slug + ' BGM 链接错误 -> ' + want.id);
-      if (!block.includes(want.song)) errors.push(lang + ': ' + slug + ' BGM 歌名/歌手漂移');
-      if (!block.includes(want.note)) errors.push(lang + ': ' + slug + ' BGM 说明文案漂移');
-      const href = (block.match(/href="([^"]+)"/) || [])[1] || '';
-      if (!/open\.spotify\.com|youtu\.be|youtube\.com/.test(href)) errors.push(lang + ': ' + slug + ' BGM 行只能挂 Spotify/YouTube');
-      if (/music\.163\.com|y\.qq\.com/.test(block)) errors.push(lang + ': ' + slug + ' 大陆通道不得外溢到外文页');
+    const n = BGM_PICKS[slug].zh.length;
+    bgmTotal += n;
+    for (let i = 0; i < n; i++) {
+      const zw = BGM_PICKS[slug].zh[i];
+      const zhBlock = bgmBlockOf(card, slug, i);
+      if (!zhBlock) { errors.push('zh: ' + slug + ' 缺 BGM 推荐行 ' + (i + 1)); continue; }
+      if (!zhBlock.includes('music.163.com/song?id=' + zw.id) && !zhBlock.includes('y.qq.com')) errors.push('zh: ' + slug + ' BGM 链接错误 -> ' + zw.id);
+      if (!zhBlock.includes(zw.song)) errors.push('zh: ' + slug + ' BGM 歌名/歌手漂移');
+      if (!zhBlock.includes(zw.note)) errors.push('zh: ' + slug + ' BGM 说明文案漂移');
+      const zhHref = (zhBlock.match(/href="([^"]+)"/) || [])[1] || '';
+      if (!/music\.163\.com|y\.qq\.com/.test(zhHref)) errors.push('zh: ' + slug + ' BGM 行只能挂网易云/QQ');
+      for (const lang of LANGS) {
+        const want = BGM_PICKS[slug][lang][i];
+        const block = bgmBlockOf(state.pages[lang] || '', slug, i);
+        if (!block) { errors.push(lang + ': ' + slug + ' 缺 BGM 推荐行 ' + (i + 1)); continue; }
+        if (!block.includes('youtu.be/' + want.id) && !block.includes('open.spotify.com/track/' + want.id)) errors.push(lang + ': ' + slug + ' BGM 链接错误 -> ' + want.id);
+        if (!block.includes(want.song)) errors.push(lang + ': ' + slug + ' BGM 歌名/歌手漂移');
+        if (!block.includes(want.note)) errors.push(lang + ': ' + slug + ' BGM 说明文案漂移');
+        const href = (block.match(/href="([^"]+)"/) || [])[1] || '';
+        if (!/open\.spotify\.com|youtu\.be|youtube\.com/.test(href)) errors.push(lang + ': ' + slug + ' BGM 行只能挂 Spotify/YouTube');
+        if (/music\.163\.com|y\.qq\.com/.test(block)) errors.push(lang + ': ' + slug + ' 大陆通道不得外溢到外文页');
+      }
     }
   }
   const zhBgmCount = (state.source.match(/<p class="pick-bgm"/g) || []).length;
-  if (zhBgmCount !== bgmSlugs.length) errors.push('zh: BGM 推荐行数量应为 ' + bgmSlugs.length + '，实际 ' + zhBgmCount);
+  if (zhBgmCount !== bgmTotal) errors.push('zh: BGM 推荐行数量应为 ' + bgmTotal + '，实际 ' + zhBgmCount);
   for (const lang of LANGS) {
     const n = (state.pages[lang] || '').match(/<p class="pick-bgm"/g) || [];
-    if (n.length !== bgmSlugs.length) errors.push(lang + ': BGM 推荐行数量应为 ' + bgmSlugs.length + '，实际 ' + n.length);
+    if (n.length !== bgmTotal) errors.push(lang + ': BGM 推荐行数量应为 ' + bgmTotal + '，实际 ' + n.length);
   }
   for (const p of [state.source, ...LANGS.map(l => state.pages[l] || '')]) {
     if (/uct2=/.test(p)) errors.push('音乐链接带 uct2 账号令牌，必须脱敏');
@@ -3469,6 +3476,12 @@ const faults = [
   } },
   { name: 'foreign BGM row dropped from the English page', mutate: s => {
     s.pages.en = s.pages.en.replace(/<p class="pick-bgm" data-i18n="picks\.drama4\.bgm">[\s\S]*?<\/p>/, '');
+  } },
+  { name: 'second BGM row removed from the Chinese page', mutate: s => {
+    s.source = s.source.replace(/<p class="pick-bgm" data-i18n="picks\.drama4\.bgm2">[\s\S]*?<\/p>/, '');
+  } },
+  { name: 'second BGM row leaked a mainland channel into the Japanese page', mutate: s => {
+    s.pages.jp = s.pages.jp.replace('https://youtu.be/d-jxqm9JePk', 'https://music.163.com/song?id=27906297');
   } },
 ];
 /* 故障注入用：只改某张卡 actions 里的片段（dict 与生成页同时改，避免只改一半）。 */

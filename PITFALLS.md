@@ -539,3 +539,11 @@
 - **规则二（按区锁平台要做成断言）**：站长的平台规矩要落成机器可验的规则：中文页 BGM 行只能指向 `music.163.com` / `y.qq.com`，外文页只能指向 `open.spotify.com` / `youtu.be` / `youtube.com`，且大陆通道不得外溢到外文页。**按 BGM 行内的 href 判断**，比「全页扫某域名」准（后者会误伤页面上其它用途的链接）。
 - **规则三（YouTube 链接要挑官方频道）**：站内挂 YouTube 时务必用 oEmbed 核对**频道名**（`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=<id>&format=json` 的 `author_name`），优先发行方 / 经纪公司 / OST 官方频道 / 艺人本人或 Topic 号；找歌可用 YouTube 搜索页 HTML 里的 `"videoId":"..."`（页面 SSR 带结果，普通 fetch 就能拿到，无需渲染）。
 - **另（韩剧 OST 在三个平台的收录差别很大）**：网易云与 QQ 对同一批韩剧 OST 的收录不一致（例：《哦！文姬》《医生》(닥터, 2013) 两边都没有；而《车贞淑医生》《大长今》两边都有）。**逐张查，别按剧推断**。
+
+## 73. 一部剧的 OST 不止一首：先扫全 OST 专辑再挑，别只查一首就收工
+
+- **现象**：给剧集卡配 BGM 时，我按「OST Part.N 单曲专辑首曲」只挑了一首就被站长指正：《继承者们》还有《咬住下唇》（아랫입술 물고，OST Part.4，eSNa）。**一部韩剧的 OST 通常有 6~9 个 Part**，每 Part 一首主打曲，另有全曲专辑。
+- **规则一（先扫全，再挑）**：配 BGM 前先把这剧**全部 OST 专辑**列出来（网易云：搜索 type=10 拿专辑 → `api/v1/album/<id>` 拿曲目 → `api/song/detail` 拿歌手；QQ：`search_for_qq_cp?platform=h5` 直接给 songmid / albummid），再从「主打曲 + 另一首代表作」里挑两首挂上，而不是查一首就交工。
+- **规则二（署名要交叉核对）**：《你好妈妈，再见》OST Part.1 网易云记 JAMIE（제이미），Bugs / Genie 专辑页的 아티스트 也写 JAMIE（제이미），但专辑介绍写「박지민 - 별처럼 빛나는 시간」——**JAMIE 就是 박지민**，同一录音；而《亲爱的恩东啊》的《처음 너를 본 순간》在网易云记「남혜승」、韩方 Topic 号却是「Park Sang Hee」，**署名对不上就不挂**，宁缺勿错。
+- **规则三（官方 MV 优先级）**：外文页挂 YouTube 按「发行方 / 经纪公司官方 MV（STONE MUSIC、MUSIC&NEW、VLENDING、Warner、RIAK、1theK、DOREMI 等）→ 艺人本人频道 / 官方 Topic → 官方音频 → 非官方 MV」挑，每条用 oEmbed 核对 `author_name`。同一首歌常有多个版本（eSNa 的《아랫입술 물고》有韩文原版与 **Eng. ver.** 两支），**别把英文版当原曲挂**。
+- **另（登记表要能放多首）**：`BGM_PICKS` 这类登记表别只存「每卡一首」，存成数组；写生成器时注意**同一个 key 写两遍后者会覆盖前者**（曾因此让校验只看到最后一首），一个语种一行、整行拼成一个数组。
