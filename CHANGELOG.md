@@ -12,6 +12,8 @@
 - 14 条外文链接逐条 oEmbed 复核（HTTP 200 + 歌名 + 频道），**频道全部是发行方 / 经纪公司 / OST 官方 / 艺人本人号**：Warner Music Korea、MUSIC&NEW 뮤직앤뉴、VLENDING 블렌딩、Luna OST드라마（tvN）、STONE MUSIC、Dreamus Music、DOREMI Entertainment、1theK（원더케이）、RIAK OFFICIAL、Alessandro Safina（艺人 Topic 号）、Lena Park（艺人本人频道）。
 - 外文页说明文案用**各语区自己的剧名**（en `The Heirs (2013)` / jp「相続者たち（2013）」/ ko「상속자들 (2013)」）+ OST Part 号 + 平台名；歌名与歌手按官方 OST 命名（韩文原名，需要时附罗马字）。
 - 校验：新增 `BGM_PICKS` 登记表（14 条 × 四语，逐条锁定 id / 歌名 / 说明文案）+ **按区锁平台**的断言（中文页 BGM 行只能指向 `music.163.com` / `y.qq.com`；外文三页只能指向 `open.spotify.com` / `youtu.be` / `youtube.com`，且大陆通道不得外溢）+ 四语行数一致 + 全站 `uct2` 扫描；故障注入改为 7 条（删行 / 带 uct2 / 中文行挂 YouTube / 外文行泄漏网易云 / 换同剧另一首 / 说明漂移 / 外文页少一行）。结果 `VERIFY OK · 451 translated nodes · 69 translated attributes · 4 languages`，`SELF-TEST 275/275 injected faults rejected`。
+- 站长指正两处：**《哲仁王后》**那条我原挂的是 Luna OST드라마 的 1 小时音频，站长指正应挂官方 MV，已换成 `youtu.be/BbZLHTfub3c`（Im Han Byul — 별들 중에서，Mr. Queen OST Part.8 MV，`si=` 跟踪参数照惯例去掉）；据此把「MV 优先、1 小时音频兜底」的取向统一到**《你好妈妈，再见》**，也换成 MV（`youtu.be/EDXVhBn9RB4`，Park Ji Min — 별처럼 빛나는 시간，Hi Bye Mama! OST Part.1 MV）。
+- 顺带核实：《你好妈妈，再见》OST Part.1 的主唱 **JAMIE（제이미）就是 박지민**（Bugs / Genie 专辑页：아티스트 JAMIE（제이미），专辑介绍写「박지민 - 별처럼 빛나는 시간」），网易云记作 JAMIE、韩方记作 박지민，是同一人同一录音，不存在挂错版本。
 - 《哦！文姬》《医生》(닥터, 2013) 仍无 BGM：两个大陆平台都没有这两部的 OST（且它们本就没有人声单曲），见上一条记录。
 
 ## 2026-11-28 · 看韩剧区 BGM 推荐行扩到 14 张卡（逐部查网易云 OST，仍只挂中文区）

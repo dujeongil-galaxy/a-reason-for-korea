@@ -2165,15 +2165,15 @@ function verify(state) {
     },
     drama7: {
       zh: { id: '1818581719', song: '별들 중에서 — 林韩星', note: '《哲仁王后》OST Part.8 · 网易云音乐（VIP 单曲）' },
-      en: { id: 'EVXozIP0Nxk', song: '별들 중에서 — 임한별', note: 'Mr. Queen (2020) OST Part.8 · YouTube' },
-      jp: { id: 'EVXozIP0Nxk', song: '별들 중에서 — 임한별', note: '哲仁王后（2020） OST Part.8 · YouTube' },
-      ko: { id: 'EVXozIP0Nxk', song: '별들 중에서 — 임한별', note: '철인왕후 (2020) OST Part.8 · YouTube' }
+      en: { id: 'BbZLHTfub3c', song: '별들 중에서 — 임한별', note: 'Mr. Queen (2020) OST Part.8 · YouTube' },
+      jp: { id: 'BbZLHTfub3c', song: '별들 중에서 — 임한별', note: '哲仁王后（2020） OST Part.8 · YouTube' },
+      ko: { id: 'BbZLHTfub3c', song: '별들 중에서 — 임한별', note: '철인왕후 (2020) OST Part.8 · YouTube' }
     },
     drama8: {
       zh: { id: '1427705631', song: '별처럼 빛나는 시간 — JAMIE', note: '《你好妈妈，再见》OST Part.1 · 网易云音乐（VIP 单曲）' },
-      en: { id: 'FBgco0xCm7c', song: '별처럼 빛나는 시간 — 제이미 (JAMIE)', note: 'Hi Bye, Mama! (2020) OST Part.1 · YouTube' },
-      jp: { id: 'FBgco0xCm7c', song: '별처럼 빛나는 시간 — 제이미 (JAMIE)', note: 'ハイ バイ ママ！（2020） OST Part.1 · YouTube' },
-      ko: { id: 'FBgco0xCm7c', song: '별처럼 빛나는 시간 — 제이미 (JAMIE)', note: '하이바이, 마마! (2020) OST Part.1 · YouTube' }
+      en: { id: 'EDXVhBn9RB4', song: '별처럼 빛나는 시간 — 제이미 (JAMIE)', note: 'Hi Bye, Mama! (2020) OST Part.1 · YouTube' },
+      jp: { id: 'EDXVhBn9RB4', song: '별처럼 빛나는 시간 — 제이미 (JAMIE)', note: 'ハイ バイ ママ！（2020） OST Part.1 · YouTube' },
+      ko: { id: 'EDXVhBn9RB4', song: '별처럼 빛나는 시간 — 제이미 (JAMIE)', note: '하이바이, 마마! (2020) OST Part.1 · YouTube' }
     },
     drama11: {
       zh: { id: '421423448', song: '너만 보여 — 柳智娴', note: '《打架吧鬼神》OST Part.1 · 网易云音乐（VIP 单曲）' },
