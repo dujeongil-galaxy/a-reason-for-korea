@@ -2139,21 +2139,42 @@ function verify(state) {
   /* ---------- 2026-11-28：剧集卡 BGM 推荐（暂只挂中文区） ----------
      站长要求：先只做中文区看效果，外文区暂不做。故 BGM 行用 data-zh-only 标记，
      由 build-i18n.mjs 在生成 en/jp/ko 时整块摘除（不走 i18n 字典）。
-     不变量：① 中文源页 BGM 行存在、挂在《继承者们》卡上、链接已脱敏（不带 uct2 账号令牌）；
+     登记表 BGM_PICKS：每张卡挂哪首 OST 主打曲（网易云 id / 歌名+歌手 / 说明文案）逐条锁定。
+     不变量：① 每张卡的 BGM 行都挂在自己的卡上、链接与文案一字不差、链接已脱敏（不带 uct2）；
      ② 外文三页不得出现 BGM 行，也不得出现网易云歌曲链接（大陆通道不外溢）；
-     ③ BGM 行不得带 data-i18n 键（否则四语对不上）。 */
-  const BGM_LINK = 'https://music.163.com/song?id=1476000538';
-  const bgmBlock = (state.source.match(/<p class="pick-bgm"[\s\S]*?<\/p>/) || [])[0] || '';
-  if (!bgmBlock) errors.push('zh: BGM 推荐行缺失');
-  else {
-    if (!bgmBlock.includes(BGM_LINK)) errors.push('zh: BGM 推荐行链接错误/缺失');
-    if (!bgmBlock.includes('data-zh-only')) errors.push('zh: BGM 推荐行必须标 data-zh-only');
-    if (bgmBlock.includes('data-i18n')) errors.push('zh: BGM 推荐行不得带 data-i18n 键');
+     ③ BGM 行不得带 data-i18n 键（否则四语对不上）；④ BGM 行总数必须等于登记条数。
+     注：《哦！文姬》《医生》(닥터, 2013) 的 OST 网易云未收录，故这两张卡不挂 BGM。 */
+  const BGM_PICKS = {
+    drama9:  { id: '2738613686', song: '시간을 넘어 너에게로 — 道英',   note: '《暴君的厨师》OST Part.1 · 网易云音乐（VIP 单曲）' },
+    drama1:  { id: '2043178599', song: '숨 — 郑承焕',                    note: '《车贞淑医生》OST Part.3 · 网易云音乐（VIP 单曲）' },
+    drama10: { id: '2108515847', song: '기적은 없어도 — 徐仁国',           note: '《死期将至》OST Part.2 · 网易云音乐（单曲）' },
+    drama7:  { id: '1818581719', song: '별들 중에서 — 林韩星',             note: '《哲仁王后》OST Part.8 · 网易云音乐（VIP 单曲）' },
+    drama8:  { id: '1427705631', song: '별처럼 빛나는 시간 — JAMIE',      note: '《你好妈妈，再见》OST Part.1 · 网易云音乐（VIP 单曲）' },
+    drama11: { id: '421423448',  song: '너만 보여 — 柳智娴',              note: '《打架吧鬼神》OST Part.1 · 网易云音乐（VIP 单曲）' },
+    drama13: { id: '412902448',  song: 'Baby Blue — Kevin Oh',           note: '《我亲爱的朋友们》OST Part.1 · 网易云音乐（VIP 单曲）' },
+    drama2:  { id: '35345403',   song: 'Shooting Star — 寒星',           note: '《无理的前进》OST Part.2 · 网易云音乐（VIP 单曲）' },
+    drama12: { id: '32451208',   song: '내맘이 그래요 — 金泰贤',          note: '《亲爱的恩东啊》OST Part.1 · 网易云音乐（VIP 单曲）' },
+    drama3:  { id: '28228208',   song: '안녕 — 孝琳',                     note: '《来自星星的你》OST Part.4 · 网易云音乐（VIP 单曲）' },
+    drama14: { id: '27901889',   song: '가시사랑 — 4MEN',                note: '《奇皇后》OST Part.1 · 网易云音乐（VIP 单曲）' },
+    drama4:  { id: '1476000538', song: 'My Wish — 朴正炫',               note: '《继承者们》OST Part.8 · 李敏镐×朴信惠 爱情主题曲 · 网易云音乐（VIP 单曲）' },
+    drama6:  { id: '5350321',    song: '시간을 거슬러 — LYn',             note: '《拥抱太阳的月亮》OST Part.2 · 网易云音乐（单曲）' },
+    drama5:  { id: '5413431',    song: '하망연(何茫然) — Alessandro Safina', note: '《大长今》OST 原声配乐 · 网易云音乐（单曲）' }
+  };
+  const bgmBlocks = state.source.match(/<p class="pick-bgm"[\s\S]*?<\/p>/g) || [];
+  if (bgmBlocks.length !== Object.keys(BGM_PICKS).length)
+    errors.push('zh: BGM 推荐行数量应为 ' + Object.keys(BGM_PICKS).length + '，实际 ' + bgmBlocks.length);
+  for (const slug of Object.keys(BGM_PICKS)) {
+    const want = BGM_PICKS[slug];
+    const card = (state.source.match(new RegExp('<article class="pick-card">\\s*<p class="pick-card-label" data-i18n="picks\\.' + slug + '\\.label">[\\s\\S]*?<\\/article>')) || [])[0] || '';
+    if (!card) { errors.push('zh: ' + slug + ' 卡片缺失，无法校验 BGM'); continue; }
+    const block = (card.match(/<p class="pick-bgm"[\s\S]*?<\/p>/) || [])[0] || '';
+    if (!block) { errors.push('zh: ' + slug + ' 缺 BGM 推荐行'); continue; }
+    if (!block.includes('https://music.163.com/song?id=' + want.id)) errors.push('zh: ' + slug + ' BGM 链接错误 -> ' + want.id);
+    if (!block.includes(want.song)) errors.push('zh: ' + slug + ' BGM 歌名/歌手漂移');
+    if (!block.includes(want.note)) errors.push('zh: ' + slug + ' BGM 说明文案漂移');
+    if (!block.includes('data-zh-only')) errors.push('zh: ' + slug + ' BGM 行必须标 data-zh-only');
+    if (block.includes('data-i18n')) errors.push('zh: ' + slug + ' BGM 行不得带 data-i18n 键');
   }
-  if ((state.source.match(/class="pick-bgm"/g) || []).length !== 1)
-    errors.push('zh: BGM 推荐行数量必须为 1');
-  const drama4Card = (state.source.match(/<article class="pick-card">\s*<p class="pick-card-label" data-i18n="picks\.drama4\.label">[\s\S]*?<\/article>/) || [])[0] || '';
-  if (drama4Card && !drama4Card.includes('pick-bgm')) errors.push('zh: BGM 推荐行必须挂在《继承者们》卡上');
   for (const p of [state.source, ...LANGS.map(l => state.pages[l] || '')]) {
     if (/uct2=/.test(p)) errors.push('音乐链接带 uct2 账号令牌，必须脱敏');
     if (/music\.163\.com\/song\?id=\d+&/.test(p)) errors.push('网易云歌曲链接未脱敏');
@@ -3362,6 +3383,12 @@ const faults = [
   { name: 'BGM line given a data-i18n key', mutate: s => {
     s.source = s.source.replace('<p class="pick-bgm" data-zh-only>',
       '<p class="pick-bgm" data-zh-only data-i18n="picks.drama4.bgm">');
+  } },
+  { name: 'BGM song swapped for another track of the same drama', mutate: s => {
+    s.source = s.source.replace('https://music.163.com/song?id=28228208', 'https://music.163.com/song?id=28190474');
+  } },
+  { name: 'BGM note wording drifted', mutate: s => {
+    s.source = s.source.replace('《来自星星的你》OST Part.4', '《来自星星的你》主题曲');
   } },
 ];
 /* 故障注入用：只改某张卡 actions 里的片段（dict 与生成页同时改，避免只改一半）。 */
